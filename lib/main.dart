@@ -1,7 +1,27 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-void main() {
-  runApp(const WakeUpApp());
+// ─────────────────────────────────────────────
+// 时间表配置（名称 + 20节时间）
+// ─────────────────────────────────────────────
+
+class TimeTableConfig {
+  final String name;
+  final List<List<String>> times;
+
+  TimeTableConfig({required this.name, required this.times});
+
+  Map<String, dynamic> toJson() => {'name': name, 'times': times};
+
+  factory TimeTableConfig.fromJson(Map<String, dynamic> j) => TimeTableConfig(
+    name:  j['name'] as String? ?? '时间表',
+    times: (j['times'] as List).map((r) => (r as List).cast<String>()).toList(),
+  );
+
+  TimeTableConfig copyWith({String? name, List<List<String>>? times}) =>
+      TimeTableConfig(name: name ?? this.name, times: times ?? this.times);
 }
 
 // ─────────────────────────────────────────────
@@ -35,14 +55,36 @@ class ScheduleConfig {
     sectionsPerDay: sectionsPerDay ?? this.sectionsPerDay,
     totalWeeks:     totalWeeks     ?? this.totalWeeks,
   );
+
+  Map<String, dynamic> toJson() => {
+    'name':           name,
+    'firstWeekDay':   firstWeekDay.millisecondsSinceEpoch,
+    'sectionsPerDay': sectionsPerDay,
+    'totalWeeks':     totalWeeks,
+  };
+
+  factory ScheduleConfig.fromJson(Map<String, dynamic> j) => ScheduleConfig(
+    name:           j['name'] as String,
+    firstWeekDay:   DateTime.fromMillisecondsSinceEpoch(j['firstWeekDay'] as int),
+    sectionsPerDay: j['sectionsPerDay'] as int,
+    totalWeeks:     j['totalWeeks'] as int,
+  );
 }
 
 class AppState extends ChangeNotifier {
-  List<List<String>> customTimes;
+  List<TimeTableConfig> allTimeTables;
+  int activeTimeTableIndex;
+
+  // 向后兼容：当前激活时间表的 times
+  List<List<String>> get customTimes => allTimeTables[activeTimeTableIndex].times;
 
   bool showWeekend;
   bool showNonWeek;
   bool showSection;
+
+  // 全局主题色（null = 使用 kCourseColors[0] 默认值）
+  int? themeColorValue;
+  Color get themeColor => themeColorValue != null ? Color(themeColorValue!) : kCourseColors[0];
 
   // ── 多课表：每张课表独立配置 + 课程数据 ──
   List<ScheduleConfig> allConfigs;
@@ -57,14 +99,21 @@ class AppState extends ChangeNotifier {
   static final _defaultFirstWeekDay = DateTime(DateTime.now().year, 9, 1);
 
   AppState({
-    required this.customTimes,
+    List<TimeTableConfig>? allTimeTables,
+    this.activeTimeTableIndex = 0,
     required List<Course> initialCourses,
     this.showWeekend        = true,
     this.showNonWeek        = true,
     this.showSection        = true,
+    this.themeColorValue,
     this.activeScheduleIndex = 0,
     List<ScheduleConfig>? allConfigs,
-  }) : allConfigs = allConfigs ?? [
+  }) : allTimeTables = allTimeTables ?? [
+         TimeTableConfig(
+           name: '默认',
+           times: kTimeSlots.map((s) => [s.start, s.end]).toList(),
+         ),
+       ], allConfigs = allConfigs ?? [
          ScheduleConfig(
            name:           '新建课表',
            firstWeekDay:   _defaultFirstWeekDay,
@@ -149,16 +198,177 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTimes(List<List<String>> times) {
-    customTimes = times;
+  void renameSchedule(int index, String name) {
+    allConfigs = List.from(allConfigs)
+      ..[index] = allConfigs[index].copyWith(name: name);
     notifyListeners();
   }
 
+  // ── 时间表管理 ──
+  void updateTimeTable(int index, List<List<String>> times) {
+    allTimeTables = List.from(allTimeTables)
+      ..[index] = allTimeTables[index].copyWith(times: times);
+    notifyListeners();
+  }
+
+  void renameTimeTable(int index, String name) {
+    allTimeTables = List.from(allTimeTables)
+      ..[index] = allTimeTables[index].copyWith(name: name);
+    notifyListeners();
+  }
+
+  void addTimeTable(String name) {
+    allTimeTables = [
+      ...allTimeTables,
+      TimeTableConfig(
+        name: name,
+        times: kTimeSlots.map((s) => [s.start, s.end]).toList(),
+      ),
+    ];
+    notifyListeners();
+  }
+
+  void deleteTimeTable(int index) {
+    if (allTimeTables.length <= 1) return; // 至少保留一个
+    allTimeTables = List.from(allTimeTables)..removeAt(index);
+    if (activeTimeTableIndex >= allTimeTables.length) {
+      activeTimeTableIndex = allTimeTables.length - 1;
+    }
+    notifyListeners();
+  }
+
+  void switchTimeTable(int index) {
+    activeTimeTableIndex = index.clamp(0, allTimeTables.length - 1);
+    notifyListeners();
+  }
+
+  // 向后兼容旧调用
+  void updateTimes(List<List<String>> times) => updateTimeTable(activeTimeTableIndex, times);
+
   void updateSettings({bool? showWeekend, bool? showNonWeek, bool? showSection}) {
     if (showWeekend != null) this.showWeekend = showWeekend;
-    if (showNonWeek != null) this.showNonWeek = showNonWeek;
-    if (showSection != null) this.showSection = showSection;
+    if (showNonWeek  != null) this.showNonWeek  = showNonWeek;
+    if (showSection  != null) this.showSection  = showSection;
     notifyListeners();
+  }
+
+  void updateThemeColor(Color color) {
+    themeColorValue = color.value;
+    notifyListeners();
+  }
+
+  // ── 持久化 ──
+
+  static const _kPrefsKey = 'wakeup_app_state_v1';
+
+  /// 每次状态变更后自动触发保存
+  @override
+  void notifyListeners() {
+    super.notifyListeners();
+    _scheduleSave();
+  }
+
+  bool _savePending = false;
+  void _scheduleSave() {
+    if (_savePending) return;
+    _savePending = true;
+    // microtask 延迟，合并同帧内多次变更为一次写入
+    Future.microtask(() async {
+      _savePending = false;
+      await saveToPrefs();
+    });
+  }
+
+  Future<void> saveToPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final data = jsonEncode({
+        'activeScheduleIndex':  activeScheduleIndex,
+        'activeTimeTableIndex': activeTimeTableIndex,
+        'showWeekend':  showWeekend,
+        'showNonWeek':  showNonWeek,
+        'showSection':  showSection,
+        'themeColorValue': themeColorValue,
+        'allTimeTables': allTimeTables.map((t) => t.toJson()).toList(),
+        'allConfigs':   allConfigs.map((c) => c.toJson()).toList(),
+        'allCourses':   allCourses
+            .map((list) => list.map((c) => c.toJson()).toList())
+            .toList(),
+      });
+      await prefs.setString(_kPrefsKey, data);
+    } catch (e) {
+      debugPrint('AppState.saveToPrefs error: $e');
+    }
+  }
+
+  static Future<AppState> loadFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_kPrefsKey);
+      if (raw != null) {
+        final j = jsonDecode(raw) as Map<String, dynamic>;
+
+        final allConfigs = (j['allConfigs'] as List)
+            .map((e) => ScheduleConfig.fromJson(e as Map<String, dynamic>))
+            .toList();
+
+        final allCourses = (j['allCourses'] as List)
+            .map((list) => (list as List)
+                .map((e) => Course.fromJson(e as Map<String, dynamic>))
+                .toList())
+            .toList();
+
+        // 兼容旧数据：优先读 allTimeTables，否则从 customTimes 迁移
+        List<TimeTableConfig> allTimeTables;
+        if (j['allTimeTables'] != null) {
+          allTimeTables = (j['allTimeTables'] as List)
+              .map((e) => TimeTableConfig.fromJson(e as Map<String, dynamic>))
+              .toList();
+        } else if (j['customTimes'] != null) {
+          final rawTimes = j['customTimes'] as List;
+          final times = rawTimes.map((row) => (row as List).cast<String>()).toList();
+          allTimeTables = [TimeTableConfig(name: '默认', times: times)];
+        } else {
+          allTimeTables = [TimeTableConfig(
+            name: '默认',
+            times: kTimeSlots.map((s) => [s.start, s.end]).toList(),
+          )];
+        }
+
+        return AppState(
+          allTimeTables:        allTimeTables,
+          activeTimeTableIndex: j['activeTimeTableIndex'] as int? ?? 0,
+          initialCourses:      [],
+          activeScheduleIndex: j['activeScheduleIndex'] as int? ?? 0,
+          allConfigs:          allConfigs,
+          showWeekend:         j['showWeekend'] as bool? ?? true,
+          showNonWeek:         j['showNonWeek'] as bool? ?? true,
+          showSection:         j['showSection'] as bool? ?? true,
+          themeColorValue:     j['themeColorValue'] as int?,
+        ).._loadedCourses(allCourses);
+      }
+    } catch (e) {
+      debugPrint('AppState.loadFromPrefs error: $e');
+    }
+    // 返回默认初始状态
+    return AppState(
+      initialCourses: [],
+      activeScheduleIndex: 0,
+      allConfigs: [
+        ScheduleConfig(
+          name:           '新建课表',
+          firstWeekDay:   DateTime(DateTime.now().year, 9, 1),
+          sectionsPerDay: 20,
+          totalWeeks:     20,
+        ),
+      ],
+    );
+  }
+
+  /// 构造后直接注入已加载的课程列表（绕过 initialCourses 限制）
+  AppState _loadedCourses(List<List<Course>> loaded) {
+    allCourses = loaded;
+    return this;
   }
 }
 
@@ -184,6 +394,51 @@ class TimeSlot {
   const TimeSlot(this.section, this.start, this.end);
 }
 
+// ─────────────────────────────────────────────
+// 附加时间段数据类
+// ─────────────────────────────────────────────
+
+class CourseSlot {
+  int day;
+  int startSection;
+  int endSection;
+  int startWeek;
+  int endWeek;
+
+  CourseSlot({
+    required this.day,
+    required this.startSection,
+    required this.endSection,
+    required this.startWeek,
+    required this.endWeek,
+  });
+
+  int get span => (endSection - startSection + 1).clamp(1, 20);
+  List<int> get weeks => List.generate(endWeek - startWeek + 1, (i) => startWeek + i);
+
+  CourseSlot copyWith({int? day, int? startSection, int? endSection, int? startWeek, int? endWeek}) =>
+      CourseSlot(
+        day:          day          ?? this.day,
+        startSection: startSection ?? this.startSection,
+        endSection:   endSection   ?? this.endSection,
+        startWeek:    startWeek    ?? this.startWeek,
+        endWeek:      endWeek      ?? this.endWeek,
+      );
+
+  Map<String, dynamic> toJson() => {
+    'day': day, 'startSection': startSection, 'endSection': endSection,
+    'startWeek': startWeek, 'endWeek': endWeek,
+  };
+
+  factory CourseSlot.fromJson(Map<String, dynamic> j) => CourseSlot(
+    day:          j['day'] as int,
+    startSection: j['startSection'] as int,
+    endSection:   j['endSection'] as int? ?? j['startSection'] as int,
+    startWeek:    j['startWeek'] as int? ?? 1,
+    endWeek:      j['endWeek'] as int? ?? 18,
+  );
+}
+
 class Course {
   final int id;
   final String name;
@@ -195,15 +450,23 @@ class Course {
   final int startSection;
   final int span;
   final int colorIdx;
-  final Color? customColor; // 任意颜色，优先于 colorIdx
+  final Color? customColor;
   final bool isNonWeek;
   final List<int> weeks;
   final int startWeek;
   final int endWeek;
+  final List<CourseSlot> extraSlots;
 
-  // 实际使用的颜色
   Color get effectiveColor =>
       customColor ?? kCourseColors[colorIdx % kCourseColors.length];
+
+  /// 所有时间段（主 + 附加），供网格渲染遍历
+  List<CourseSlot> get allSlots => [
+    CourseSlot(day: day, startSection: startSection,
+        endSection: startSection + span - 1,
+        startWeek: startWeek, endWeek: endWeek),
+    ...extraSlots,
+  ];
 
   Course({
     required this.id,
@@ -221,7 +484,48 @@ class Course {
     required this.weeks,
     this.startWeek = 1,
     this.endWeek = 18,
+    this.extraSlots = const [],
   });
+
+  Map<String, dynamic> toJson() => {
+    'id':           id,
+    'name':         name,
+    'location':     location,
+    'teacher':      teacher,
+    'credit':       credit,
+    'note':         note,
+    'day':          day,
+    'startSection': startSection,
+    'span':         span,
+    'colorIdx':     colorIdx,
+    'customColor':  customColor?.value,
+    'isNonWeek':    isNonWeek,
+    'weeks':        weeks,
+    'startWeek':    startWeek,
+    'endWeek':      endWeek,
+    'extraSlots':   extraSlots.map((s) => s.toJson()).toList(),
+  };
+
+  factory Course.fromJson(Map<String, dynamic> j) => Course(
+    id:           j['id'] as int,
+    name:         j['name'] as String,
+    location:     j['location'] as String? ?? '',
+    teacher:      j['teacher'] as String? ?? '',
+    credit:       j['credit'] as String? ?? '',
+    note:         j['note'] as String? ?? '',
+    day:          j['day'] as int,
+    startSection: j['startSection'] as int,
+    span:         j['span'] as int,
+    colorIdx:     j['colorIdx'] as int? ?? 0,
+    customColor:  j['customColor'] != null ? Color(j['customColor'] as int) : null,
+    isNonWeek:    j['isNonWeek'] as bool? ?? false,
+    weeks:        (j['weeks'] as List).cast<int>(),
+    startWeek:    j['startWeek'] as int? ?? 1,
+    endWeek:      j['endWeek'] as int? ?? 18,
+    extraSlots:   (j['extraSlots'] as List? ?? [])
+        .map((e) => CourseSlot.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
 
 }
 
@@ -292,6 +596,11 @@ final List<Course> kInitialCourses = [
   Course(id: 15, name: '生物信息数据挖掘',   location: '',             day: 3, startSection: 9, span: 2, colorIdx: 2, isNonWeek: true, weeks: kEvenWeeks),
 ];
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const WakeUpApp());
+}
+
 // ─────────────────────────────────────────────
 // 根 App
 // ─────────────────────────────────────────────
@@ -303,36 +612,50 @@ class WakeUpApp extends StatefulWidget {
 }
 
 class _WakeUpAppState extends State<WakeUpApp> {
-  late final AppState _appState;
+  AppState? _appState;
 
   @override
   void initState() {
     super.initState();
-    _appState = AppState(
-      customTimes:    kTimeSlots.map((s) => [s.start, s.end]).toList(),
-      initialCourses: [],
-      activeScheduleIndex: 0,
-      allConfigs: [
-        ScheduleConfig(
-          name:           '新建课表',
-          firstWeekDay:   DateTime(DateTime.now().year, 9, 1),
-          sectionsPerDay: 20,
-          totalWeeks:     20,
-        ),
-      ],
-    );
+    _loadState();
+  }
+
+  Future<void> _loadState() async {
+    final state = await AppState.loadFromPrefs();
+    if (mounted) setState(() => _appState = state);
   }
 
   @override
   void dispose() {
-    _appState.dispose();
+    _appState?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = _appState;
+    if (state == null) {
+      // 启动加载屏
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          backgroundColor: const Color(0xFF1C1C1E),
+          body: const Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: Color(0xFF4ECDC4), strokeWidth: 2),
+                SizedBox(height: 20),
+                Text('正在加载课表…',
+                    style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return AppStateScope(
-      notifier: _appState,
+      notifier: state,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'WakeUp 课程表',
@@ -457,12 +780,43 @@ class _SchedulePageState extends State<SchedulePage> {
                     visibleForWeek = visibleForWeek.where((c) => !c.isNonWeek).toList();
                   }
                   List<Course> getCoursesAt(int day, int section) {
-                    return visibleForWeek
-                        .where((c) =>
-                            c.day == day &&
-                            section >= c.startSection &&
-                            section < c.startSection + c.span)
-                        .toList();
+                    final result = <Course>[];
+                    // 主时间段
+                    for (final c in visibleForWeek) {
+                      if (c.day == day &&
+                          section >= c.startSection &&
+                          section < c.startSection + c.span) {
+                        result.add(c);
+                      }
+                    }
+                    // 附加时间段：包装成虚拟 Course 供网格渲染
+                    for (final c in courses) {
+                      for (final s in c.extraSlots) {
+                        if (s.weeks.contains(week) &&
+                            s.day == day &&
+                            section >= s.startSection &&
+                            section < s.startSection + s.span) {
+                          result.add(Course(
+                            id: c.id,
+                            name: c.name,
+                            location: c.location,
+                            teacher: c.teacher,
+                            credit: c.credit,
+                            note: c.note,
+                            day: s.day,
+                            startSection: s.startSection,
+                            span: s.span,
+                            colorIdx: c.colorIdx,
+                            customColor: c.customColor,
+                            isNonWeek: c.isNonWeek,
+                            weeks: s.weeks,
+                            startWeek: s.startWeek,
+                            endWeek: s.endWeek,
+                          ));
+                        }
+                      }
+                    }
+                    return result;
                   }
                   return Column(
                     children: [
@@ -510,12 +864,13 @@ class _SchedulePageState extends State<SchedulePage> {
           Navigator.pop(context);
         },
         onEdit: () {
+          final appState = AppStateScope.of(context);
           Navigator.pop(context);
           Navigator.push(context, MaterialPageRoute(
             fullscreenDialog: true,
             builder: (_) => AddCoursePage(
               editCourse: course,
-              onEdit: (updated) => AppStateScope.of(context).editCourse(updated),
+              onEdit: (updated) => appState.editCourse(updated),
             ),
           ));
         },
@@ -551,9 +906,7 @@ class _SchedulePageState extends State<SchedulePage> {
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (_) => AddCoursePage(
-          onAdd: (c) {
-            _addCourse(c);
-          },
+          onAdd: (_) {}, // _save 内部已直接调用 appState.addCourse
         ),
       ),
     );
@@ -865,7 +1218,6 @@ class _ScheduleGrid extends StatelessWidget {
                           ? const Color(0xFF4ECDC4).withOpacity(0.1)
                           : Colors.transparent,
                       border: const Border(
-                        right: BorderSide(color: Color(0x10000000)),
                         bottom: BorderSide(color: Color(0x08000000)),
                       ),
                     ),
@@ -935,15 +1287,16 @@ class _DayColumn extends StatelessWidget {
     final totalHeight = sectionCount * kSlotHeight;
 
     // 收集每天需要渲染的课程（只取 startSection 处的）
-    final Set<int> rendered = {};
+    final Set<String> rendered = {};
     final List<_CoursePosition> positioned = [];
 
     for (int sIdx = 0; sIdx < sectionCount; sIdx++) {
       final section = sIdx + 1;
       final cs = getCoursesAt(day, section);
       for (final c in cs) {
-        if (c.startSection == section && !rendered.contains(c.id)) {
-          rendered.add(c.id);
+        final key = '${c.id}_${c.day}_${c.startSection}';
+        if (c.startSection == section && !rendered.contains(key)) {
+          rendered.add(key);
           positioned.add(_CoursePosition(
             course: c,
             top: sIdx * kSlotHeight,
@@ -1020,7 +1373,17 @@ class _CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = course.effectiveColor;
+    // customColor 优先；否则用调色板，但 colorIdx 0 受全局主题色覆盖
+    Color color;
+    if (course.customColor != null) {
+      color = course.customColor!;
+    } else {
+      final idx = course.colorIdx % kCourseColors.length;
+      final appState = AppStateScope.of(context);
+      color = (idx == 0 && appState.themeColorValue != null)
+          ? appState.themeColor
+          : kCourseColors[idx];
+    }
     final opacity = course.isNonWeek ? 0.55 : 1.0;
 
     return GestureDetector(
@@ -1510,7 +1873,7 @@ class _ToolCell extends StatelessWidget {
     Widget page;
     switch (tool.route) {
       case 'class_time':
-        page = const ClassTimePage();
+        page = const ClassTimeListPage();
         break;
       case 'schedule_settings':
         page = const ScheduleSettingsPage();
@@ -1522,8 +1885,34 @@ class _ToolCell extends StatelessWidget {
         page = const GlobalSettingsPage();
         break;
       case 'export':
-        page = const ExportPage();
-        break;
+        Navigator.pop(context); // 关闭菜单
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: const Color(0xFF2C2C2E),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              title: const Row(children: [
+                Icon(Icons.ios_share_outlined, color: Color(0xFF8E8E93), size: 20),
+                SizedBox(width: 8),
+                Text('导出课表', style: TextStyle(
+                    color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+              ]),
+              content: const Text(
+                '「导出课表」功能正在开发中，敬请期待。',
+                style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('好的',
+                      style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
+                ),
+              ],
+            ),
+          );
+        });
+        return;
       case 'about':
       default:
         page = const AboutPage();
@@ -1560,6 +1949,35 @@ class _ToolCell extends StatelessWidget {
 // 添加/编辑课程全屏页（仿 WakeUp 深色风格）
 // ─────────────────────────────────────────────
 
+// 单个时间段（仅用于 AddCoursePage 内部编辑状态）
+class _CourseSlot {
+  int day;
+  int startSection;
+  int endSection;
+  int startWeek;
+  int endWeek;
+
+  _CourseSlot({
+    required this.day,
+    required this.startSection,
+    required this.endSection,
+    required this.startWeek,
+    required this.endWeek,
+  });
+
+  int get span => (endSection - startSection + 1).clamp(1, 20);
+  List<int> get weeks => List.generate(endWeek - startWeek + 1, (i) => startWeek + i);
+
+  _CourseSlot copyWith({int? day, int? startSection, int? endSection, int? startWeek, int? endWeek}) =>
+      _CourseSlot(
+        day:          day          ?? this.day,
+        startSection: startSection ?? this.startSection,
+        endSection:   endSection   ?? this.endSection,
+        startWeek:    startWeek    ?? this.startWeek,
+        endWeek:      endWeek      ?? this.endWeek,
+      );
+}
+
 class AddCoursePage extends StatefulWidget {
   final ValueChanged<Course>? onAdd;
   final ValueChanged<Course>? onEdit;
@@ -1581,11 +1999,13 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
   Color? _customColor;   // null = 随机自动
   bool   _initialized = false;
-  int _day          = 1;
-  int _startSection = 1;
-  int _endSection   = 2;   // 直接用结束节，span = end - start + 1
-  int _startWeek    = 1;
-  int _endWeek      = 18;
+
+  // ── 多时间段 ──
+  late List<_CourseSlot> _slots;
+  int _activeSlotIdx = 0;
+
+  _CourseSlot get _activeSlot => _slots[_activeSlotIdx];
+  void _updateActiveSlot(_CourseSlot s) => setState(() => _slots[_activeSlotIdx] = s);
 
   static const Color _bg       = Color(0xFF1C1C1E);
   static const Color _card     = Color(0xFF2C2C2E);
@@ -1612,24 +2032,42 @@ class _AddCoursePageState extends State<AddCoursePage> {
     if (_initialized) return;
     _initialized = true;
     final cfg = AppStateScope.of(context).config;
-    _endWeek = cfg.totalWeeks;
 
     final e = widget.editCourse;
     if (e != null) {
-      // 编辑模式：预填所有字段
       _nameCtrl.text    = e.name;
       _creditCtrl.text  = e.credit;
       _noteCtrl.text    = e.note;
       _teacherCtrl.text = e.teacher;
       _locCtrl.text     = e.location;
       _customColor      = e.customColor ?? e.effectiveColor;
-      _day              = e.day;
-      _startSection     = e.startSection;
-      _endSection       = (e.startSection + e.span - 1).clamp(1, cfg.sectionsPerDay);
-      _startWeek        = e.startWeek;
-      _endWeek          = e.endWeek;
+      _slots = [
+        _CourseSlot(
+          day: e.day,
+          startSection: e.startSection,
+          endSection: (e.startSection + e.span - 1).clamp(1, cfg.sectionsPerDay),
+          startWeek: e.startWeek,
+          endWeek: e.endWeek,
+        ),
+        // 还原附加时间段
+        ...e.extraSlots.map((s) => _CourseSlot(
+          day: s.day,
+          startSection: s.startSection,
+          endSection: s.endSection,
+          startWeek: s.startWeek,
+          endWeek: s.endWeek,
+        )),
+      ];
     } else {
-      _endSection = (_startSection + 1).clamp(1, cfg.sectionsPerDay);
+      _slots = [
+        _CourseSlot(
+          day: 1,
+          startSection: 1,
+          endSection: 2.clamp(1, cfg.sectionsPerDay),
+          startWeek: 1,
+          endWeek: cfg.totalWeeks,
+        ),
+      ];
     }
   }
 
@@ -1647,30 +2085,37 @@ class _AddCoursePageState extends State<AddCoursePage> {
       );
       return;
     }
-    final s = AppStateScope.of(context);
-    final color = _customColor ?? _pickAutoColor(s.courses);
-    final span  = (_endSection - _startSection + 1).clamp(1, 20);
-    final weeks = List.generate(_endWeek - _startWeek + 1, (i) => _startWeek + i);
+    final appState = AppStateScope.of(context);
+    final color    = _customColor ?? _pickAutoColor(appState.courses);
+    final primary  = _slots[0];
+    final extras   = _slots.length > 1
+        ? _slots.sublist(1).map((s) => CourseSlot(
+              day: s.day, startSection: s.startSection,
+              endSection: s.endSection,
+              startWeek: s.startWeek, endWeek: s.endWeek)).toList()
+        : <CourseSlot>[];
     final course = Course(
-      id: widget.editCourse?.id ?? DateTime.now().millisecondsSinceEpoch,
-      name: _nameCtrl.text.trim(),
-      location: _locCtrl.text.trim(),
-      teacher: _teacherCtrl.text.trim(),
-      credit: _creditCtrl.text.trim(),
-      note: _noteCtrl.text.trim(),
-      day: _day,
-      startSection: _startSection,
-      span: span,
-      colorIdx: 0,
-      customColor: color,
-      weeks: weeks,
-      startWeek: _startWeek,
-      endWeek: _endWeek,
+      id:           widget.editCourse?.id ?? DateTime.now().millisecondsSinceEpoch,
+      name:         _nameCtrl.text.trim(),
+      location:     _locCtrl.text.trim(),
+      teacher:      _teacherCtrl.text.trim(),
+      credit:       _creditCtrl.text.trim(),
+      note:         _noteCtrl.text.trim(),
+      day:          primary.day,
+      startSection: primary.startSection,
+      span:         primary.span,
+      colorIdx:     0,
+      customColor:  color,
+      weeks:        primary.weeks,
+      startWeek:    primary.startWeek,
+      endWeek:      primary.endWeek,
+      isNonWeek:    widget.editCourse?.isNonWeek ?? false,
+      extraSlots:   extras,
     );
     if (widget.editCourse != null) {
-      widget.onEdit?.call(course);
+      appState.editCourse(course);
     } else {
-      widget.onAdd?.call(course);
+      appState.addCourse(course);
     }
     Navigator.pop(context);
   }
@@ -1751,7 +2196,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) {
-        int tmpStart = _startWeek, tmpEnd = _endWeek;
+        int tmpStart = _activeSlot.startWeek, tmpEnd = _activeSlot.endWeek;
         return StatefulBuilder(builder: (ctx, setS) {
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -1769,7 +2214,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     const Text('周数', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                     TextButton(
                         onPressed: () {
-                          setState(() { _startWeek = tmpStart; _endWeek = tmpEnd; });
+                          _updateActiveSlot(_activeSlot.copyWith(startWeek: tmpStart, endWeek: tmpEnd));
                           Navigator.pop(ctx);
                         },
                         child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
@@ -1835,7 +2280,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) {
-        int tmpStart = _startSection, tmpEnd = _endSection;
+        int tmpStart = _activeSlot.startSection, tmpEnd = _activeSlot.endSection;
         return StatefulBuilder(builder: (ctx, setS) {
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -1855,7 +2300,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         onPressed: () {
                           // 确保 end >= start
                           final end = tmpEnd < tmpStart ? tmpStart : tmpEnd;
-                          setState(() { _startSection = tmpStart; _endSection = end; });
+                          _updateActiveSlot(_activeSlot.copyWith(startSection: tmpStart, endSection: end));
                           Navigator.pop(ctx);
                         },
                         child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
@@ -1994,8 +2439,6 @@ class _AddCoursePageState extends State<AddCoursePage> {
   Widget build(BuildContext context) {
     final s = AppStateScope.of(context);
     final previewColor = _customColor ?? _pickAutoColor(s.courses);
-    final sectionLabel = '周${kWeekDays[_day - 1]}   第$_startSection – $_endSection节';
-    final weekLabel    = '第$_startWeek – $_endWeek周';
 
     return Scaffold(
       backgroundColor: _bg,
@@ -2061,31 +2504,102 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
             const SizedBox(height: 24),
 
-            // ── 时间段标题行 ──
+            // ── 时间段标题 + tab 操作行 ──
             Padding(
               padding: const EdgeInsets.only(left: 4, bottom: 8),
               child: Row(
                 children: [
                   const Text('时间段', style: TextStyle(color: _hint, fontSize: 13)),
+                  const SizedBox(width: 8),
+                  // slot tab 圆点
+                  ...List.generate(_slots.length, (i) {
+                    final active = i == _activeSlotIdx;
+                    return GestureDetector(
+                      onTap: () => setState(() => _activeSlotIdx = i),
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          width: active ? 22 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: active ? _accent : const Color(0xFF48484A),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
                   const Spacer(),
-                  // 复制按钮（暂为空操作）
-                  TextButton(onPressed: () {}, child: const Text('复制', style: TextStyle(color: _accent, fontSize: 13))),
+                  // 删除当前 tab（超过1个时显示）
+                  if (_slots.length > 1)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _slots.removeAt(_activeSlotIdx);
+                          if (_activeSlotIdx >= _slots.length) {
+                            _activeSlotIdx = _slots.length - 1;
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B5C).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(Icons.remove, color: Color(0xFFFF3B5C), size: 13),
+                          SizedBox(width: 2),
+                          Text('删除', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 12)),
+                        ]),
+                      ),
+                    ),
+                  // 复制按钮：克隆当前 slot 新建 tab
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _slots.add(_activeSlot.copyWith());
+                        _activeSlotIdx = _slots.length - 1;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _accent.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.add, color: _accent, size: 13),
+                        SizedBox(width: 2),
+                        Text('添加', style: TextStyle(color: _accent, fontSize: 12)),
+                      ]),
+                    ),
+                  ),
                 ],
               ),
             ),
 
-            // ── 时间卡 ──
+            // ── 时间卡（显示当前激活 slot）──
             _buildCard([
-              _buildTapRow('周数', weekLabel, _showWeekRangePicker),
-              _buildTapRow('时间', sectionLabel, () {
-                _showPicker<int>(
+              _buildTapRow(
+                '周数',
+                '第${_activeSlot.startWeek} – ${_activeSlot.endWeek}周',
+                _showWeekRangePicker,
+              ),
+              _buildTapRow(
+                '时间',
+                '周${kWeekDays[_activeSlot.day - 1]}',
+                () => _showPicker<int>(
                   title: '星期',
                   values: List.generate(7, (i) => i + 1),
-                  selected: _day,
+                  selected: _activeSlot.day,
                   label: (v) => '周${kWeekDays[v - 1]}',
-                  onChanged: (v) => setState(() => _day = v),
-                );
-              }),
+                  onChanged: (v) => _updateActiveSlot(_activeSlot.copyWith(day: v)),
+                ),
+              ),
               GestureDetector(
                 onTap: _showSectionPicker,
                 behavior: HitTestBehavior.opaque,
@@ -2094,7 +2608,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   child: Row(children: [
                     const Text('节次', style: TextStyle(color: _label, fontSize: 16)),
                     const Spacer(),
-                    Text('第$_startSection – $_endSection节',
+                    Text('第${_activeSlot.startSection} – ${_activeSlot.endSection}节',
                         style: const TextStyle(color: _hint, fontSize: 15)),
                     const SizedBox(width: 4),
                     const Icon(Icons.chevron_right, color: _hint, size: 18),
@@ -2104,6 +2618,16 @@ class _AddCoursePageState extends State<AddCoursePage> {
               _buildTextRow('老师', _teacherCtrl, '选填', maxLength: 20),
               _buildTextRow('地点', _locCtrl, '选填', maxLength: 30),
             ]),
+
+            // 多时间段提示
+            if (_slots.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, top: 8),
+                child: Text(
+                  '共 ${_slots.length} 个时间段 · 点击圆点切换',
+                  style: const TextStyle(color: _hint, fontSize: 12),
+                ),
+              ),
 
             const SizedBox(height: 32),
           ],
@@ -2321,21 +2845,25 @@ class _SettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
+          const Spacer(),
+          // onTap 存在时用 IgnorePointer 让点击穿透到外层 GestureDetector
+          onTap != null
+              ? IgnorePointer(child: trailing ?? const Icon(Icons.chevron_right, color: _kHint, size: 18))
+              : (trailing ?? const Icon(Icons.chevron_right, color: _kHint, size: 18)),
+        ],
+      ),
+    );
     return Column(
       children: [
         GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
-                const Spacer(),
-                trailing ?? const Icon(Icons.chevron_right, color: _kHint, size: 18),
-              ],
-            ),
-          ),
+          child: row,
         ),
         if (showDivider)
           Container(height: 0.5, color: _kDivider, margin: const EdgeInsets.only(left: 16)),
@@ -2350,21 +2878,227 @@ Widget _settingCard(List<Widget> rows) => Container(
   child: Column(children: rows),
 );
 
+// ─────────────────────────────────────────────
+// 上课时间 列表页（入口）
+// ─────────────────────────────────────────────
+
+class ClassTimeListPage extends StatefulWidget {
+  const ClassTimeListPage({super.key});
+  @override
+  State<ClassTimeListPage> createState() => _ClassTimeListPageState();
+}
+
+class _ClassTimeListPageState extends State<ClassTimeListPage> {
+  @override
+  Widget build(BuildContext context) {
+    final s = AppStateScope.of(context);
+    final tables = s.allTimeTables;
+    final activeIdx = s.activeTimeTableIndex;
+
+    return Scaffold(
+      backgroundColor: _kBg,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2C2C2E),
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Row(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(width: 8),
+            Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+          ]),
+        ),
+        leadingWidth: 40,
+        title: const Text('上课时间',
+            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () => _newTimeTable(context, s),
+            child: const Text('新建', style: TextStyle(color: _kAccent, fontSize: 16)),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ── 当前使用的时间表 ──
+          _settingCard([
+            _SettingRow(
+              label: '当前课表显示的时间表',
+              showDivider: false,
+              onTap: () => _pickActive(context, s),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(tables[activeIdx].name,
+                    style: const TextStyle(color: _kHint, fontSize: 15)),
+                const SizedBox(width: 4),
+                const Icon(Icons.unfold_more, color: _kHint, size: 16),
+              ]),
+            ),
+          ]),
+          const Padding(
+            padding: EdgeInsets.only(left: 6, bottom: 16, top: 4),
+            child: Text('轻触右侧选择当前使用的时间表',
+                style: TextStyle(color: _kHint, fontSize: 12)),
+          ),
+
+          // ── 时间表列表 ──
+          Padding(
+            padding: const EdgeInsets.only(left: 6, bottom: 6),
+            child: Row(children: [
+              const Text('时间表', style: TextStyle(color: _kHint, fontSize: 12)),
+              const Spacer(),
+              if (tables.length > 1)
+                const Text('条目上左划删除', style: TextStyle(color: _kHint, fontSize: 12)),
+            ]),
+          ),
+          _settingCard(
+            List.generate(tables.length, (i) {
+              return Dismissible(
+                key: ValueKey('tt_$i\_${tables[i].name}'),
+                direction: tables.length > 1
+                    ? DismissDirection.endToStart
+                    : DismissDirection.none,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF3B5C),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: const Icon(Icons.delete_outline, color: Colors.white),
+                ),
+                confirmDismiss: (_) async {
+                  if (tables.length <= 1) return false;
+                  return await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: const Color(0xFF2C2C2E),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      title: const Text('删除时间表',
+                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                      content: Text('确定删除「${tables[i].name}」？',
+                          style: const TextStyle(color: _kHint, fontSize: 14)),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('取消', style: TextStyle(color: _kHint))),
+                        TextButton(onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('删除',
+                                style: TextStyle(color: Color(0xFFFF3B5C)))),
+                      ],
+                    ),
+                  ) ?? false;
+                },
+                onDismissed: (_) => s.deleteTimeTable(i),
+                child: _SettingRow(
+                  label: tables[i].name,
+                  showDivider: i < tables.length - 1,
+                  trailing: const Icon(Icons.chevron_right, color: _kHint, size: 18),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => ClassTimePage(timeTableIndex: i),
+                  )),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _pickActive(BuildContext context, AppState s) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF2C2C2E),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: const Color(0xFF48484A),
+                    borderRadius: BorderRadius.circular(2))),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text('选择时间表',
+                  style: TextStyle(color: Colors.white, fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+            ),
+            ...List.generate(s.allTimeTables.length, (i) {
+              final active = i == s.activeTimeTableIndex;
+              return ListTile(
+                title: Text(s.allTimeTables[i].name,
+                    style: TextStyle(
+                        color: active ? _kAccent : Colors.white, fontSize: 16)),
+                trailing: active ? const Icon(Icons.check, color: _kAccent) : null,
+                onTap: () {
+                  s.switchTimeTable(i);
+                  Navigator.pop(ctx);
+                },
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _newTimeTable(BuildContext context, AppState s) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF2C2C2E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('新建时间表',
+            style: TextStyle(color: Colors.white, fontSize: 16)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: '请输入时间表名称',
+            hintStyle: TextStyle(color: _kHint),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF4ECDC4))),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx),
+              child: const Text('取消', style: TextStyle(color: _kHint))),
+          TextButton(
+            onPressed: () {
+              final name = ctrl.text.trim().isEmpty ? '时间表' : ctrl.text.trim();
+              s.addTimeTable(name);
+              Navigator.pop(ctx);
+            },
+            child: const Text('新建', style: TextStyle(color: _kAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════
 // 1. 上课时间（仿 WakeUp 风格，固定20节，检查冲突）
 // ═══════════════════════════════════════════════════════════════
 class ClassTimePage extends StatefulWidget {
-  const ClassTimePage({super.key});
+  final int timeTableIndex;
+  const ClassTimePage({super.key, required this.timeTableIndex});
   @override
   State<ClassTimePage> createState() => _ClassTimePageState();
 }
 
 class _ClassTimePageState extends State<ClassTimePage> {
-  // 本地副本，20节固定
   late List<List<String>> _times;
   bool _sameLength = true;
-  int  _duration   = 45; // 每节课时长（分钟）
-  final TextEditingController _nameCtrl = TextEditingController(text: '默认时间表');
+  int  _duration   = 45;
+  late TextEditingController _nameCtrl;
   bool _initialized = false;
 
   @override
@@ -2372,10 +3106,10 @@ class _ClassTimePageState extends State<ClassTimePage> {
     super.didChangeDependencies();
     if (_initialized) return;
     _initialized = true;
-    final appTimes = AppStateScope.of(context).customTimes;
-    // 始终保持20节，不足补默认
+    final tt = AppStateScope.of(context).allTimeTables[widget.timeTableIndex];
+    _nameCtrl = TextEditingController(text: tt.name);
     _times = List.generate(20, (i) {
-      if (i < appTimes.length) return List<String>.from(appTimes[i]);
+      if (i < tt.times.length) return List<String>.from(tt.times[i]);
       return List<String>.from(kDefaultTimes[i]);
     });
   }
@@ -2387,8 +3121,12 @@ class _ClassTimePageState extends State<ClassTimePage> {
   }
 
   void _push() {
-    AppStateScope.of(context)
-        .updateTimes(_times.map((t) => List<String>.from(t)).toList());
+    final s = AppStateScope.of(context);
+    s.updateTimeTable(widget.timeTableIndex, _times.map((t) => List<String>.from(t)).toList());
+  }
+
+  void _pushName(String name) {
+    AppStateScope.of(context).renameTimeTable(widget.timeTableIndex, name);
   }
 
   // ── 将 HH:mm 转成分钟数 ──
@@ -2522,14 +3260,13 @@ class _ClassTimePageState extends State<ClassTimePage> {
             children: [
               SizedBox(width: 8),
               Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-              Text('上课时间', style: TextStyle(color: _kAccent, fontSize: 15)),
             ],
           ),
         ),
-        leadingWidth: 100,
-        title: Text(
-          _nameCtrl.text,
-          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
+        leadingWidth: 40,
+        title: const Text(
+          '上课时间',
+          style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -2548,12 +3285,10 @@ class _ClassTimePageState extends State<ClassTimePage> {
             _SettingRow(
               label: '时间表名称',
               showDivider: false,
-              trailing: GestureDetector(
-                onTap: () => _editName(),
-                child: Text(
-                  _nameCtrl.text,
-                  style: const TextStyle(color: _kHint, fontSize: 15),
-                ),
+              onTap: () => _editName(),
+              trailing: Text(
+                _nameCtrl.text,
+                style: const TextStyle(color: _kHint, fontSize: 15),
               ),
             ),
           ]),
@@ -2576,14 +3311,12 @@ class _ClassTimePageState extends State<ClassTimePage> {
             _SettingRow(
               label: '每节课时长（分钟）',
               showDivider: false,
-              trailing: GestureDetector(
-                onTap: _sameLength ? _pickDuration : null,
-                child: Text(
-                  '$_duration',
-                  style: TextStyle(
-                    color: _sameLength ? Colors.white : _kHint,
-                    fontSize: 15,
-                  ),
+              onTap: _sameLength ? _pickDuration : null,
+              trailing: Text(
+                '$_duration',
+                style: TextStyle(
+                  color: _sameLength ? Colors.white : _kHint,
+                  fontSize: 15,
                 ),
               ),
             ),
@@ -2606,12 +3339,10 @@ class _ClassTimePageState extends State<ClassTimePage> {
               return _SettingRow(
                 label: '第 ${i + 1} 节',
                 showDivider: i < 19,
-                trailing: GestureDetector(
-                  onTap: () => _editTime(i),
-                  child: Text(
-                    '${_times[i][0]} - ${_times[i][1]}',
-                    style: const TextStyle(color: _kHint, fontSize: 15),
-                  ),
+                onTap: () => _editTime(i),
+                trailing: Text(
+                  '${_times[i][0]} - ${_times[i][1]}',
+                  style: const TextStyle(color: _kHint, fontSize: 15),
                 ),
               );
             }),
@@ -2663,7 +3394,9 @@ class _ClassTimePageState extends State<ClassTimePage> {
               child: const Text('取消', style: TextStyle(color: _kHint))),
           TextButton(
               onPressed: () {
-                setState(() => _nameCtrl.text = ctrl.text.isEmpty ? '默认时间表' : ctrl.text);
+                final newName = ctrl.text.trim().isEmpty ? '时间表' : ctrl.text.trim();
+                setState(() => _nameCtrl.text = newName);
+                _pushName(newName);
                 Navigator.pop(context);
               },
               child: const Text('确定', style: TextStyle(color: _kAccent))),
@@ -2919,6 +3652,46 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
             _SettingRow(
               label: '课表名称',
               trailing: Text(cfg.name, style: const TextStyle(color: _kHint, fontSize: 15)),
+              onTap: () {
+                final ctrl = TextEditingController(text: cfg.name);
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: const Color(0xFF2C2C2E),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    title: const Text('修改课表名称',
+                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                    content: TextField(
+                      controller: ctrl,
+                      autofocus: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: '请输入课表名称',
+                        hintStyle: TextStyle(color: _kHint),
+                        enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: _kAccent)),
+                        focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: _kAccent, width: 2)),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text('取消', style: TextStyle(color: _kHint))),
+                      TextButton(
+                          onPressed: () {
+                            final name = ctrl.text.trim();
+                            if (name.isNotEmpty) {
+                              AppStateScope.of(context).renameSchedule(
+                                  AppStateScope.of(context).activeScheduleIndex, name);
+                            }
+                            Navigator.pop(ctx);
+                          },
+                          child: const Text('确定', style: TextStyle(color: _kAccent))),
+                    ],
+                  ),
+                );
+              },
             ),
             _SettingRow(
               label: '上课时间',
@@ -2926,7 +3699,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               onTap: () {
                 Navigator.pop(context); // 关闭当前页
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => const ClassTimePage()));
+                    MaterialPageRoute(builder: (_) => const ClassTimeListPage()));
               },
             ),
           ]),
@@ -2937,18 +3710,16 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           _settingCard([
             _SettingRow(
               label: '第一周的第一天',
-              trailing: GestureDetector(
-                onTap: () => _pickDate(cfg.firstWeekDay,
-                    (d) => s.updateActiveConfig(firstWeekDay: d)),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3C),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(_fmtDate(cfg.firstWeekDay),
-                      style: const TextStyle(color: Colors.white, fontSize: 14)),
+              onTap: () => _pickDate(cfg.firstWeekDay,
+                  (d) => s.updateActiveConfig(firstWeekDay: d)),
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3A3A3C),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Text(_fmtDate(cfg.firstWeekDay),
+                    style: const TextStyle(color: Colors.white, fontSize: 14)),
               ),
             ),
             _SettingRow(
@@ -2958,16 +3729,13 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
             _SettingRow(
               label: '当前周',
               showDivider: false,
-              trailing: GestureDetector(
-                onTap: () => _pickNumber('当前周', displayWeek, 1, cfg.totalWeeks,
-                    (v) {}),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('第 $displayWeek 周',
-                      style: const TextStyle(color: _kHint, fontSize: 14)),
-                  const SizedBox(width: 6),
-                  const Icon(Icons.unfold_more, color: _kHint, size: 18),
-                ]),
-              ),
+              onTap: () => _pickNumber('当前周', displayWeek, 1, cfg.totalWeeks, (v) {}),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text('第 $displayWeek 周',
+                    style: const TextStyle(color: _kHint, fontSize: 14)),
+                const SizedBox(width: 6),
+                const Icon(Icons.unfold_more, color: _kHint, size: 18),
+              ]),
             ),
           ]),
 
@@ -2977,22 +3745,18 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           _settingCard([
             _SettingRow(
               label: '一天课程节数',
-              trailing: GestureDetector(
-                onTap: () => _pickNumber('一天课程节数', cfg.sectionsPerDay, 1, 20,
-                    (v) => s.updateActiveConfig(sectionsPerDay: v)),
-                child: Text('${cfg.sectionsPerDay}',
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
-              ),
+              onTap: () => _pickNumber('一天课程节数', cfg.sectionsPerDay, 1, 20,
+                  (v) => s.updateActiveConfig(sectionsPerDay: v)),
+              trailing: Text('${cfg.sectionsPerDay}',
+                  style: const TextStyle(color: _kHint, fontSize: 15)),
             ),
             _SettingRow(
               label: '学期周数',
               showDivider: false,
-              trailing: GestureDetector(
-                onTap: () => _pickNumber('学期周数', cfg.totalWeeks, 1, 20,
-                    (v) => s.updateActiveConfig(totalWeeks: v)),
-                child: Text('${cfg.totalWeeks}',
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
-              ),
+              onTap: () => _pickNumber('学期周数', cfg.totalWeeks, 1, 20,
+                  (v) => s.updateActiveConfig(totalWeeks: v)),
+              trailing: Text('${cfg.totalWeeks}',
+                  style: const TextStyle(color: _kHint, fontSize: 15)),
             ),
           ]),
         ],
@@ -3292,7 +4056,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
       context,
       MaterialPageRoute(
         fullscreenDialog: true,
-        builder: (_) => AddCoursePage(onAdd: (c) => s.addCourse(c)),
+        builder: (_) => AddCoursePage(onAdd: (_) {}),
       ),
     );
   }
@@ -3398,17 +4162,19 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                         behavior: HitTestBehavior.opaque,
                         onTap: _editing
                             ? () => _toggleSelect(c.id)
-                            : () => Navigator.push(
+                            : () {
+                                final appState = AppStateScope.of(context);
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     fullscreenDialog: true,
                                     builder: (_) => AddCoursePage(
                                       editCourse: c,
-                                      onEdit: (updated) =>
-                                          AppStateScope.of(context).editCourse(updated),
+                                      onEdit: (updated) => appState.editCourse(updated),
                                     ),
                                   ),
-                                ),
+                                );
+                              },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                           child: Row(children: [
@@ -3566,11 +4332,29 @@ class GlobalSettingsPage extends StatefulWidget {
 }
 
 class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
-  bool _darkMode    = true;
+  bool _darkMode    = false;
   bool _notification = false;
-  bool _widgetSync  = true;
-  String _theme     = '青绿';
-  final List<String> _themes = ['青绿', '珊瑚红', '薰衣草', '晴空蓝', '橙黄'];
+  bool _widgetSync  = false;
+
+  void _showWip(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF2C2C2E),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('功能开发中',
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+        content: const Text('该功能正在开发中，敬请期待。',
+            style: TextStyle(color: _kHint, fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('好的', style: TextStyle(color: _kAccent)),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -3582,7 +4366,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             label: '深色模式',
             trailing: Switch(
               value: _darkMode,
-              onChanged: (v) => setState(() => _darkMode = v),
+              onChanged: (v) => _showWip(context),
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
@@ -3590,7 +4374,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             label: '课程提醒',
             trailing: Switch(
               value: _notification,
-              onChanged: (v) => setState(() => _notification = v),
+              onChanged: (v) => _showWip(context),
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
@@ -3599,7 +4383,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             showDivider: false,
             trailing: Switch(
               value: _widgetSync,
-              onChanged: (v) => setState(() => _widgetSync = v),
+              onChanged: (v) => _showWip(context),
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
@@ -3607,27 +4391,38 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
         _settingCard([
           _SettingRow(
             label: '主题色',
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(_theme, style: const TextStyle(color: _kHint, fontSize: 14)),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: _kHint, size: 18),
-              ],
-            ),
-            onTap: () => _pickTheme(),
+            onTap: () => _pickThemeColor(context),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 20, height: 20,
+                decoration: BoxDecoration(
+                  color: AppStateScope.of(context).themeColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white24, width: 1),
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(Icons.chevron_right, color: _kHint, size: 18),
+            ]),
           ),
           _SettingRow(
-            label: '字体大小',
+            label: '设置背景格式',
             showDivider: false,
-            trailing: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text('标准', style: TextStyle(color: _kHint, fontSize: 14)),
-                SizedBox(width: 4),
-                Icon(Icons.chevron_right, color: _kHint, size: 18),
-              ],
-            ),
+            onTap: () => _showWip(context),
+            trailing: const Icon(Icons.chevron_right, color: _kHint, size: 18),
+          ),
+        ]),
+        _settingCard([
+          _SettingRow(
+            label: '使用帮助',
+            showDivider: false,
+            trailing: const Icon(Icons.open_in_new, color: _kHint, size: 16),
+            onTap: () async {
+              final uri = Uri.parse('https://github.com/Shiroko114514/StayUP-Calendar');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
           ),
         ]),
         _settingCard([
@@ -3642,42 +4437,111 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
     );
   }
 
-  void _pickTheme() {
+  void _pickThemeColor(BuildContext context) {
+    final appState = AppStateScope.of(context);
+    Color selected = appState.themeColor;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: _kCard,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 36),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('选择主题色', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12, runSpacing: 12,
-              children: _themes.map((t) {
-                final isSelected = t == _theme;
-                return GestureDetector(
-                  onTap: () { setState(() => _theme = t); Navigator.pop(context); },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF4ECDC4).withOpacity(0.2) : const Color(0xFF3A3A3C),
-                      borderRadius: BorderRadius.circular(20),
-                      border: isSelected ? Border.all(color: const Color(0xFF4ECDC4)) : null,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModal) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(width: 36, height: 4,
+                      decoration: BoxDecoration(color: const Color(0xFF48484A),
+                          borderRadius: BorderRadius.circular(2))),
+                ),
+                const SizedBox(height: 16),
+                const Text('主题色',
+                    style: TextStyle(color: Colors.white, fontSize: 16,
+                        fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                const Text('将覆盖课程卡片的默认颜色（颜色编号 0）',
+                    style: TextStyle(color: _kHint, fontSize: 12)),
+                const SizedBox(height: 16),
+                // 预设色盘
+                Wrap(
+                  spacing: 12, runSpacing: 12,
+                  children: [
+                    ...kCourseColors.map((c) {
+                      final isSelected = selected.value == c.value;
+                      return GestureDetector(
+                        onTap: () => setModal(() => selected = c),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 40, height: 40,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            border: isSelected
+                                ? Border.all(color: Colors.white, width: 3)
+                                : Border.all(color: Colors.transparent, width: 3),
+                            boxShadow: isSelected
+                                ? [BoxShadow(color: c.withOpacity(0.5), blurRadius: 8)]
+                                : null,
+                          ),
+                          child: isSelected
+                              ? const Icon(Icons.check, color: Colors.white, size: 18)
+                              : null,
+                        ),
+                      );
+                    }),
+                    // 自定义颜色按钮
+                    GestureDetector(
+                      onTap: () async {
+                        Navigator.pop(ctx);
+                        final picked = await showDialog<Color>(
+                          context: context,
+                          builder: (_) => _ColorPickerDialog(initial: selected),
+                        );
+                        if (picked != null) {
+                          appState.updateThemeColor(picked);
+                        }
+                      },
+                      child: Container(
+                        width: 40, height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF48484A), width: 2),
+                        ),
+                        child: const Icon(Icons.colorize, color: _kHint, size: 18),
+                      ),
                     ),
-                    child: Text(t, style: TextStyle(
-                      color: isSelected ? const Color(0xFF4ECDC4) : Colors.white70,
-                      fontSize: 14,
-                    )),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: GestureDetector(
+                    onTap: () {
+                      appState.updateThemeColor(selected);
+                      Navigator.pop(ctx);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: selected,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text('确定',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 16,
+                              fontWeight: FontWeight.w600)),
+                    ),
                   ),
-                );
-              }).toList(),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -3812,40 +4676,60 @@ class AboutPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 32),
           child: Column(
             children: [
-              Container(
-                width: 80, height: 80,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF4ECDC4), Color(0xFF44A5A0)],
-                    begin: Alignment.topLeft, end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: const Color(0xFF4ECDC4).withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 8))],
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.memory(
+                  base64Decode('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'),
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
                 ),
-                child: const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 38),
               ),
               const SizedBox(height: 16),
-              const Text('WakeUp 课程表', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+              const Text('StayUP课程表', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              const Text('版本 1.0.0', style: TextStyle(color: _kHint, fontSize: 13)),
+              const Text('版本 0.0.1 (Beta)', style: TextStyle(color: _kHint, fontSize: 13)),
             ],
           ),
         ),
         _settingCard([
-          _SettingRow(label: '版本号',      trailing: const Text('1.0.0', style: TextStyle(color: _kHint, fontSize: 14)), showDivider: true),
-          _SettingRow(label: '开发者',      trailing: const Text('WakeUp Team', style: TextStyle(color: _kHint, fontSize: 14)), showDivider: true),
-          _SettingRow(label: '开源协议',    trailing: const Text('MIT', style: TextStyle(color: _kHint, fontSize: 14)), showDivider: true),
-          _SettingRow(label: '用户协议',    showDivider: true),
-          _SettingRow(label: '隐私政策',    showDivider: true),
-          _SettingRow(label: '检查更新',    showDivider: false,
-              trailing: const Text('已是最新', style: TextStyle(color: Color(0xFF4ECDC4), fontSize: 14))),
+          const _SettingRow(
+            label: '版本号',
+            trailing: Text('0.0.1 (Beta)', style: TextStyle(color: _kHint, fontSize: 14)),
+            showDivider: true,
+          ),
+          _SettingRow(
+            label: '开发者',
+            trailing: const Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('Shiroko114514', style: TextStyle(color: _kHint, fontSize: 14)),
+              SizedBox(width: 4),
+              Icon(Icons.open_in_new, color: _kHint, size: 14),
+            ]),
+            showDivider: true,
+            onTap: () async {
+              final uri = Uri.parse('https://github.com/Shiroko114514');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+          const _SettingRow(
+            label: '开源协议',
+            trailing: Text('MIT License', style: TextStyle(color: _kHint, fontSize: 14)),
+            showDivider: true,
+          ),
+          const _SettingRow(
+            label: '检查更新',
+            showDivider: false,
+            trailing: Text('已是最新', style: TextStyle(color: Color(0xFF4ECDC4), fontSize: 14)),
+          ),
         ]),
         const SizedBox(height: 16),
-        Center(
+        const Center(
           child: Text(
-            '© 2026 WakeUp Team\n用心打造每一天的课程表',
+            '© 2026 Shiroko114514\n因一时兴起而制作的课程表，也希望能陪你走过很多节课',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: _kHint, fontSize: 12, height: 1.8),
+            style: TextStyle(color: _kHint, fontSize: 12, height: 1.8),
           ),
         ),
       ],
@@ -4026,17 +4910,15 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           _settingCard([
             _SettingRow(
               label: '第一周的第一天',
-              trailing: GestureDetector(
-                onTap: _pickDate,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3C),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(_fmtDate(_firstDay),
-                      style: const TextStyle(color: Colors.white, fontSize: 14)),
+              onTap: _pickDate,
+              trailing: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3A3A3C),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: Text(_fmtDate(_firstDay),
+                    style: const TextStyle(color: Colors.white, fontSize: 14)),
               ),
             ),
             const _SettingRow(
@@ -4060,22 +4942,18 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           _settingCard([
             _SettingRow(
               label: '一天课程节数',
-              trailing: GestureDetector(
-                onTap: () => _pickNumber('一天课程节数', _sectionsPerDay, 1, 20,
-                    (v) => setState(() => _sectionsPerDay = v)),
-                child: Text('$_sectionsPerDay',
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
-              ),
+              onTap: () => _pickNumber('一天课程节数', _sectionsPerDay, 1, 20,
+                  (v) => setState(() => _sectionsPerDay = v)),
+              trailing: Text('$_sectionsPerDay',
+                  style: const TextStyle(color: _kHint, fontSize: 15)),
             ),
             _SettingRow(
               label: '学期周数',
               showDivider: false,
-              trailing: GestureDetector(
-                onTap: () => _pickNumber('学期周数', _totalWeeks, 1, 30,
-                    (v) => setState(() => _totalWeeks = v)),
-                child: Text('$_totalWeeks',
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
-              ),
+              onTap: () => _pickNumber('学期周数', _totalWeeks, 1, 30,
+                  (v) => setState(() => _totalWeeks = v)),
+              trailing: Text('$_totalWeeks',
+                  style: const TextStyle(color: _kHint, fontSize: 15)),
             ),
           ]),
         ],
@@ -4300,5 +5178,91 @@ class _ScheduleListItem extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+// ─────────────────────────────────────────────
+// 自定义颜色选择器 Dialog（HSV 色轮简化版）
+// ─────────────────────────────────────────────
+
+class _ColorPickerDialog extends StatefulWidget {
+  final Color initial;
+  const _ColorPickerDialog({required this.initial});
+  @override
+  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<_ColorPickerDialog> {
+  late double _hue;
+  late double _sat;
+  late double _val;
+
+  @override
+  void initState() {
+    super.initState();
+    final hsv = HSVColor.fromColor(widget.initial);
+    _hue = hsv.hue;
+    _sat = hsv.saturation;
+    _val = hsv.value;
+  }
+
+  Color get _color => HSVColor.fromAHSV(1, _hue, _sat, _val).toColor();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF2C2C2E),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      title: const Text('自定义颜色',
+          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 预览
+          Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: _color,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _sliderRow('色相', _hue, 0, 360, (v) => setState(() => _hue = v),
+              activeColor: HSVColor.fromAHSV(1, _hue, 1, 1).toColor()),
+          _sliderRow('饱和度', _sat, 0, 1, (v) => setState(() => _sat = v),
+              activeColor: _color),
+          _sliderRow('明度', _val, 0, 1, (v) => setState(() => _val = v),
+              activeColor: _color),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context),
+            child: const Text('取消', style: TextStyle(color: _kHint))),
+        TextButton(
+          onPressed: () => Navigator.pop(context, _color),
+          child: const Text('确定', style: TextStyle(color: _kAccent)),
+        ),
+      ],
+    );
+  }
+
+  Widget _sliderRow(String label, double value, double min, double max,
+      ValueChanged<double> onChanged, {required Color activeColor}) {
+    return Row(children: [
+      SizedBox(width: 48,
+          child: Text(label, style: const TextStyle(color: _kHint, fontSize: 12))),
+      Expanded(
+        child: SliderTheme(
+          data: SliderThemeData(
+            activeTrackColor: activeColor,
+            thumbColor: activeColor,
+            inactiveTrackColor: const Color(0xFF48484A),
+            overlayColor: activeColor.withOpacity(0.2),
+            trackHeight: 4,
+          ),
+          child: Slider(value: value, min: min, max: max, onChanged: onChanged),
+        ),
+      ),
+    ]);
   }
 }
