@@ -1,17 +1,27 @@
-# stayup
+# StayUP 课程表
 
-A new Flutter project.
+StayUP 课程表是一个使用 Flutter 编写的简单课程表应用。
 
-## Getting Started
+做这个软件的最初原因其实很简单：  
+我一直在使用的 WakeUp 课程表在被收购之后，逐渐加入了很多复杂甚至有些“用不到”的功能，用起来反而没有以前那么清爽了。于是某天突然产生了一个想法——既然如此，不如自己写一个简单一点的课程表。
 
-This project is a starting point for a Flutter application.
+作为一个编程经验并不多的新手，本项目的开发过程中大量借助了 AI 工具的帮助，包括 ChatGPT 和 Claude 等。可以说，这是一次一边学习一边完成的小项目。
 
-A few resources to get you started if this is your first Flutter project:
+之所以取名 **StayUP 课程表**，一方面是对 WakeUp 课程表的一点致敬——它曾经是一款非常优秀的课程表应用；另一方面，这个名字也来自开发这个项目时连续一周熬夜写代码的真实经历（笑）。  
+“Stay up” 本身也有“保持清醒”的意思，某种程度上也算是对写代码状态的真实写照。
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+由于作者仍然是编程新手，项目中难免会存在各种不足甚至 Bug。如果你在使用过程中遇到问题，还请多多包涵，也欢迎提出 Issue 或建议。
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+如果这个项目对你有所帮助，也欢迎点一个 ⭐ Star 支持一下。
+
+---
+
+## Features
+
+- 简洁直观的课程表界面
+- 支持添加和管理课程
+- 本地存储课程数据
+- 无账号、无云端、轻量简单
+
+---
+
