@@ -4,6 +4,87 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // ─────────────────────────────────────────────
+// 主题色扩展（浅色 / 深色）
+// ─────────────────────────────────────────────
+
+class AppColors extends ThemeExtension<AppColors> {
+  final Color bg;
+  final Color card;
+  final Color divider;
+  final Color hint;
+  final Color primaryText;
+  final Color secondaryText;
+  final Color inputBg;
+  final Color iconBg;
+
+  const AppColors({
+    required this.bg,
+    required this.card,
+    required this.divider,
+    required this.hint,
+    required this.primaryText,
+    required this.secondaryText,
+    required this.inputBg,
+    required this.iconBg,
+  });
+
+  static const light = AppColors(
+    bg:            Color(0xFFF2F2F7),
+    card:          Color(0xFFFFFFFF),
+    divider:       Color(0xFFE5E5EA),
+    hint:          Color(0xFF6C6C70),
+    primaryText:   Color(0xFF1C1C1E),
+    secondaryText: Color(0xFF3C3C43),
+    inputBg:       Color(0xFFE5E5EA),
+    iconBg:        Color(0xFFE5E5EA),
+  );
+
+  static const dark = AppColors(
+    bg:            Color(0xFF1C1C1E),
+    card:          Color(0xFF2C2C2E),
+    divider:       Color(0xFF3A3A3C),
+    hint:          Color(0xFF8E8E93),
+    primaryText:   Color(0xFFFFFFFF),
+    secondaryText: Color(0xFFEBEBF5),
+    inputBg:       Color(0xFF2C2C2E),
+    iconBg:        Color(0xFF3A3A3C),
+  );
+
+  @override
+  AppColors copyWith({Color? bg, Color? card, Color? divider, Color? hint,
+      Color? primaryText, Color? secondaryText, Color? inputBg, Color? iconBg}) =>
+      AppColors(
+        bg:            bg            ?? this.bg,
+        card:          card          ?? this.card,
+        divider:       divider       ?? this.divider,
+        hint:          hint          ?? this.hint,
+        primaryText:   primaryText   ?? this.primaryText,
+        secondaryText: secondaryText ?? this.secondaryText,
+        inputBg:       inputBg       ?? this.inputBg,
+        iconBg:        iconBg        ?? this.iconBg,
+      );
+
+  @override
+  AppColors lerp(AppColors? other, double t) {
+    if (other == null) return this;
+    return AppColors(
+      bg:            Color.lerp(bg, other.bg, t)!,
+      card:          Color.lerp(card, other.card, t)!,
+      divider:       Color.lerp(divider, other.divider, t)!,
+      hint:          Color.lerp(hint, other.hint, t)!,
+      primaryText:   Color.lerp(primaryText, other.primaryText, t)!,
+      secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
+      inputBg:       Color.lerp(inputBg, other.inputBg, t)!,
+      iconBg:        Color.lerp(iconBg, other.iconBg, t)!,
+    );
+  }
+}
+
+// 便捷访问
+AppColors _ac(BuildContext context) =>
+    Theme.of(context).extension<AppColors>() ?? AppColors.light;
+
+// ─────────────────────────────────────────────
 // 时间表配置（名称 + 20节时间）
 // ─────────────────────────────────────────────
 
@@ -81,6 +162,7 @@ class AppState extends ChangeNotifier {
   bool showWeekend;
   bool showNonWeek;
   bool showSection;
+  bool isDarkMode;
 
   // 全局主题色（null = 使用 kCourseColors[0] 默认值）
   int? themeColorValue;
@@ -105,6 +187,7 @@ class AppState extends ChangeNotifier {
     this.showWeekend        = true,
     this.showNonWeek        = true,
     this.showSection        = true,
+    this.isDarkMode         = false,
     this.themeColorValue,
     this.activeScheduleIndex = 0,
     List<ScheduleConfig>? allConfigs,
@@ -252,6 +335,11 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateDarkMode(bool value) {
+    isDarkMode = value;
+    notifyListeners();
+  }
+
   void updateThemeColor(Color color) {
     themeColorValue = color.value;
     notifyListeners();
@@ -288,6 +376,7 @@ class AppState extends ChangeNotifier {
         'showWeekend':  showWeekend,
         'showNonWeek':  showNonWeek,
         'showSection':  showSection,
+        'isDarkMode':   isDarkMode,
         'themeColorValue': themeColorValue,
         'allTimeTables': allTimeTables.map((t) => t.toJson()).toList(),
         'allConfigs':   allConfigs.map((c) => c.toJson()).toList(),
@@ -344,6 +433,7 @@ class AppState extends ChangeNotifier {
           showWeekend:         j['showWeekend'] as bool? ?? true,
           showNonWeek:         j['showNonWeek'] as bool? ?? true,
           showSection:         j['showSection'] as bool? ?? true,
+          isDarkMode:          j['isDarkMode'] as bool? ?? false,
           themeColorValue:     j['themeColorValue'] as int?,
         ).._loadedCourses(allCourses);
       }
@@ -613,6 +703,7 @@ class WakeUpApp extends StatefulWidget {
 
 class _WakeUpAppState extends State<WakeUpApp> {
   AppState? _appState;
+  bool _isDarkMode = false;
 
   @override
   void initState() {
@@ -622,11 +713,26 @@ class _WakeUpAppState extends State<WakeUpApp> {
 
   Future<void> _loadState() async {
     final state = await AppState.loadFromPrefs();
-    if (mounted) setState(() => _appState = state);
+    if (mounted) {
+      state.addListener(_onStateChanged);
+      setState(() {
+        _appState = state;
+        _isDarkMode = state.isDarkMode;
+      });
+    }
+  }
+
+  void _onStateChanged() {
+    if (mounted && _appState != null && _appState!.isDarkMode != _isDarkMode) {
+      setState(() {
+        _isDarkMode = _appState!.isDarkMode;
+      });
+    }
   }
 
   @override
   void dispose() {
+    _appState?.removeListener(_onStateChanged);
     _appState?.dispose();
     super.dispose();
   }
@@ -647,25 +753,73 @@ class _WakeUpAppState extends State<WakeUpApp> {
                 CircularProgressIndicator(color: Color(0xFF4ECDC4), strokeWidth: 2),
                 SizedBox(height: 20),
                 Text('正在加载课表…',
-                    style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14)),
+                    style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14)),
               ],
             ),
           ),
         ),
       );
     }
-    return AppStateScope(
-      notifier: state,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'WakeUp 课程表',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4ECDC4)),
-          fontFamily: 'PingFang SC',
-          useMaterial3: true,
+    return _AppWithTheme(appState: state, isDarkMode: _isDarkMode);
+  }
+}
+
+class _AppWithTheme extends StatelessWidget {
+  final AppState appState;
+  final bool isDarkMode;
+  const _AppWithTheme({required this.appState, required this.isDarkMode});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'WakeUp 课程表',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4ECDC4), brightness: Brightness.light),
+        scaffoldBackgroundColor: const Color(0xFFF2F2F7),
+        cardColor: const Color(0xFFFFFFFF),
+        dividerColor: const Color(0xFFE5E5EA),
+        fontFamily: 'PingFang SC',
+        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFFFFFFFF),
+          foregroundColor: Color(0xFF1C1C1E),
+          elevation: 0,
+          titleTextStyle: TextStyle(color: Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600, fontFamily: 'PingFang SC'),
+          iconTheme: IconThemeData(color: Color(0xFF1C1C1E)),
         ),
-        home: const SchedulePage(),
+        dialogTheme: const DialogThemeData(
+          titleTextStyle: TextStyle(color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'PingFang SC'),
+          contentTextStyle: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5, fontFamily: 'PingFang SC'),
+        ),
+        extensions: const [AppColors.light],
       ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4ECDC4), brightness: Brightness.dark),
+        scaffoldBackgroundColor: const Color(0xFF1C1C1E),
+        cardColor: const Color(0xFF2C2C2E),
+        dividerColor: const Color(0xFF3A3A3C),
+        fontFamily: 'PingFang SC',
+        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF2C2C2E),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600, fontFamily: 'PingFang SC'),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        dialogTheme: const DialogThemeData(
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600, fontFamily: 'PingFang SC'),
+          contentTextStyle: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5, fontFamily: 'PingFang SC'),
+        ),
+        extensions: const [AppColors.dark],
+      ),
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      builder: (context, child) => AppStateScope(
+        notifier: appState,
+        child: child!,
+      ),
+      home: const SchedulePage(),
     );
   }
 }
@@ -1023,29 +1177,9 @@ class _Header extends StatelessWidget {
               const SizedBox(width: 4),
               IconButton(
                 icon: const Icon(Icons.download_outlined, size: 20),
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    backgroundColor: const Color(0xFF2C2C2E),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    title: const Row(children: [
-                      Icon(Icons.downloading_outlined, color: Color(0xFF8E8E93), size: 20),
-                      SizedBox(width: 8),
-                      Text('导入功能', style: TextStyle(
-                          color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                    ]),
-                    content: const Text(
-                      '「导入功能」正在开发中，敬请期待。',
-                      style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('好的',
-                            style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
-                      ),
-                    ],
-                  ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SchoolImportPage()),
                 ),
                 color: const Color(0xFF444444),
                 padding: EdgeInsets.zero,
@@ -1411,7 +1545,7 @@ class _CourseCard extends StatelessWidget {
                   '[非本周]',
                   style: TextStyle(
                     fontSize: 7,
-                    color: Colors.white70,
+                    color: const Color(0xFF3C3C43),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -1420,7 +1554,7 @@ class _CourseCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: const Color(0xFF1C1C1E),
                   height: 1.3,
                 ),
                 textAlign: TextAlign.center,
@@ -1433,7 +1567,7 @@ class _CourseCard extends StatelessWidget {
                   '@${course.location}',
                   style: const TextStyle(
                     fontSize: 8,
-                    color: Colors.white70,
+                    color: const Color(0xFF3C3C43),
                     height: 1.2,
                   ),
                   textAlign: TextAlign.center,
@@ -1478,7 +1612,7 @@ class _CourseDetailSheet extends StatelessWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF1C1C1E),
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -1515,7 +1649,7 @@ class _CourseDetailSheet extends StatelessWidget {
                       child: Text(
                         '周${kWeekDays[course.day - 1]}  ·  第${course.startSection}–${course.startSection + course.span - 1}节',
                         style: const TextStyle(
-                            fontSize: 12, color: Colors.white, fontWeight: FontWeight.w500),
+                            fontSize: 12, color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1620,10 +1754,7 @@ class _MoreMenuSheet extends StatefulWidget {
 }
 
 class _MoreMenuSheetState extends State<_MoreMenuSheet> {
-  static const Color _bg     = Color(0xFF2C2C2E);
-  static const Color _card   = Color(0xFF3A3A3C);
   static const Color _accent = Color(0xFFFF3B5C);
-  static const Color _white  = Colors.white;
 
   late double _sliderValue;
 
@@ -1645,10 +1776,11 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final ac = _ac(context);
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1C1C1E),
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: ac.bg,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         top: false,
@@ -1664,7 +1796,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                   width: 36, height: 4,
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF48484A),
+                    color: ac.divider,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -1677,7 +1809,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('周数', style: TextStyle(color: _white, fontSize: 15, fontWeight: FontWeight.w600)),
+                      Text('周数', style: TextStyle(color: ac.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       // 带数字标签的滑块
                       Row(
@@ -1686,21 +1818,21 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                           Container(
                             width: 44, height: 28,
                             decoration: BoxDecoration(
-                              color: Colors.black,
+                              color: ac.divider,
                               borderRadius: BorderRadius.circular(14),
                             ),
                             alignment: Alignment.center,
                             child: Text(
                               '${_sliderValue.round()}',
-                              style: const TextStyle(color: _white, fontSize: 14, fontWeight: FontWeight.w700),
+                              style: TextStyle(color: ac.primaryText, fontSize: 14, fontWeight: FontWeight.w700),
                             ),
                           ),
                           Expanded(
                             child: SliderTheme(
                               data: SliderTheme.of(context).copyWith(
-                                activeTrackColor: const Color(0xFF636366),
-                                inactiveTrackColor: const Color(0xFF48484A),
-                                thumbColor: _white,
+                                activeTrackColor: const Color(0xFF4ECDC4),
+                                inactiveTrackColor: ac.divider,
+                                thumbColor: const Color(0xFF4ECDC4),
                                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
                                 trackHeight: 4,
                                 overlayShape: SliderComponentShape.noOverlay,
@@ -1734,7 +1866,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     children: [
                       Row(
                         children: [
-                          const Text('切换课表', style: TextStyle(color: _white, fontSize: 15, fontWeight: FontWeight.w600)),
+                          Text('切换课表', style: TextStyle(color: ac.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
@@ -1815,7 +1947,7 @@ class _Card extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2E),
+        color: _ac(context).card,
         borderRadius: BorderRadius.circular(16),
       ),
       child: child,
@@ -1831,6 +1963,7 @@ class _ScheduleThumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ac = _ac(context);
     return Container(
       width: 72,
       margin: const EdgeInsets.only(right: 10),
@@ -1839,7 +1972,7 @@ class _ScheduleThumb extends StatelessWidget {
           Container(
             width: 72, height: 64,
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF4ECDC4).withOpacity(0.25) : const Color(0xFF48484A),
+              color: isSelected ? const Color(0xFF4ECDC4).withOpacity(0.25) : ac.divider,
               borderRadius: BorderRadius.circular(10),
               border: isSelected ? Border.all(color: const Color(0xFF4ECDC4), width: 1.5) : null,
             ),
@@ -1848,7 +1981,7 @@ class _ScheduleThumb extends StatelessWidget {
                 : null,
           ),
           const SizedBox(height: 6),
-          Text(label, style: const TextStyle(color: Colors.white70, fontSize: 11), textAlign: TextAlign.center),
+          Text(label, style: TextStyle(color: ac.secondaryText, fontSize: 11), textAlign: TextAlign.center),
         ],
       ),
     );
@@ -1890,17 +2023,17 @@ class _ToolCell extends StatelessWidget {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              backgroundColor: const Color(0xFF2C2C2E),
+              backgroundColor: _ac(ctx).card,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               title: const Row(children: [
-                Icon(Icons.ios_share_outlined, color: Color(0xFF8E8E93), size: 20),
+                Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
                 SizedBox(width: 8),
                 Text('导出课表', style: TextStyle(
-                    color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
               ]),
               content: const Text(
                 '「导出课表」功能正在开发中，敬请期待。',
-                style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
+                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
               ),
               actions: [
                 TextButton(
@@ -1924,6 +2057,7 @@ class _ToolCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ac = _ac(context);
     return GestureDetector(
       onTap: () => _navigate(context),
       child: Column(
@@ -1931,14 +2065,14 @@ class _ToolCell extends StatelessWidget {
         children: [
           Container(
             width: 52, height: 52,
-            decoration: const BoxDecoration(
-              color: Color(0xFF3A3A3C),
+            decoration: BoxDecoration(
+              color: ac.iconBg,
               shape: BoxShape.circle,
             ),
-            child: Icon(tool.icon, color: Colors.white70, size: 24),
+            child: Icon(tool.icon, color: ac.secondaryText, size: 24),
           ),
           const SizedBox(height: 6),
-          Text(tool.label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+          Text(tool.label, style: TextStyle(color: ac.secondaryText, fontSize: 12)),
         ],
       ),
     );
@@ -2007,11 +2141,6 @@ class _AddCoursePageState extends State<AddCoursePage> {
   _CourseSlot get _activeSlot => _slots[_activeSlotIdx];
   void _updateActiveSlot(_CourseSlot s) => setState(() => _slots[_activeSlotIdx] = s);
 
-  static const Color _bg       = Color(0xFF1C1C1E);
-  static const Color _card     = Color(0xFF2C2C2E);
-  static const Color _divider  = Color(0xFF3A3A3C);
-  static const Color _label    = Color(0xFFFFFFFF);
-  static const Color _hint     = Color(0xFF6B6B6D);
   static const Color _accent   = Color(0xFFFF3B5C);
 
   // 自动选一个与已有课程不冲突的颜色
@@ -2081,7 +2210,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
   void _save() {
     if (_nameCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请填写课程名称'), backgroundColor: Color(0xFF3A3A3C)),
+        const SnackBar(content: Text('请填写课程名称'), backgroundColor: Color(0xFFE5E5EA)),
       );
       return;
     }
@@ -2130,7 +2259,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
   }) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -2142,7 +2271,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             children: [
               const SizedBox(height: 8),
               Container(width: 36, height: 4,
-                decoration: BoxDecoration(color: const Color(0xFF48484A), borderRadius: BorderRadius.circular(2))),
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 child: Row(
@@ -2150,7 +2279,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(onPressed: () => Navigator.pop(ctx),
                         child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
-                    Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(title, style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
                     TextButton(
                         onPressed: () { onChanged(current); Navigator.pop(ctx); },
                         child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
@@ -2171,7 +2300,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     builder: (_, i) => Center(
                       child: Text(label(values[i]),
                         style: TextStyle(
-                          color: values[i] == current ? Colors.white : const Color(0xFF6B6B6D),
+                          color: values[i] == current ? Colors.white : const Color(0xFFC7C7CC),
                           fontSize: values[i] == current ? 18 : 15,
                           fontWeight: values[i] == current ? FontWeight.w600 : FontWeight.w400,
                         )),
@@ -2191,7 +2320,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
   void _showWeekRangePicker() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -2203,7 +2332,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             children: [
               const SizedBox(height: 8),
               Container(width: 36, height: 4,
-                decoration: BoxDecoration(color: const Color(0xFF48484A), borderRadius: BorderRadius.circular(2))),
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 child: Row(
@@ -2211,7 +2340,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(onPressed: () => Navigator.pop(ctx),
                         child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
-                    const Text('周数', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    const Text('周数', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
                     TextButton(
                         onPressed: () {
                           _updateActiveSlot(_activeSlot.copyWith(startWeek: tmpStart, endWeek: tmpEnd));
@@ -2224,7 +2353,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    const Text('开始', style: TextStyle(color: Color(0xFF6B6B6D), fontSize: 12)),
+                    const Text('开始', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
                     SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
                       itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
                       physics: const FixedExtentScrollPhysics(),
@@ -2234,7 +2363,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childCount: 20,
                         builder: (_, i) => Center(child: Text('第${i+1}周',
                           style: TextStyle(
-                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFF6B6B6D),
+                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFFC7C7CC),
                             fontSize: i + 1 == tmpStart ? 17 : 14,
                             fontWeight: i + 1 == tmpStart ? FontWeight.w600 : FontWeight.w400,
                           ))),
@@ -2242,7 +2371,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     )),
                   ])),
                   Expanded(child: Column(children: [
-                    const Text('结束', style: TextStyle(color: Color(0xFF6B6B6D), fontSize: 12)),
+                    const Text('结束', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
                     SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
                       itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
                       physics: const FixedExtentScrollPhysics(),
@@ -2252,7 +2381,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childCount: 20,
                         builder: (_, i) => Center(child: Text('第${i+1}周',
                           style: TextStyle(
-                            color: i + 1 == tmpEnd ? Colors.white : const Color(0xFF6B6B6D),
+                            color: i + 1 == tmpEnd ? Colors.white : const Color(0xFFC7C7CC),
                             fontSize: i + 1 == tmpEnd ? 17 : 14,
                             fontWeight: i + 1 == tmpEnd ? FontWeight.w600 : FontWeight.w400,
                           ))),
@@ -2275,7 +2404,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
     final maxSec = cfg.sectionsPerDay;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -2287,7 +2416,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             children: [
               const SizedBox(height: 8),
               Container(width: 36, height: 4,
-                decoration: BoxDecoration(color: const Color(0xFF48484A), borderRadius: BorderRadius.circular(2))),
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 child: Row(
@@ -2295,7 +2424,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(onPressed: () => Navigator.pop(ctx),
                         child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
-                    const Text('选择节次', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                    const Text('选择节次', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
                     TextButton(
                         onPressed: () {
                           // 确保 end >= start
@@ -2310,7 +2439,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    const Text('开始节', style: TextStyle(color: Color(0xFF6B6B6D), fontSize: 12)),
+                    const Text('开始节', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
                     SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
                       itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
                       physics: const FixedExtentScrollPhysics(),
@@ -2325,7 +2454,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childCount: maxSec,
                         builder: (_, i) => Center(child: Text('第${i+1}节',
                           style: TextStyle(
-                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFF6B6B6D),
+                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFFC7C7CC),
                             fontSize: i + 1 == tmpStart ? 17 : 14,
                             fontWeight: i + 1 == tmpStart ? FontWeight.w600 : FontWeight.w400,
                           ))),
@@ -2333,7 +2462,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     )),
                   ])),
                   Expanded(child: Column(children: [
-                    const Text('结束节', style: TextStyle(color: Color(0xFF6B6B6D), fontSize: 12)),
+                    const Text('结束节', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
                     SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
                       itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
                       physics: const FixedExtentScrollPhysics(),
@@ -2349,7 +2478,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childCount: maxSec,
                         builder: (_, i) => Center(child: Text('第${i+1}节',
                           style: TextStyle(
-                            color: i + 1 == tmpEnd ? Colors.white : (i + 1 < tmpStart ? const Color(0xFF48484A) : const Color(0xFF6B6B6D)),
+                            color: i + 1 == tmpEnd ? Colors.white : (i + 1 < tmpStart ? const Color(0xFFD1D1D6) : const Color(0xFFC7C7CC)),
                             fontSize: i + 1 == tmpEnd ? 17 : 14,
                             fontWeight: i + 1 == tmpEnd ? FontWeight.w600 : FontWeight.w400,
                           ))),
@@ -2366,10 +2495,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
     );
   }
 
-  Widget _buildCard(List<Widget> rows) {
+  Widget _buildCard(BuildContext context, List<Widget> rows) {
+    final ac = _ac(context);
     return Container(
       decoration: BoxDecoration(
-        color: _card,
+        color: ac.card,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -2377,15 +2507,16 @@ class _AddCoursePageState extends State<AddCoursePage> {
           for (int i = 0; i < rows.length; i++) ...[
             rows[i],
             if (i < rows.length - 1)
-              Container(height: 0.5, color: _divider, margin: const EdgeInsets.only(left: 16)),
+              Container(height: 0.5, color: ac.divider, margin: const EdgeInsets.only(left: 16)),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildTextRow(String label, TextEditingController ctrl, String hint,
+  Widget _buildTextRow(BuildContext context, String label, TextEditingController ctrl, String hint,
       {bool multiline = false, int? maxLength}) {
+    final ac = _ac(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
@@ -2394,19 +2525,19 @@ class _AddCoursePageState extends State<AddCoursePage> {
           SizedBox(width: 60,
             child: Padding(
               padding: EdgeInsets.only(top: multiline ? 14 : 0),
-              child: Text(label, style: const TextStyle(color: _label, fontSize: 16)),
+              child: Text(label, style: TextStyle(color: ac.primaryText, fontSize: 16)),
             )),
           Expanded(
             child: TextField(
               controller: ctrl,
               maxLines: multiline ? 4 : 1,
               maxLength: maxLength,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
+              style: TextStyle(color: ac.primaryText, fontSize: 15),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: const TextStyle(color: _hint, fontSize: 15),
+                hintStyle: TextStyle(color: ac.hint, fontSize: 15),
                 border: InputBorder.none,
-                counterStyle: const TextStyle(color: _hint, fontSize: 11),
+                counterStyle: TextStyle(color: ac.hint, fontSize: 11),
                 contentPadding: EdgeInsets.symmetric(vertical: multiline ? 12 : 0),
               ),
             ),
@@ -2416,7 +2547,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
     );
   }
 
-  Widget _buildTapRow(String label, String value, VoidCallback onTap) {
+  Widget _buildTapRow(BuildContext context, String label, String value, VoidCallback onTap) {
+    final ac = _ac(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -2424,11 +2556,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
-            Text(label, style: const TextStyle(color: _label, fontSize: 16)),
+            Text(label, style: TextStyle(color: ac.primaryText, fontSize: 16)),
             const Spacer(),
-            Text(value, style: const TextStyle(color: _hint, fontSize: 15)),
+            Text(value, style: TextStyle(color: ac.hint, fontSize: 15)),
             const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, color: _hint, size: 18),
+            Icon(Icons.chevron_right, color: ac.hint, size: 18),
           ],
         ),
       ),
@@ -2439,11 +2571,12 @@ class _AddCoursePageState extends State<AddCoursePage> {
   Widget build(BuildContext context) {
     final s = AppStateScope.of(context);
     final previewColor = _customColor ?? _pickAutoColor(s.courses);
+    final ac = _ac(context);
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: ac.bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: ac.card,
         elevation: 0,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
@@ -2455,7 +2588,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             ),
             const Spacer(),
             Text(widget.editCourse != null ? '编辑课程' : '添加课程',
-                style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+                style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600)),
             const Spacer(),
             TextButton(
               onPressed: _save,
@@ -2470,19 +2603,19 @@ class _AddCoursePageState extends State<AddCoursePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // ── 基本信息卡 ──
-            _buildCard([
-              _buildTextRow('课程', _nameCtrl, '必填', maxLength: 20),
+            _buildCard(context, [
+              _buildTextRow(context, '课程', _nameCtrl, '必填', maxLength: 20),
               // 颜色行
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    const Text('颜色', style: TextStyle(color: _label, fontSize: 16)),
+                    Text('颜色', style: TextStyle(color: ac.primaryText, fontSize: 16)),
                     const Spacer(),
                     if (_customColor == null)
-                      const Padding(
-                        padding: EdgeInsets.only(right: 8),
-                        child: Text('自动', style: TextStyle(color: _hint, fontSize: 13)),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Text('自动', style: TextStyle(color: ac.hint, fontSize: 13)),
                       ),
                     GestureDetector(
                       onTap: () => _showColorPicker(s.courses),
@@ -2491,15 +2624,15 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         decoration: BoxDecoration(
                           color: previewColor,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white24, width: 1.5),
+                          border: Border.all(color: ac.divider, width: 1.5),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              _buildTextRow('学分', _creditCtrl, '选填'),
-              _buildTextRow('备注', _noteCtrl, '', multiline: true),
+              _buildTextRow(context, '学分', _creditCtrl, '选填'),
+              _buildTextRow(context, '备注', _noteCtrl, '', multiline: true),
             ]),
 
             const SizedBox(height: 24),
@@ -2509,7 +2642,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               padding: const EdgeInsets.only(left: 4, bottom: 8),
               child: Row(
                 children: [
-                  const Text('时间段', style: TextStyle(color: _hint, fontSize: 13)),
+                  Text('时间段', style: TextStyle(color: ac.hint, fontSize: 13)),
                   const SizedBox(width: 8),
                   // slot tab 圆点
                   ...List.generate(_slots.length, (i) {
@@ -2524,7 +2657,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           width: active ? 22 : 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: active ? _accent : const Color(0xFF48484A),
+                            color: active ? _accent : const Color(0xFFD1D1D6),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -2583,13 +2716,13 @@ class _AddCoursePageState extends State<AddCoursePage> {
             ),
 
             // ── 时间卡（显示当前激活 slot）──
-            _buildCard([
-              _buildTapRow(
+            _buildCard(context, [
+              _buildTapRow(context, 
                 '周数',
                 '第${_activeSlot.startWeek} – ${_activeSlot.endWeek}周',
                 _showWeekRangePicker,
               ),
-              _buildTapRow(
+              _buildTapRow(context, 
                 '时间',
                 '周${kWeekDays[_activeSlot.day - 1]}',
                 () => _showPicker<int>(
@@ -2606,17 +2739,17 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(children: [
-                    const Text('节次', style: TextStyle(color: _label, fontSize: 16)),
+                    Text('节次', style: TextStyle(color: ac.primaryText, fontSize: 16)),
                     const Spacer(),
                     Text('第${_activeSlot.startSection} – ${_activeSlot.endSection}节',
-                        style: const TextStyle(color: _hint, fontSize: 15)),
+                        style: TextStyle(color: ac.hint, fontSize: 15)),
                     const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right, color: _hint, size: 18),
+                    Icon(Icons.chevron_right, color: ac.hint, size: 18),
                   ]),
                 ),
               ),
-              _buildTextRow('老师', _teacherCtrl, '选填', maxLength: 20),
-              _buildTextRow('地点', _locCtrl, '选填', maxLength: 30),
+              _buildTextRow(context, '老师', _teacherCtrl, '选填', maxLength: 20),
+              _buildTextRow(context, '地点', _locCtrl, '选填', maxLength: 30),
             ]),
 
             // 多时间段提示
@@ -2625,7 +2758,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 padding: const EdgeInsets.only(left: 4, top: 8),
                 child: Text(
                   '共 ${_slots.length} 个时间段 · 点击圆点切换',
-                  style: const TextStyle(color: _hint, fontSize: 12),
+                  style: TextStyle(color: ac.hint, fontSize: 12),
                 ),
               ),
 
@@ -2659,7 +2792,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: _ac(context).card,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -2676,14 +2809,14 @@ class _AddCoursePageState extends State<AddCoursePage> {
               children: [
                 Center(child: Container(width: 36, height: 4,
                     decoration: BoxDecoration(
-                        color: const Color(0xFF48484A),
+                        color: const Color(0xFFD1D1D6),
                         borderRadius: BorderRadius.circular(2)))),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('选择颜色',
-                        style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+                        style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
                     // 当前预览色
                     Row(children: [
                       Container(
@@ -2701,11 +2834,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           Navigator.pop(ctx);
                         },
                         style: TextButton.styleFrom(
-                          backgroundColor: const Color(0xFF3A3A3C),
+                          backgroundColor: const Color(0xFFE5E5EA),
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
-                        child: const Text('确定', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        child: const Text('确定', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
                       ),
                     ]),
                   ],
@@ -2725,7 +2858,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     decoration: BoxDecoration(
                       color: _customColor == null
                           ? const Color(0xFF4ECDC4).withOpacity(0.15)
-                          : const Color(0xFF3A3A3C),
+                          : const Color(0xFFE5E5EA),
                       borderRadius: BorderRadius.circular(8),
                       border: _customColor == null
                           ? Border.all(color: const Color(0xFF4ECDC4).withOpacity(0.4))
@@ -2745,7 +2878,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                       ),
                       const SizedBox(width: 10),
                       const Text('自动选色（不与已有课程冲突）',
-                          style: TextStyle(color: Colors.white, fontSize: 13)),
+                          style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 13)),
                       if (_customColor == null) ...[
                         const Spacer(),
                         const Icon(Icons.check, color: Color(0xFF4ECDC4), size: 16),
@@ -2775,14 +2908,14 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           color: c,
                           shape: BoxShape.circle,
                           border: isSelected
-                              ? Border.all(color: Colors.white, width: 2.5)
+                              ? Border.all(color: const Color(0xFF1C1C1E), width: 2.5)
                               : null,
                           boxShadow: isSelected
                               ? [BoxShadow(color: c.withOpacity(0.6), blurRadius: 6)]
                               : null,
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check, color: Colors.white, size: 14)
+                            ? const Icon(Icons.check, color: const Color(0xFF1C1C1E), size: 14)
                             : null,
                       ),
                     );
@@ -2801,11 +2934,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
 // ═══════════════════════════════════════════════════════════════
 // 子页面共用样式常量
 // ═══════════════════════════════════════════════════════════════
-const Color _kBg      = Color(0xFF1C1C1E);
-const Color _kCard    = Color(0xFF2C2C2E);
-const Color _kDivider = Color(0xFF3A3A3C);
 const Color _kAccent  = Color(0xFFFF3B5C);
-const Color _kHint    = Color(0xFF8E8E93);
+const Color _kHint    = Color(0xFF8E8E93); // 中性灰，深浅模式均可读
+const Color _kDivider = Color(0xFFD1D1D6); // 用于 const 上下文
+// _kBg, _kCard 现由 _ac(context) 动态提供
 
 // 通用子页面脚手架
 class _SubPageScaffold extends StatelessWidget {
@@ -2815,16 +2947,17 @@ class _SubPageScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ac = _ac(context);
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: ac.bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: ac.card,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: _kAccent, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(title, style: TextStyle(color: ac.primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: ListView(
@@ -2845,16 +2978,16 @@ class _SettingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ac = _ac(context);
     final row = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 15)),
+          Text(label, style: TextStyle(color: ac.primaryText, fontSize: 15)),
           const Spacer(),
-          // onTap 存在时用 IgnorePointer 让点击穿透到外层 GestureDetector
           onTap != null
-              ? IgnorePointer(child: trailing ?? const Icon(Icons.chevron_right, color: _kHint, size: 18))
-              : (trailing ?? const Icon(Icons.chevron_right, color: _kHint, size: 18)),
+              ? IgnorePointer(child: trailing ?? Icon(Icons.chevron_right, color: ac.hint, size: 18))
+              : (trailing ?? Icon(Icons.chevron_right, color: ac.hint, size: 18)),
         ],
       ),
     );
@@ -2866,15 +2999,15 @@ class _SettingRow extends StatelessWidget {
           child: row,
         ),
         if (showDivider)
-          Container(height: 0.5, color: _kDivider, margin: const EdgeInsets.only(left: 16)),
+          Container(height: 0.5, color: ac.divider, margin: const EdgeInsets.only(left: 16)),
       ],
     );
   }
 }
 
-Widget _settingCard(List<Widget> rows) => Container(
+Widget _settingCard(BuildContext context, List<Widget> rows) => Container(
   margin: const EdgeInsets.only(bottom: 20),
-  decoration: BoxDecoration(color: _kCard, borderRadius: BorderRadius.circular(12)),
+  decoration: BoxDecoration(color: _ac(context).card, borderRadius: BorderRadius.circular(12)),
   child: Column(children: rows),
 );
 
@@ -2896,9 +3029,9 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
     final activeIdx = s.activeTimeTableIndex;
 
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -2909,7 +3042,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         ),
         leadingWidth: 40,
         title: const Text('上课时间',
-            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -2922,7 +3055,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         padding: const EdgeInsets.all(16),
         children: [
           // ── 当前使用的时间表 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '当前课表显示的时间表',
               showDivider: false,
@@ -2951,7 +3084,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                 const Text('条目上左划删除', style: TextStyle(color: _kHint, fontSize: 12)),
             ]),
           ),
-          _settingCard(
+          _settingCard(context, 
             List.generate(tables.length, (i) {
               return Dismissible(
                 key: ValueKey('tt_$i\_${tables[i].name}'),
@@ -2965,17 +3098,17 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                     color: Color(0xFFFF3B5C),
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
-                  child: const Icon(Icons.delete_outline, color: Colors.white),
+                  child: const Icon(Icons.delete_outline, color: const Color(0xFF1C1C1E)),
                 ),
                 confirmDismiss: (_) async {
                   if (tables.length <= 1) return false;
                   return await showDialog<bool>(
                     context: context,
                     builder: (ctx) => AlertDialog(
-                      backgroundColor: const Color(0xFF2C2C2E),
+                      backgroundColor: _ac(ctx).card,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       title: const Text('删除时间表',
-                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                          style: TextStyle(fontSize: 16)),
                       content: Text('确定删除「${tables[i].name}」？',
                           style: const TextStyle(color: _kHint, fontSize: 14)),
                       actions: [
@@ -3008,7 +3141,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
   void _pickActive(BuildContext context, AppState s) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF2C2C2E),
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (ctx) => SafeArea(
@@ -3017,12 +3150,12 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           children: [
             const SizedBox(height: 8),
             Container(width: 36, height: 4,
-                decoration: BoxDecoration(color: const Color(0xFF48484A),
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6),
                     borderRadius: BorderRadius.circular(2))),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
               child: Text('选择时间表',
-                  style: TextStyle(color: Colors.white, fontSize: 16,
+                  style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16,
                       fontWeight: FontWeight.w600)),
             ),
             ...List.generate(s.allTimeTables.length, (i) {
@@ -3050,14 +3183,14 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Text('新建时间表',
-            style: TextStyle(color: Colors.white, fontSize: 16)),
+            style: TextStyle(fontSize: 16)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: const Color(0xFF1C1C1E)),
           decoration: const InputDecoration(
             hintText: '请输入时间表名称',
             hintStyle: TextStyle(color: _kHint),
@@ -3162,7 +3295,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Row(children: [
           Icon(
@@ -3173,18 +3306,18 @@ class _ClassTimePageState extends State<ClassTimePage> {
           const SizedBox(width: 8),
           Text(
             errors.isEmpty ? '时间顺序正常' : '发现 ${errors.length} 处冲突',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+            style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ]),
         content: errors.isEmpty
             ? const Text('所有节次时间区间无冲突，顺序正确。',
-                style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14))
+                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14))
             : SizedBox(
                 width: double.maxFinite,
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: errors.length,
-                  separatorBuilder: (_, __) => const Divider(color: Color(0xFF3A3A3C), height: 16),
+                  separatorBuilder: (_, __) => const Divider(color: Color(0xFFE5E5EA), height: 16),
                   itemBuilder: (_, i) => Text(
                     errors[i],
                     style: const TextStyle(color: Color(0xFFF07B8A), fontSize: 13, height: 1.5),
@@ -3249,9 +3382,9 @@ class _ClassTimePageState extends State<ClassTimePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -3266,7 +3399,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
         leadingWidth: 40,
         title: const Text(
           '上课时间',
-          style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -3281,7 +3414,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
         padding: const EdgeInsets.all(16),
         children: [
           // ── 时间表名称 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '时间表名称',
               showDivider: false,
@@ -3299,7 +3432,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           ),
 
           // ── 每节课时长 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '每节课时长相同',
               trailing: Switch(
@@ -3334,7 +3467,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           const SizedBox(height: 8),
 
           // ── 20节时间列表 ──
-          _settingCard(
+          _settingCard(context, 
             List.generate(20, (i) {
               return _SettingRow(
                 label: '第 ${i + 1} 节',
@@ -3349,7 +3482,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           ),
 
           // ── 重置 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '重置为默认时间',
               showDivider: false,
@@ -3374,16 +3507,16 @@ class _ClassTimePageState extends State<ClassTimePage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('编辑名称', style: TextStyle(color: Colors.white, fontSize: 16)),
+        title: const Text('编辑名称', style: TextStyle(fontSize: 16)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: const Color(0xFF1C1C1E)),
           decoration: const InputDecoration(
             hintText: '请输入时间表名称',
-            hintStyle: TextStyle(color: Color(0xFF8E8E93)),
+            hintStyle: TextStyle(color: Color(0xFF6C6C70)),
             enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF4ECDC4))),
             focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2)),
           ),
@@ -3408,7 +3541,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
   void _pickDuration() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _kCard,
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (_) {
@@ -3423,7 +3556,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                 TextButton(onPressed: () => Navigator.pop(ctx),
                     child: const Text('取消', style: TextStyle(color: _kAccent))),
                 const Text('每节课时长（分钟）',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                    style: TextStyle(color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
                 TextButton(
                   onPressed: () {
                     // 重新计算所有节的结束时间
@@ -3481,7 +3614,7 @@ class ScheduleSettingsPage extends StatelessWidget {
     return _SubPageScaffold(
       title: '课表设置',
       children: [
-        _settingCard([
+        _settingCard(context, [
           _SettingRow(
             label: '课表数据',
             onTap: () => Navigator.push(context,
@@ -3494,8 +3627,7 @@ class ScheduleSettingsPage extends StatelessWidget {
           _SettingRow(
             label: '调课工具',
             showDivider: false,
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const AdjustCoursePage())),
+            onTap: () => _showComingSoon(context),
           ),
         ]),
       ],
@@ -3506,16 +3638,16 @@ class ScheduleSettingsPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: const Row(children: [
-          Icon(Icons.lock_outline, color: Color(0xFF8E8E93), size: 20),
+          Icon(Icons.lock_outline, color: Color(0xFF6C6C70), size: 20),
           SizedBox(width: 8),
-          Text('暂未开放', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+          Text('暂未开放', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
         ]),
         content: const Text(
           '「课表外观」功能正在开发中，敬请期待。',
-          style: TextStyle(color: Color(0xFF8E8E93), fontSize: 14, height: 1.5),
+          style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -3542,7 +3674,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
   void _pickNumber(String title, int current, int min, int max, ValueChanged<int> onPick) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _kCard,
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (_) {
@@ -3557,7 +3689,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 TextButton(onPressed: () => Navigator.pop(ctx),
                     child: const Text('取消', style: TextStyle(color: _kAccent))),
                 Text(title, style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                    color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
                 TextButton(
                     onPressed: () { onPick(tmp); Navigator.pop(ctx); },
                     child: const Text('确定', style: TextStyle(color: _kAccent))),
@@ -3602,9 +3734,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: Color(0xFFFF3B5C),
-            surface: Color(0xFF2C2C2E),
+            surface: Color(0xFFFFFFFF),
           ),
-          dialogBackgroundColor: const Color(0xFF1C1C1E),
+          dialogBackgroundColor: const Color(0xFFF2F2F7),
         ),
         child: child!,
       ),
@@ -3627,9 +3759,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
     final displayWeek = autoWeek;
 
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -3641,14 +3773,14 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
         ),
         leadingWidth: 100,
         title: const Text('课表数据',
-            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // ── 基本信息卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '课表名称',
               trailing: Text(cfg.name, style: const TextStyle(color: _kHint, fontSize: 15)),
@@ -3657,14 +3789,14 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    backgroundColor: const Color(0xFF2C2C2E),
+                    backgroundColor: _ac(ctx).card,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     title: const Text('修改课表名称',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                        style: TextStyle(fontSize: 16)),
                     content: TextField(
                       controller: ctrl,
                       autofocus: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: const Color(0xFF1C1C1E)),
                       decoration: const InputDecoration(
                         hintText: '请输入课表名称',
                         hintStyle: TextStyle(color: _kHint),
@@ -3707,7 +3839,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           const SizedBox(height: 20),
 
           // ── 周次信息卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '第一周的第一天',
               onTap: () => _pickDate(cfg.firstWeekDay,
@@ -3715,11 +3847,11 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3A3A3C),
+                  color: const Color(0xFFE5E5EA),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(_fmtDate(cfg.firstWeekDay),
-                    style: const TextStyle(color: Colors.white, fontSize: 14)),
+                    style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
               ),
             ),
             _SettingRow(
@@ -3742,7 +3874,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           const SizedBox(height: 20),
 
           // ── 数量卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '一天课程节数',
               onTap: () => _pickNumber('一天课程节数', cfg.sectionsPerDay, 1, 20,
@@ -3791,9 +3923,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: Color(0xFFFF3B5C),
-            surface: Color(0xFF2C2C2E),
+            surface: Color(0xFFFFFFFF),
           ),
-          dialogBackgroundColor: const Color(0xFF1C1C1E),
+          dialogBackgroundColor: const Color(0xFFF2F2F7),
         ),
         child: child!,
       ),
@@ -3835,7 +3967,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('已将 ${_fmtDate(_fromDate)} 的课程移动到 ${_fmtDate(_toDate)}'),
-      backgroundColor: const Color(0xFF3A3A3C),
+      backgroundColor: const Color(0xFFE5E5EA),
       behavior: SnackBarBehavior.floating,
     ));
   }
@@ -3843,9 +3975,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -3857,7 +3989,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
         ),
         leadingWidth: 100,
         title: const Text('调课工具',
-            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -3880,7 +4012,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
           ),
 
           // ── 选择课表卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '要调整的课表',
               showDivider: false,
@@ -3895,47 +4027,47 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
           const SizedBox(height: 20),
 
           // ── 日期选择卡 ──
-          _settingCard([
+          _settingCard(context, [
             // 将 xxx 的课程
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                const Text('将', style: TextStyle(color: Colors.white, fontSize: 15)),
+                const Text('将', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () => _pickDate(_fromDate, (d) => setState(() => _fromDate = d)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3A3A3C),
+                      color: const Color(0xFFE5E5EA),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_fmtDate(_fromDate),
-                        style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text('的课程', style: TextStyle(color: Colors.white, fontSize: 15)),
+                const Text('的课程', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
               ]),
             ),
             // 分隔线
-            Container(height: 0.5, color: const Color(0xFF3A3A3C), margin: const EdgeInsets.only(left: 16)),
+            Container(height: 0.5, color: const Color(0xFFE5E5EA), margin: const EdgeInsets.only(left: 16)),
             // 移动到 xxx
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                const Text('移动到', style: TextStyle(color: Colors.white, fontSize: 15)),
+                const Text('移动到', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () => _pickDate(_toDate, (d) => setState(() => _toDate = d)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3A3A3C),
+                      color: const Color(0xFFE5E5EA),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_fmtDate(_toDate),
-                        style: const TextStyle(color: Colors.white, fontSize: 14)),
+                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
                   ),
                 ),
               ]),
@@ -4004,9 +4136,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _kCard,
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('删除课程', style: TextStyle(color: Colors.white)),
+        title: const Text('删除课程'),
         content: Text('确定删除已选的 ${_selected.length} 门课程？',
             style: const TextStyle(color: _kHint, fontSize: 14)),
         actions: [
@@ -4030,9 +4162,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _kCard,
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('清空课表', style: TextStyle(color: Colors.white)),
+        title: const Text('清空课表'),
         content: Text('确定删除当前课表全部 ${s.courses.length} 门课程？此操作不可恢复。',
             style: const TextStyle(color: _kHint, fontSize: 14, height: 1.5)),
         actions: [
@@ -4068,9 +4200,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
     final allSelected = courses.isNotEmpty && _selected.length == courses.length;
 
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
@@ -4085,7 +4217,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
           _editing
               ? (_selected.isEmpty ? '选择课程' : '已选 ${_selected.length} 门')
               : '已添课程',
-          style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600),
+          style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -4148,7 +4280,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
               else
                 Container(
                   decoration: BoxDecoration(
-                    color: _kCard,
+                    color: _ac(context).card,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -4187,12 +4319,12 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                   shape: BoxShape.circle,
                                   color: isSelected ? const Color(0xFFFF3B5C) : Colors.transparent,
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFFFF3B5C) : const Color(0xFF636366),
+                                    color: isSelected ? const Color(0xFFFF3B5C) : const Color(0xFF6C6C70),
                                     width: 2,
                                   ),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check, color: Colors.white, size: 13)
+                                    ? const Icon(Icons.check, color: const Color(0xFF1C1C1E), size: 13)
                                     : null,
                               ),
                               const SizedBox(width: 12),
@@ -4206,7 +4338,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                             // 课程名
                             Expanded(
                               child: Text(c.name,
-                                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                                  style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15),
                                   overflow: TextOverflow.ellipsis),
                             ),
                             // 时间信息
@@ -4226,7 +4358,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                         return Column(children: [
                           row,
                           if (!isLast)
-                            Container(height: 0.5, color: const Color(0xFF3A3A3C),
+                            Container(height: 0.5, color: const Color(0xFFE5E5EA),
                                 margin: const EdgeInsets.only(left: 50)),
                         ]);
                       }
@@ -4246,9 +4378,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                               await showDialog<bool>(
                                 context: context,
                                 builder: (_) => AlertDialog(
-                                  backgroundColor: _kCard,
+                                  backgroundColor: _ac(context).card,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                  title: const Text('删除课程', style: TextStyle(color: Colors.white)),
+                                  title: const Text('删除课程'),
                                   content: Text('确定删除「${c.name}」？',
                                       style: const TextStyle(color: _kHint)),
                                   actions: [
@@ -4266,7 +4398,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                           child: row,
                         ),
                         if (!isLast)
-                          Container(height: 0.5, color: const Color(0xFF3A3A3C),
+                          Container(height: 0.5, color: const Color(0xFFE5E5EA),
                               margin: const EdgeInsets.only(left: 32)),
                       ]);
                     }),
@@ -4280,7 +4412,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
             Positioned(
               left: 0, right: 0, bottom: 0,
               child: Container(
-                color: const Color(0xFF1C1C1E),
+                color: const Color(0xFFF2F2F7),
                 padding: EdgeInsets.fromLTRB(
                     20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
                 child: Row(
@@ -4332,7 +4464,6 @@ class GlobalSettingsPage extends StatefulWidget {
 }
 
 class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
-  bool _darkMode    = false;
   bool _notification = false;
   bool _widgetSync  = false;
 
@@ -4340,11 +4471,11 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(ctx).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('功能开发中',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-        content: const Text('该功能正在开发中，敬请期待。',
+        title: Text('功能开发中',
+            style: TextStyle(color: _ac(ctx).primaryText, fontSize: 16, fontWeight: FontWeight.w600)),
+        content: Text('该功能正在开发中，敬请期待。',
             style: TextStyle(color: _kHint, fontSize: 14)),
         actions: [
           TextButton(
@@ -4358,15 +4489,16 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = AppStateScope.of(context);
     return _SubPageScaffold(
       title: '全局设置',
       children: [
-        _settingCard([
+        _settingCard(context, [
           _SettingRow(
             label: '深色模式',
             trailing: Switch(
-              value: _darkMode,
-              onChanged: (v) => _showWip(context),
+              value: appState.isDarkMode,
+              onChanged: (v) => appState.updateDarkMode(v),
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
@@ -4388,23 +4520,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             ),
           ),
         ]),
-        _settingCard([
-          _SettingRow(
-            label: '主题色',
-            onTap: () => _pickThemeColor(context),
-            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-              Container(
-                width: 20, height: 20,
-                decoration: BoxDecoration(
-                  color: AppStateScope.of(context).themeColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white24, width: 1),
-                ),
-              ),
-              const SizedBox(width: 6),
-              const Icon(Icons.chevron_right, color: _kHint, size: 18),
-            ]),
-          ),
+        _settingCard(context, [
           _SettingRow(
             label: '设置背景格式',
             showDivider: false,
@@ -4412,7 +4528,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             trailing: const Icon(Icons.chevron_right, color: _kHint, size: 18),
           ),
         ]),
-        _settingCard([
+        _settingCard(context, [
           _SettingRow(
             label: '使用帮助',
             showDivider: false,
@@ -4425,127 +4541,10 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             },
           ),
         ]),
-        _settingCard([
-          _SettingRow(
-            label: '清除缓存',
-            showDivider: false,
-            trailing: const Text('2.3 MB', style: TextStyle(color: _kHint, fontSize: 14)),
-            onTap: () {},
-          ),
-        ]),
       ],
     );
   }
 
-  void _pickThemeColor(BuildContext context) {
-    final appState = AppStateScope.of(context);
-    Color selected = appState.themeColor;
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: _kCard,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setModal) => SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(width: 36, height: 4,
-                      decoration: BoxDecoration(color: const Color(0xFF48484A),
-                          borderRadius: BorderRadius.circular(2))),
-                ),
-                const SizedBox(height: 16),
-                const Text('主题色',
-                    style: TextStyle(color: Colors.white, fontSize: 16,
-                        fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
-                const Text('将覆盖课程卡片的默认颜色（颜色编号 0）',
-                    style: TextStyle(color: _kHint, fontSize: 12)),
-                const SizedBox(height: 16),
-                // 预设色盘
-                Wrap(
-                  spacing: 12, runSpacing: 12,
-                  children: [
-                    ...kCourseColors.map((c) {
-                      final isSelected = selected.value == c.value;
-                      return GestureDetector(
-                        onTap: () => setModal(() => selected = c),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          width: 40, height: 40,
-                          decoration: BoxDecoration(
-                            color: c,
-                            shape: BoxShape.circle,
-                            border: isSelected
-                                ? Border.all(color: Colors.white, width: 3)
-                                : Border.all(color: Colors.transparent, width: 3),
-                            boxShadow: isSelected
-                                ? [BoxShadow(color: c.withOpacity(0.5), blurRadius: 8)]
-                                : null,
-                          ),
-                          child: isSelected
-                              ? const Icon(Icons.check, color: Colors.white, size: 18)
-                              : null,
-                        ),
-                      );
-                    }),
-                    // 自定义颜色按钮
-                    GestureDetector(
-                      onTap: () async {
-                        Navigator.pop(ctx);
-                        final picked = await showDialog<Color>(
-                          context: context,
-                          builder: (_) => _ColorPickerDialog(initial: selected),
-                        );
-                        if (picked != null) {
-                          appState.updateThemeColor(picked);
-                        }
-                      },
-                      child: Container(
-                        width: 40, height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF48484A), width: 2),
-                        ),
-                        child: const Icon(Icons.colorize, color: _kHint, size: 18),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: GestureDetector(
-                    onTap: () {
-                      appState.updateThemeColor(selected);
-                      Navigator.pop(ctx);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: selected,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text('确定',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 16,
-                              fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -4570,7 +4569,7 @@ class _ExportPageState extends State<ExportPage> {
     return _SubPageScaffold(
       title: '导出课表',
       children: [
-        _settingCard([
+        _settingCard(context, [
           _SettingRow(
             label: '导出格式',
             trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -4602,7 +4601,7 @@ class _ExportPageState extends State<ExportPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('课表已导出为 $_format'),
-                  backgroundColor: const Color(0xFF3A3A3C),
+                  backgroundColor: const Color(0xFFE5E5EA),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
@@ -4624,7 +4623,7 @@ class _ExportPageState extends State<ExportPage> {
   void _pickFormat() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _kCard,
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (_) => Padding(
@@ -4633,7 +4632,7 @@ class _ExportPageState extends State<ExportPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('选择格式', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+            const Text('选择格式', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 12),
             ..._formats.map((f) => GestureDetector(
               onTap: () { setState(() => _format = f); Navigator.pop(context); },
@@ -4686,13 +4685,13 @@ class AboutPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text('StayUP课程表', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+              const Text('StayUP课程表', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 20, fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
               const Text('版本 0.0.1 (Beta)', style: TextStyle(color: _kHint, fontSize: 13)),
             ],
           ),
         ),
-        _settingCard([
+        _settingCard(context, [
           const _SettingRow(
             label: '版本号',
             trailing: Text('0.0.1 (Beta)', style: TextStyle(color: _kHint, fontSize: 14)),
@@ -4764,9 +4763,9 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: Color(0xFFFF3B5C),
-            surface: Color(0xFF2C2C2E),
+            surface: Color(0xFFFFFFFF),
           ),
-          dialogBackgroundColor: const Color(0xFF1C1C1E),
+          dialogBackgroundColor: const Color(0xFFF2F2F7),
         ),
         child: child!,
       ),
@@ -4777,7 +4776,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
   void _pickNumber(String title, int current, int min, int max, ValueChanged<int> cb) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: _kCard,
+      backgroundColor: _ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
       builder: (_) {
@@ -4792,7 +4791,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 TextButton(onPressed: () => Navigator.pop(ctx),
                     child: const Text('取消', style: TextStyle(color: _kAccent))),
                 Text(title, style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16)),
+                    color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
                 TextButton(onPressed: () { cb(tmp); Navigator.pop(ctx); },
                     child: const Text('确定', style: TextStyle(color: _kAccent))),
               ]),
@@ -4830,7 +4829,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('请填写课表名称'),
-        backgroundColor: Color(0xFF3A3A3C),
+        backgroundColor: Color(0xFFE5E5EA),
         behavior: SnackBarBehavior.floating,
       ));
       return;
@@ -4856,9 +4855,9 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
   Widget build(BuildContext context) {
     final isEmpty = _nameCtrl.text.trim().isEmpty;
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         elevation: 0,
         automaticallyImplyLeading: false,
         leading: TextButton(
@@ -4867,7 +4866,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
         ),
         leadingWidth: 64,
         title: const Text('新建课表',
-            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -4875,7 +4874,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
             child: Text(
               '保存',
               style: TextStyle(
-                color: isEmpty ? const Color(0xFF48484A) : const Color(0xFF8E8E93),
+                color: isEmpty ? const Color(0xFFD1D1D6) : const Color(0xFF6C6C70),
                 fontSize: 16,
               ),
             ),
@@ -4886,17 +4885,17 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
         padding: const EdgeInsets.all(16),
         children: [
           // ── 课表名称 ──
-          _settingCard([
+          _settingCard(context, [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: TextField(
                 controller: _nameCtrl,
                 onChanged: (_) => setState(() {}),
                 autofocus: true,
-                style: const TextStyle(color: Colors.white, fontSize: 15),
+                style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15),
                 decoration: const InputDecoration(
                   hintText: '课表名称（必填）',
-                  hintStyle: TextStyle(color: Color(0xFF48484A), fontSize: 15),
+                  hintStyle: TextStyle(color: Color(0xFFD1D1D6), fontSize: 15),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(vertical: 14),
                 ),
@@ -4907,18 +4906,18 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           const SizedBox(height: 20),
 
           // ── 周次设置卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '第一周的第一天',
               onTap: _pickDate,
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3A3A3C),
+                  color: const Color(0xFFE5E5EA),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(_fmtDate(_firstDay),
-                    style: const TextStyle(color: Colors.white, fontSize: 14)),
+                    style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
               ),
             ),
             const _SettingRow(
@@ -4939,7 +4938,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           const SizedBox(height: 20),
 
           // ── 数量卡 ──
-          _settingCard([
+          _settingCard(context, [
             _SettingRow(
               label: '一天课程节数',
               onTap: () => _pickNumber('一天课程节数', _sectionsPerDay, 1, 20,
@@ -4980,9 +4979,9 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
     final schedules = s.scheduleNames;
 
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: _ac(context).bg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: _ac(context).bg,
         elevation: 0,
         leading: TextButton(
           onPressed: () => Navigator.pop(context),
@@ -4990,7 +4989,7 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
         ),
         leadingWidth: 60,
         title: const Text('多课表管理',
-            style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w600)),
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -5032,9 +5031,16 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
                 isActive: isActive,
                 isEditing: _isEditing,
                 index: i,
+                isLast: i == schedules.length - 1,
                 onTap: () {
                   s.switchSchedule(i);
-                  Navigator.pop(context);
+                  if (_isEditing) {
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => const ScheduleDataPage(),
+                    ));
+                  }
                 },
                 onDelete: schedules.length > 1
                     ? () => _confirmDelete(ctx, s, i, name)
@@ -5074,9 +5080,9 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
     showDialog(
       context: ctx,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF2C2C2E),
+        backgroundColor: _ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('删除课表', style: TextStyle(color: Colors.white, fontSize: 16)),
+        title: const Text('删除课表', style: TextStyle(fontSize: 16)),
         content: Text('确定删除「$name」？此操作不可恢复。',
             style: const TextStyle(color: _kHint, fontSize: 14, height: 1.5)),
         actions: [
@@ -5102,6 +5108,7 @@ class _ScheduleListItem extends StatelessWidget {
   final bool isActive;
   final bool isEditing;
   final int index;
+  final bool isLast;
   final VoidCallback onTap;
   final VoidCallback? onDelete;
 
@@ -5111,6 +5118,7 @@ class _ScheduleListItem extends StatelessWidget {
     required this.isActive,
     required this.isEditing,
     required this.index,
+    required this.isLast,
     required this.onTap,
     this.onDelete,
   });
@@ -5122,10 +5130,10 @@ class _ScheduleListItem extends StatelessWidget {
         // 卡片圆角处理
         Container(
           decoration: BoxDecoration(
-            color: _kCard,
+            color: _ac(context).card,
             borderRadius: BorderRadius.vertical(
               top: index == 0 ? const Radius.circular(12) : Radius.zero,
-              bottom: Radius.zero, // 由外部列表控制
+              bottom: isLast ? const Radius.circular(12) : Radius.zero,
             ),
           ),
           child: GestureDetector(
@@ -5143,17 +5151,17 @@ class _ScheduleListItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: onDelete != null
                             ? const Color(0xFFFF3B5C)
-                            : const Color(0xFF48484A),
+                            : const Color(0xFFD1D1D6),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.remove, color: Colors.white, size: 14),
+                      child: const Icon(Icons.remove, color: const Color(0xFF1C1C1E), size: 14),
                     ),
                   ),
                   const SizedBox(width: 12),
                 ],
                 Expanded(child: Text(name,
                     style: TextStyle(
-                      color: isActive && !isEditing ? const Color(0xFF4ECDC4) : Colors.white,
+                      color: isActive && !isEditing ? const Color(0xFF4ECDC4) : _ac(context).primaryText,
                       fontSize: 16,
                       fontWeight: isActive && !isEditing ? FontWeight.w600 : FontWeight.w400,
                     ))),
@@ -5161,108 +5169,340 @@ class _ScheduleListItem extends StatelessWidget {
                 if (isEditing)
                   ReorderableDragStartListener(
                     index: index,
-                    child: const Icon(Icons.drag_handle, color: _kHint, size: 20),
+                    child: Icon(Icons.drag_handle, color: _ac(context).hint, size: 20),
                   )
                 else if (isActive)
                   const Icon(Icons.check, color: Color(0xFF4ECDC4), size: 18)
                 else
-                  const Icon(Icons.chevron_right, color: _kHint, size: 20),
+                  Icon(Icons.chevron_right, color: _ac(context).hint, size: 20),
               ]),
             ),
           ),
         ),
-        Container(
-          height: 0.5,
-          color: const Color(0xFF3A3A3C),
-          margin: EdgeInsets.only(left: isEditing ? 50 : 16),
-        ),
+        // 最后一项不显示分割线
+        if (!isLast)
+          Container(
+            height: 0.5,
+            color: _ac(context).divider,
+            margin: EdgeInsets.only(left: isEditing ? 50 : 16),
+          ),
       ],
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// 自定义颜色选择器 Dialog（HSV 色轮简化版）
-// ─────────────────────────────────────────────
 
-class _ColorPickerDialog extends StatefulWidget {
-  final Color initial;
-  const _ColorPickerDialog({required this.initial});
+// ═══════════════════════════════════════════════════════════════
+// 选择学校导入页
+// ═══════════════════════════════════════════════════════════════
+
+class SchoolImportPage extends StatefulWidget {
+  const SchoolImportPage({super.key});
   @override
-  State<_ColorPickerDialog> createState() => _ColorPickerDialogState();
+  State<SchoolImportPage> createState() => _SchoolImportPageState();
 }
 
-class _ColorPickerDialogState extends State<_ColorPickerDialog> {
-  late double _hue;
-  late double _sat;
-  late double _val;
+class _SchoolImportPageState extends State<SchoolImportPage> {
+  // 支持的学校列表（拼音首字母 → 显示名称）
+  static const List<Map<String, String>> _allSchools = [
+    {'name': '华中科技大学', 'pinyin': 'H'},
+    {'name': '江西师范大学', 'pinyin': 'J'},
+    {'name': '上海交通大学', 'pinyin': 'S'},
+    {'name': '武汉大学',     'pinyin': 'W'},
+    {'name': '香港中文大学（深圳）', 'pinyin': 'X'},
+    {'name': '中国人民大学', 'pinyin': 'Z'},
+  ];
+
+  // 按首字母分组
+  static Map<String, List<String>> get _grouped {
+    final map = <String, List<String>>{};
+    for (final s in _allSchools) {
+      final letter = s['pinyin']!;
+      map.putIfAbsent(letter, () => []).add(s['name']!);
+    }
+    return map;
+  }
+
+  // 字母索引列表（已排序）
+  static List<String> get _letters {
+    final keys = _grouped.keys.toList()..sort();
+    return keys;
+  }
+
+  final TextEditingController _searchCtrl = TextEditingController();
+  final ScrollController _scrollCtrl = ScrollController();
+  String _query = '';
+
+  // 每个字母 section 的 ScrollController key → offset 映射（按索引跳转）
+  // 用 GlobalKey 计算各 section 高度
+  final Map<String, GlobalKey> _sectionKeys = {};
 
   @override
   void initState() {
     super.initState();
-    final hsv = HSVColor.fromColor(widget.initial);
-    _hue = hsv.hue;
-    _sat = hsv.saturation;
-    _val = hsv.value;
+    for (final l in _letters) {
+      _sectionKeys[l] = GlobalKey();
+    }
+    _searchCtrl.addListener(() => setState(() => _query = _searchCtrl.text.trim()));
   }
 
-  Color get _color => HSVColor.fromAHSV(1, _hue, _sat, _val).toColor();
-
   @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: const Color(0xFF2C2C2E),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      title: const Text('自定义颜色',
-          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 预览
-          Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: _color,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _sliderRow('色相', _hue, 0, 360, (v) => setState(() => _hue = v),
-              activeColor: HSVColor.fromAHSV(1, _hue, 1, 1).toColor()),
-          _sliderRow('饱和度', _sat, 0, 1, (v) => setState(() => _sat = v),
-              activeColor: _color),
-          _sliderRow('明度', _val, 0, 1, (v) => setState(() => _val = v),
-              activeColor: _color),
-        ],
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context),
-            child: const Text('取消', style: TextStyle(color: _kHint))),
-        TextButton(
-          onPressed: () => Navigator.pop(context, _color),
-          child: const Text('确定', style: TextStyle(color: _kAccent)),
-        ),
-      ],
+  void dispose() {
+    _searchCtrl.dispose();
+    _scrollCtrl.dispose();
+    super.dispose();
+  }
+
+  // 过滤结果
+  List<Map<String, String>> get _filtered {
+    if (_query.isEmpty) return _allSchools;
+    return _allSchools.where((s) => s['name']!.contains(_query)).toList();
+  }
+
+  // 按字母分组（过滤后）
+  Map<String, List<String>> get _filteredGrouped {
+    final map = <String, List<String>>{};
+    for (final s in _filtered) {
+      final letter = s['pinyin']!;
+      map.putIfAbsent(letter, () => []).add(s['name']!);
+    }
+    return map;
+  }
+
+  List<String> get _filteredLetters {
+    final keys = _filteredGrouped.keys.toList()..sort();
+    return keys;
+  }
+
+  // 跳转到某字母 section
+  void _jumpToLetter(String letter) {
+    final grouped = _filteredGrouped;
+    final letters = _filteredLetters;
+    if (!letters.contains(letter)) return;
+    // 计算该字母前所有 section 的高度偏移量
+    // 每个 section = header(36) + items*56
+    double offset = 0;
+    for (final l in letters) {
+      if (l == letter) break;
+      final count = grouped[l]!.length;
+      offset += 36 + count * 56.0;
+    }
+    _scrollCtrl.animateTo(
+      offset.clamp(0, _scrollCtrl.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOut,
     );
   }
 
-  Widget _sliderRow(String label, double value, double min, double max,
-      ValueChanged<double> onChanged, {required Color activeColor}) {
-    return Row(children: [
-      SizedBox(width: 48,
-          child: Text(label, style: const TextStyle(color: _kHint, fontSize: 12))),
-      Expanded(
-        child: SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: activeColor,
-            thumbColor: activeColor,
-            inactiveTrackColor: const Color(0xFF48484A),
-            overlayColor: activeColor.withOpacity(0.2),
-            trackHeight: 4,
+  void _onSchoolTap(String name) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: _ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Row(children: [
+          const Icon(Icons.school_outlined, color: Color(0xFF6C6C70), size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(name, style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600))),
+        ]),
+        content: const Text(
+          '该学校的课程导入功能正在开发中，敬请期待。',
+          style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('好的', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
           ),
-          child: Slider(value: value, min: min, max: max, onChanged: onChanged),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final grouped = _filteredGrouped;
+    final letters = _filteredLetters;
+    final allLetters = _letters; // 全部字母，用于右侧索引条
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFF2F2F7),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ── 顶部搜索栏 ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Padding(
+                      padding: EdgeInsets.only(right: 12),
+                      child: Text('返回', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: TextField(
+                        controller: _searchCtrl,
+                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15),
+                        decoration: const InputDecoration(
+                          hintText: '搜索学校',
+                          hintStyle: TextStyle(color: Color(0xFF6C6C70), fontSize: 15),
+                          prefixIcon: Icon(Icons.search, color: Color(0xFF6C6C70), size: 20),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── 提示文字 ──
+            const Padding(
+              padding: EdgeInsets.fromLTRB(20, 4, 20, 12),
+              child: Text(
+                '在搜索框输入学校全称以快速定位',
+                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 13),
+              ),
+            ),
+
+            // ── 列表 + 右侧字母索引条 ──
+            Expanded(
+              child: Stack(
+                children: [
+                  // 主列表
+                  ListView.builder(
+                    controller: _scrollCtrl,
+                    padding: const EdgeInsets.only(right: 28, bottom: 20),
+                    itemCount: letters.fold<int>(0, (sum, l) => sum + 1 + grouped[l]!.length),
+                    itemBuilder: (context, index) {
+                      // 映射 index → section header 或 item
+                      int cursor = 0;
+                      for (final letter in letters) {
+                        if (index == cursor) {
+                          // section header
+                          return _SectionHeader(letter: letter);
+                        }
+                        cursor++;
+                        final items = grouped[letter]!;
+                        if (index < cursor + items.length) {
+                          final itemIdx = index - cursor;
+                          final name = items[itemIdx];
+                          final isLast = itemIdx == items.length - 1;
+                          return _SchoolRow(
+                            name: name,
+                            showDivider: !isLast,
+                            onTap: () => _onSchoolTap(name),
+                          );
+                        }
+                        cursor += items.length;
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
+
+                  // 右侧字母索引条
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: _AlphaIndexBar(
+                      letters: allLetters,
+                      onLetterTap: _jumpToLetter,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-    ]);
+    );
+  }
+}
+
+// ── Section 字母标题 ──
+class _SectionHeader extends StatelessWidget {
+  final String letter;
+  const _SectionHeader({required this.letter});
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
+    child: Text(letter, style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 13, fontWeight: FontWeight.w600)),
+  );
+}
+
+// ── 学校行 ──
+class _SchoolRow extends StatelessWidget {
+  final String name;
+  final bool showDivider;
+  final VoidCallback onTap;
+  const _SchoolRow({required this.name, required this.showDivider, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Row(
+                children: [
+                  Expanded(child: Text(name, style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16))),
+                  const Icon(Icons.chevron_right, color: Color(0xFFD1D1D6), size: 20),
+                ],
+              ),
+            ),
+            if (showDivider)
+              const Divider(height: 1, indent: 16, endIndent: 0, color: Color(0xFFE5E5EA)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── 右侧字母索引条 ──
+class _AlphaIndexBar extends StatelessWidget {
+  final List<String> letters;
+  final ValueChanged<String> onLetterTap;
+  const _AlphaIndexBar({required this.letters, required this.onLetterTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 28,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: letters.map((l) => GestureDetector(
+          onTap: () => onLetterTap(l),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              l,
+              style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 12, fontWeight: FontWeight.w600),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        )).toList(),
+      ),
+    );
   }
 }
