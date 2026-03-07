@@ -1,10 +1,15 @@
 name: Flutter CI
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    tags:
+      - 'v*.*.*'
+    branches: 
+      - main
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
 
 jobs:
   build:
