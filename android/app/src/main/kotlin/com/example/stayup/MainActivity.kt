@@ -1,4 +1,4 @@
-package com.example.stayup
+package com.stayup.schedule
 
 import io.flutter.embedding.android.FlutterActivity
 
