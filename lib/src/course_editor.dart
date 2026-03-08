@@ -1,0 +1,1498 @@
+import 'package:flutter/material.dart';
+import 'models.dart';
+import 'common_widgets.dart';
+
+class AddCoursePage extends StatefulWidget {
+  final ValueChanged<Course>? onAdd;
+  final ValueChanged<Course>? onEdit;
+  final Course? editCourse; // 非 null 时为编辑模式
+  const AddCoursePage({super.key, this.onAdd, this.onEdit, this.editCourse})
+      : assert(editCourse != null || onAdd != null,
+            'Must provide onAdd for add mode or onEdit for edit mode');
+
+  @override
+  State<AddCoursePage> createState() => _AddCoursePageState();
+}
+
+class _AddCoursePageState extends State<AddCoursePage> {
+  final _nameCtrl    = TextEditingController();
+  final _creditCtrl  = TextEditingController();
+  final _noteCtrl    = TextEditingController();
+  final _teacherCtrl = TextEditingController();
+  final _locCtrl     = TextEditingController();
+
+  Color? _customColor;   // null = 随机自动
+  bool   _initialized = false;
+
+  // ── 多时间段 ──
+  late List<CourseSlot> _slots;
+  int _activeSlotIdx = 0;
+
+  CourseSlot get _activeSlot => _slots[_activeSlotIdx];
+  void _updateActiveSlot(CourseSlot s) => setState(() => _slots[_activeSlotIdx] = s);
+
+  static const Color _accent   = Color(0xFFFF3B5C);
+
+  // 自动选一个与已有课程不冲突的颜色
+  Color _pickAutoColor(List<Course> existing) {
+    final usedColors = existing.map((c) => c.effectiveColor.value).toSet();
+    // 先从预设色盘找未用色
+    for (final c in kCourseColors) {
+      if (!usedColors.contains(c.value)) return c;
+    }
+    // 全部用过就从色相环随机取
+    final hue = (existing.length * 47.0) % 360;
+    return HSVColor.fromAHSV(1, hue, 0.7, 0.9).toColor();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    final cfg = AppStateScope.of(context).config;
+
+    final e = widget.editCourse;
+    if (e != null) {
+      _nameCtrl.text    = e.name;
+      _creditCtrl.text  = e.credit;
+      _noteCtrl.text    = e.note;
+      _teacherCtrl.text = e.teacher;
+      _locCtrl.text     = e.location;
+      _customColor      = e.customColor ?? e.effectiveColor;
+      _slots = [
+        CourseSlot(
+          day: e.day,
+          startSection: e.startSection,
+          endSection: (e.startSection + e.span - 1).clamp(1, cfg.sectionsPerDay),
+          startWeek: e.startWeek,
+          endWeek: e.endWeek,
+        ),
+        // 还原附加时间段
+        ...e.extraSlots.map((s) => CourseSlot(
+          day: s.day,
+          startSection: s.startSection,
+          endSection: s.endSection,
+          startWeek: s.startWeek,
+          endWeek: s.endWeek,
+        )),
+      ];
+    } else {
+      _slots = [
+        CourseSlot(
+          day: 1,
+          startSection: 1,
+          endSection: 2.clamp(1, cfg.sectionsPerDay),
+          startWeek: 1,
+          endWeek: cfg.totalWeeks,
+        ),
+      ];
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose(); _creditCtrl.dispose(); _noteCtrl.dispose();
+    _teacherCtrl.dispose(); _locCtrl.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (_nameCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请填写课程名称'), backgroundColor: Color(0xFFE5E5EA)),
+      );
+      return;
+    }
+    final appState = AppStateScope.of(context);
+    final color    = _customColor ?? _pickAutoColor(appState.courses);
+    final primary  = _slots[0];
+    final extras   = _slots.length > 1
+        ? _slots.sublist(1).map((s) => CourseSlot(
+              day: s.day, startSection: s.startSection,
+              endSection: s.endSection,
+              startWeek: s.startWeek, endWeek: s.endWeek)).toList()
+        : <CourseSlot>[];
+    final course = Course(
+      id:           widget.editCourse?.id ?? DateTime.now().millisecondsSinceEpoch,
+      name:         _nameCtrl.text.trim(),
+      location:     _locCtrl.text.trim(),
+      teacher:      _teacherCtrl.text.trim(),
+      credit:       _creditCtrl.text.trim(),
+      note:         _noteCtrl.text.trim(),
+      day:          primary.day,
+      startSection: primary.startSection,
+      span:         primary.span,
+      colorIdx:     0,
+      customColor:  color,
+      weeks:        primary.weeks,
+      startWeek:    primary.startWeek,
+      endWeek:      primary.endWeek,
+      isNonWeek:    widget.editCourse?.isNonWeek ?? false,
+      extraSlots:   extras,
+    );
+    if (widget.editCourse != null) {
+      appState.editCourse(course);
+    } else {
+      appState.addCourse(course);
+    }
+    Navigator.pop(context);
+  }
+
+  // ── 选择器弹窗通用方法 ──
+  void _showPicker<T>({
+    required String title,
+    required List<T> values,
+    required T selected,
+    required String Function(T) label,
+    required ValueChanged<T> onChanged,
+  }) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        T current = selected;
+        return StatefulBuilder(builder: (ctx, setS) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(onPressed: () => Navigator.pop(ctx),
+                        child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                    Text(title, style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+                    TextButton(
+                        onPressed: () { onChanged(current); Navigator.pop(ctx); },
+                        child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 220,
+                child: ListWheelScrollView.useDelegate(
+                  itemExtent: 44,
+                  perspective: 0.003,
+                  diameterRatio: 1.8,
+                  physics: const FixedExtentScrollPhysics(),
+                  controller: FixedExtentScrollController(initialItem: values.indexOf(selected)),
+                  onSelectedItemChanged: (i) => setS(() => current = values[i]),
+                  childDelegate: ListWheelChildBuilderDelegate(
+                    childCount: values.length,
+                    builder: (_, i) => Center(
+                      child: Text(label(values[i]),
+                        style: TextStyle(
+                          color: values[i] == current ? Colors.white : const Color(0xFFC7C7CC),
+                          fontSize: values[i] == current ? 18 : 15,
+                          fontWeight: values[i] == current ? FontWeight.w600 : FontWeight.w400,
+                        )),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  // 周数范围选择器（双轮）
+  void _showWeekRangePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        int tmpStart = _activeSlot.startWeek, tmpEnd = _activeSlot.endWeek;
+        return StatefulBuilder(builder: (ctx, setS) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(onPressed: () => Navigator.pop(ctx),
+                        child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                    const Text('周数', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+                    TextButton(
+                        onPressed: () {
+                          _updateActiveSlot(_activeSlot.copyWith(startWeek: tmpStart, endWeek: tmpEnd));
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(child: Column(children: [
+                    const Text('开始', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
+                      itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
+                      physics: const FixedExtentScrollPhysics(),
+                      controller: FixedExtentScrollController(initialItem: tmpStart - 1),
+                      onSelectedItemChanged: (i) => setS(() => tmpStart = i + 1),
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: 20,
+                        builder: (_, i) => Center(child: Text('第${i+1}周',
+                          style: TextStyle(
+                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFFC7C7CC),
+                            fontSize: i + 1 == tmpStart ? 17 : 14,
+                            fontWeight: i + 1 == tmpStart ? FontWeight.w600 : FontWeight.w400,
+                          ))),
+                      ),
+                    )),
+                  ])),
+                  Expanded(child: Column(children: [
+                    const Text('结束', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
+                      itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
+                      physics: const FixedExtentScrollPhysics(),
+                      controller: FixedExtentScrollController(initialItem: tmpEnd - 1),
+                      onSelectedItemChanged: (i) => setS(() => tmpEnd = i + 1),
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: 20,
+                        builder: (_, i) => Center(child: Text('第${i+1}周',
+                          style: TextStyle(
+                            color: i + 1 == tmpEnd ? Colors.white : const Color(0xFFC7C7CC),
+                            fontSize: i + 1 == tmpEnd ? 17 : 14,
+                            fontWeight: i + 1 == tmpEnd ? FontWeight.w600 : FontWeight.w400,
+                          ))),
+                      ),
+                    )),
+                  ])),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  // 节次范围选择器（开始节 + 结束节）
+  void _showSectionPicker() {
+    final cfg = AppStateScope.of(context).config;
+    final maxSec = cfg.sectionsPerDay;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        int tmpStart = _activeSlot.startSection, tmpEnd = _activeSlot.endSection;
+        return StatefulBuilder(builder: (ctx, setS) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6), borderRadius: BorderRadius.circular(2))),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(onPressed: () => Navigator.pop(ctx),
+                        child: const Text('取消', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                    const Text('选择节次', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+                    TextButton(
+                        onPressed: () {
+                          // 确保 end >= start
+                          final end = tmpEnd < tmpStart ? tmpStart : tmpEnd;
+                          _updateActiveSlot(_activeSlot.copyWith(startSection: tmpStart, endSection: end));
+                          Navigator.pop(ctx);
+                        },
+                        child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16))),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(child: Column(children: [
+                    const Text('开始节', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
+                      itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
+                      physics: const FixedExtentScrollPhysics(),
+                      controller: FixedExtentScrollController(initialItem: tmpStart - 1),
+                      onSelectedItemChanged: (i) {
+                        setS(() {
+                          tmpStart = i + 1;
+                          if (tmpEnd < tmpStart) tmpEnd = tmpStart;
+                        });
+                      },
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: maxSec,
+                        builder: (_, i) => Center(child: Text('第${i+1}节',
+                          style: TextStyle(
+                            color: i + 1 == tmpStart ? Colors.white : const Color(0xFFC7C7CC),
+                            fontSize: i + 1 == tmpStart ? 17 : 14,
+                            fontWeight: i + 1 == tmpStart ? FontWeight.w600 : FontWeight.w400,
+                          ))),
+                      ),
+                    )),
+                  ])),
+                  Expanded(child: Column(children: [
+                    const Text('结束节', style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    SizedBox(height: 200, child: ListWheelScrollView.useDelegate(
+                      itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
+                      physics: const FixedExtentScrollPhysics(),
+                      controller: FixedExtentScrollController(
+                          initialItem: (tmpEnd - 1).clamp(0, maxSec - 1)),
+                      onSelectedItemChanged: (i) {
+                        setS(() {
+                          tmpEnd = i + 1;
+                          if (tmpEnd < tmpStart) tmpStart = tmpEnd;
+                        });
+                      },
+                      childDelegate: ListWheelChildBuilderDelegate(
+                        childCount: maxSec,
+                        builder: (_, i) => Center(child: Text('第${i+1}节',
+                          style: TextStyle(
+                            color: i + 1 == tmpEnd ? Colors.white : (i + 1 < tmpStart ? const Color(0xFFD1D1D6) : const Color(0xFFC7C7CC)),
+                            fontSize: i + 1 == tmpEnd ? 17 : 14,
+                            fontWeight: i + 1 == tmpEnd ? FontWeight.w600 : FontWeight.w400,
+                          ))),
+                      ),
+                    )),
+                  ])),
+                ],
+              ),
+              const SizedBox(height: 24),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildCard(BuildContext context, List<Widget> rows) {
+    final colors = ac(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          for (int i = 0; i < rows.length; i++) ...[
+            rows[i],
+            if (i < rows.length - 1)
+              Container(height: 0.5, color: colors.divider, margin: const EdgeInsets.only(left: 16)),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextRow(BuildContext context, String label, TextEditingController ctrl, String hint,
+      {bool multiline = false, int? maxLength}) {
+    final colors = ac(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        crossAxisAlignment: multiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 60,
+            child: Padding(
+              padding: EdgeInsets.only(top: multiline ? 14 : 0),
+              child: Text(label, style: TextStyle(color: colors.primaryText, fontSize: 16)),
+            )),
+          Expanded(
+            child: TextField(
+              controller: ctrl,
+              maxLines: multiline ? 4 : 1,
+              maxLength: maxLength,
+              style: TextStyle(color: colors.primaryText, fontSize: 15),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: TextStyle(color: colors.hint, fontSize: 15),
+                border: InputBorder.none,
+                counterStyle: TextStyle(color: colors.hint, fontSize: 11),
+                contentPadding: EdgeInsets.symmetric(vertical: multiline ? 12 : 0),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTapRow(BuildContext context, String label, String value, VoidCallback onTap) {
+    final colors = ac(context);
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Text(label, style: TextStyle(color: colors.primaryText, fontSize: 16)),
+            const Spacer(),
+            Text(value, style: TextStyle(color: colors.hint, fontSize: 15)),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right, color: colors.hint, size: 18),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = AppStateScope.of(context);
+    final previewColor = _customColor ?? _pickAutoColor(s.courses);
+    final colors = ac(context);
+
+    return Scaffold(
+      backgroundColor: colors.bg,
+      appBar: AppBar(
+        backgroundColor: colors.card,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消', style: TextStyle(color: _accent, fontSize: 16)),
+            ),
+            const Spacer(),
+            Text(widget.editCourse != null ? '编辑课程' : '添加课程',
+                style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600)),
+            const Spacer(),
+            TextButton(
+              onPressed: _save,
+              child: const Text('保存', style: TextStyle(color: _accent, fontSize: 16, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── 基本信息卡 ──
+            _buildCard(context, [
+              _buildTextRow(context, '课程', _nameCtrl, '必填', maxLength: 20),
+              // 颜色行
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    Text('颜色', style: TextStyle(color: colors.primaryText, fontSize: 16)),
+                    const Spacer(),
+                    if (_customColor == null)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Text('自动', style: TextStyle(color: colors.hint, fontSize: 13)),
+                      ),
+                    GestureDetector(
+                      onTap: () => _showColorPicker(s.courses),
+                      child: Container(
+                        width: 32, height: 32,
+                        decoration: BoxDecoration(
+                          color: previewColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: colors.divider, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildTextRow(context, '学分', _creditCtrl, '选填'),
+              _buildTextRow(context, '备注', _noteCtrl, '', multiline: true),
+            ]),
+
+            const SizedBox(height: 24),
+
+            // ── 时间段标题 + tab 操作行 ──
+            Padding(
+              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              child: Row(
+                children: [
+                  Text('时间段', style: TextStyle(color: colors.hint, fontSize: 13)),
+                  const SizedBox(width: 8),
+                  // slot tab 圆点
+                  ...List.generate(_slots.length, (i) {
+                    final active = i == _activeSlotIdx;
+                    return GestureDetector(
+                      onTap: () => setState(() => _activeSlotIdx = i),
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          width: active ? 22 : 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: active ? _accent : const Color(0xFFD1D1D6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  const Spacer(),
+                  // 删除当前 tab（超过1个时显示）
+                  if (_slots.length > 1)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _slots.removeAt(_activeSlotIdx);
+                          if (_activeSlotIdx >= _slots.length) {
+                            _activeSlotIdx = _slots.length - 1;
+                          }
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        margin: const EdgeInsets.only(right: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF3B5C).withOpacity(0.12),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                          Icon(Icons.remove, color: Color(0xFFFF3B5C), size: 13),
+                          SizedBox(width: 2),
+                          Text('删除', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 12)),
+                        ]),
+                      ),
+                    ),
+                  // 复制按钮：克隆当前 slot 新建 tab
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _slots.add(_activeSlot.copyWith());
+                        _activeSlotIdx = _slots.length - 1;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: _accent.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.add, color: _accent, size: 13),
+                        SizedBox(width: 2),
+                        Text('添加', style: TextStyle(color: _accent, fontSize: 12)),
+                      ]),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // ── 时间卡（显示当前激活 slot）──
+            _buildCard(context, [
+              _buildTapRow(context, 
+                '周数',
+                '第${_activeSlot.startWeek} – ${_activeSlot.endWeek}周',
+                _showWeekRangePicker,
+              ),
+              _buildTapRow(context, 
+                '时间',
+                '周${kWeekDays[_activeSlot.day - 1]}',
+                () => _showPicker<int>(
+                  title: '星期',
+                  values: List.generate(7, (i) => i + 1),
+                  selected: _activeSlot.day,
+                  label: (v) => '周${kWeekDays[v - 1]}',
+                  onChanged: (v) => _updateActiveSlot(_activeSlot.copyWith(day: v)),
+                ),
+              ),
+              GestureDetector(
+                onTap: _showSectionPicker,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(children: [
+                    Text('节次', style: TextStyle(color: colors.primaryText, fontSize: 16)),
+                    const Spacer(),
+                    Text('第${_activeSlot.startSection} – ${_activeSlot.endSection}节',
+                        style: TextStyle(color: colors.hint, fontSize: 15)),
+                    const SizedBox(width: 4),
+                    Icon(Icons.chevron_right, color: colors.hint, size: 18),
+                  ]),
+                ),
+              ),
+              _buildTextRow(context, '老师', _teacherCtrl, '选填', maxLength: 20),
+              _buildTextRow(context, '地点', _locCtrl, '选填', maxLength: 30),
+            ]),
+
+            // 多时间段提示
+            if (_slots.length > 1)
+              Padding(
+                padding: const EdgeInsets.only(left: 4, top: 8),
+                child: Text(
+                  '共 ${_slots.length} 个时间段 · 点击圆点切换',
+                  style: TextStyle(color: colors.hint, fontSize: 12),
+                ),
+              ),
+
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showColorPicker(List<Course> existing) {
+    // 生成色相环：12色 × 3饱和度层 = 36色 + 预设色
+    final List<Color> palette = [];
+    // 第一行：高饱和鲜色
+    for (int h = 0; h < 360; h += 30) {
+      palette.add(HSVColor.fromAHSV(1, h.toDouble(), 0.75, 0.95).toColor());
+    }
+    // 第二行：中饱和柔色
+    for (int h = 15; h < 360; h += 30) {
+      palette.add(HSVColor.fromAHSV(1, h.toDouble(), 0.55, 0.90).toColor());
+    }
+    // 第三行：低饱和淡色
+    for (int h = 0; h < 360; h += 30) {
+      palette.add(HSVColor.fromAHSV(1, h.toDouble(), 0.35, 0.95).toColor());
+    }
+    // 第四行：灰阶 + 深色
+    for (int i = 0; i < 12; i++) {
+      final v = 0.3 + i * 0.06;
+      palette.add(HSVColor.fromAHSV(1, 0, 0, v).toColor());
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        Color? tmpColor = _customColor;
+        return StatefulBuilder(builder: (ctx, setS) {
+          return Padding(
+            padding: EdgeInsets.fromLTRB(20, 16, 20,
+                MediaQuery.of(ctx).viewInsets.bottom + 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(child: Container(width: 36, height: 4,
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFD1D1D6),
+                        borderRadius: BorderRadius.circular(2)))),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('选择颜色',
+                        style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+                    // 当前预览色
+                    Row(children: [
+                      Container(
+                        width: 26, height: 26,
+                        decoration: BoxDecoration(
+                          color: tmpColor ?? _pickAutoColor(existing),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white30, width: 1.5),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _customColor = tmpColor);
+                          Navigator.pop(ctx);
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xFFE5E5EA),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: const Text('确定', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                      ),
+                    ]),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // 自动选色选项
+                GestureDetector(
+                  onTap: () {
+                    setS(() => tmpColor = null);
+                    setState(() => _customColor = null);
+                    Navigator.pop(ctx);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    margin: const EdgeInsets.only(bottom: 14),
+                    decoration: BoxDecoration(
+                      color: _customColor == null
+                          ? const Color(0xFF4ECDC4).withOpacity(0.15)
+                          : const Color(0xFFE5E5EA),
+                      borderRadius: BorderRadius.circular(8),
+                      border: _customColor == null
+                          ? Border.all(color: const Color(0xFF4ECDC4).withOpacity(0.4))
+                          : null,
+                    ),
+                    child: Row(children: [
+                      Container(
+                        width: 22, height: 22,
+                        decoration: BoxDecoration(
+                          gradient: const SweepGradient(colors: [
+                            Color(0xFFFF3B5C), Color(0xFFFF9500), Color(0xFFFFD60A),
+                            Color(0xFF30D158), Color(0xFF32ADE6), Color(0xFFBF5AF2),
+                            Color(0xFFFF3B5C),
+                          ]),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text('自动选色（不与已有课程冲突）',
+                          style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 13)),
+                      if (_customColor == null) ...[
+                        const Spacer(),
+                        const Icon(Icons.check, color: Color(0xFF4ECDC4), size: 16),
+                      ],
+                    ]),
+                  ),
+                ),
+
+                // 色盘网格
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 12,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 1,
+                  ),
+                  itemCount: palette.length,
+                  itemBuilder: (_, i) {
+                    final c = palette[i];
+                    final isSelected = tmpColor?.value == c.value;
+                    return GestureDetector(
+                      onTap: () => setS(() => tmpColor = c),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: c,
+                          shape: BoxShape.circle,
+                          border: isSelected
+                              ? Border.all(color: const Color(0xFF1C1C1E), width: 2.5)
+                              : null,
+                          boxShadow: isSelected
+                              ? [BoxShadow(color: c.withOpacity(0.6), blurRadius: 6)]
+                              : null,
+                        ),
+                        child: isSelected
+                            ? const Icon(Icons.check, color: const Color(0xFF1C1C1E), size: 14)
+                            : null,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+      },
+    );
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// 子页面共用样式常量
+// ═══════════════════════════════════════════════════════════════
+const Color _kAccent  = Color(0xFFFF3B5C);
+const Color _kHint    = Color(0xFF8E8E93); // 中性灰，深浅模式均可读
+const Color _kDivider = Color(0xFFD1D1D6); // 用于 const 上下文
+// _kBg, _kCard 现由 ac(context) 动态提供
+
+// 通用子页面脚手架
+class _SubPageScaffold extends StatelessWidget {
+  final String title;
+  final List<Widget> children;
+  const _SubPageScaffold({required this.title, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = ac(context);
+    return Scaffold(
+      backgroundColor: colors.bg,
+      appBar: AppBar(
+        backgroundColor: colors.card,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: _kAccent, size: 18),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(title, style: TextStyle(color: colors.primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
+        centerTitle: true,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: children,
+      ),
+    );
+  }
+}
+
+// 通用卡片行
+class _SettingRow extends StatelessWidget {
+  final String label;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool showDivider;
+  const _SettingRow({required this.label, this.trailing, this.onTap, this.showDivider = true});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = ac(context);
+    final row = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Text(label, style: TextStyle(color: colors.primaryText, fontSize: 15)),
+          const Spacer(),
+          onTap != null
+              ? IgnorePointer(child: trailing ?? Icon(Icons.chevron_right, color: colors.hint, size: 18))
+              : (trailing ?? Icon(Icons.chevron_right, color: colors.hint, size: 18)),
+        ],
+      ),
+    );
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: row,
+        ),
+        if (showDivider)
+          Container(height: 0.5, color: colors.divider, margin: const EdgeInsets.only(left: 16)),
+      ],
+    );
+  }
+}
+
+Widget _settingCard(BuildContext context, List<Widget> rows) => Container(
+  margin: const EdgeInsets.only(bottom: 20),
+  decoration: BoxDecoration(color: ac(context).card, borderRadius: BorderRadius.circular(12)),
+  child: Column(children: rows),
+);
+
+// ─────────────────────────────────────────────
+// 上课时间 列表页（入口）
+// ─────────────────────────────────────────────
+
+class ClassTimeListPage extends StatefulWidget {
+  const ClassTimeListPage({super.key});
+  @override
+  State<ClassTimeListPage> createState() => _ClassTimeListPageState();
+}
+
+class _ClassTimeListPageState extends State<ClassTimeListPage> {
+  @override
+  Widget build(BuildContext context) {
+    final s = AppStateScope.of(context);
+    final tables = s.allTimeTables;
+    final activeIdx = s.activeTimeTableIndex;
+
+    return Scaffold(
+      backgroundColor: ac(context).bg,
+      appBar: AppBar(
+        backgroundColor: ac(context).card,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Row(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(width: 8),
+            Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+          ]),
+        ),
+        leadingWidth: 40,
+        title: const Text('上课时间',
+            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: () => _newTimeTable(context, s),
+            child: const Text('新建', style: TextStyle(color: _kAccent, fontSize: 16)),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ── 当前使用的时间表 ──
+          _settingCard(context, [
+            _SettingRow(
+              label: '当前课表显示的时间表',
+              showDivider: false,
+              onTap: () => _pickActive(context, s),
+              trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(tables[activeIdx].name,
+                    style: const TextStyle(color: _kHint, fontSize: 15)),
+                const SizedBox(width: 4),
+                const Icon(Icons.unfold_more, color: _kHint, size: 16),
+              ]),
+            ),
+          ]),
+          const Padding(
+            padding: EdgeInsets.only(left: 6, bottom: 16, top: 4),
+            child: Text('轻触右侧选择当前使用的时间表',
+                style: TextStyle(color: _kHint, fontSize: 12)),
+          ),
+
+          // ── 时间表列表 ──
+          Padding(
+            padding: const EdgeInsets.only(left: 6, bottom: 6),
+            child: Row(children: [
+              const Text('时间表', style: TextStyle(color: _kHint, fontSize: 12)),
+              const Spacer(),
+              if (tables.length > 1)
+                const Text('条目上左划删除', style: TextStyle(color: _kHint, fontSize: 12)),
+            ]),
+          ),
+          _settingCard(context, 
+            List.generate(tables.length, (i) {
+              return Dismissible(
+                key: ValueKey('tt_$i\_${tables[i].name}'),
+                direction: tables.length > 1
+                    ? DismissDirection.endToStart
+                    : DismissDirection.none,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFFF3B5C),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: const Icon(Icons.delete_outline, color: const Color(0xFF1C1C1E)),
+                ),
+                confirmDismiss: (_) async {
+                  if (tables.length <= 1) return false;
+                  return await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      backgroundColor: ac(ctx).card,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      title: const Text('删除时间表',
+                          style: TextStyle(fontSize: 16)),
+                      content: Text('确定删除「${tables[i].name}」？',
+                          style: const TextStyle(color: _kHint, fontSize: 14)),
+                      actions: [
+                        TextButton(onPressed: () => Navigator.pop(ctx, false),
+                            child: const Text('取消', style: TextStyle(color: _kHint))),
+                        TextButton(onPressed: () => Navigator.pop(ctx, true),
+                            child: const Text('删除',
+                                style: TextStyle(color: Color(0xFFFF3B5C)))),
+                      ],
+                    ),
+                  ) ?? false;
+                },
+                onDismissed: (_) => s.deleteTimeTable(i),
+                child: _SettingRow(
+                  label: tables[i].name,
+                  showDivider: i < tables.length - 1,
+                  trailing: const Icon(Icons.chevron_right, color: _kHint, size: 18),
+                  onTap: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => ClassTimePage(timeTableIndex: i),
+                  )),
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _pickActive(BuildContext context, AppState s) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(width: 36, height: 4,
+                decoration: BoxDecoration(color: const Color(0xFFD1D1D6),
+                    borderRadius: BorderRadius.circular(2))),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 14),
+              child: Text('选择时间表',
+                  style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16,
+                      fontWeight: FontWeight.w600)),
+            ),
+            ...List.generate(s.allTimeTables.length, (i) {
+              final active = i == s.activeTimeTableIndex;
+              return ListTile(
+                title: Text(s.allTimeTables[i].name,
+                    style: TextStyle(
+                        color: active ? _kAccent : Colors.white, fontSize: 16)),
+                trailing: active ? const Icon(Icons.check, color: _kAccent) : null,
+                onTap: () {
+                  s.switchTimeTable(i);
+                  Navigator.pop(ctx);
+                },
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _newTimeTable(BuildContext context, AppState s) {
+    final ctrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('新建时间表',
+            style: TextStyle(fontSize: 16)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: const Color(0xFF1C1C1E)),
+          decoration: const InputDecoration(
+            hintText: '请输入时间表名称',
+            hintStyle: TextStyle(color: _kHint),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF4ECDC4))),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2)),
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx),
+              child: const Text('取消', style: TextStyle(color: _kHint))),
+          TextButton(
+            onPressed: () {
+              final name = ctrl.text.trim().isEmpty ? '时间表' : ctrl.text.trim();
+              s.addTimeTable(name);
+              Navigator.pop(ctx);
+            },
+            child: const Text('新建', style: TextStyle(color: _kAccent)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 1. 上课时间（仿 WakeUp 风格，固定20节，检查冲突）
+// ═══════════════════════════════════════════════════════════════
+class ClassTimePage extends StatefulWidget {
+  final int timeTableIndex;
+  const ClassTimePage({super.key, required this.timeTableIndex});
+  @override
+  State<ClassTimePage> createState() => _ClassTimePageState();
+}
+
+class _ClassTimePageState extends State<ClassTimePage> {
+  late List<List<String>> _times;
+  bool _sameLength = true;
+  int  _duration   = 45;
+  late TextEditingController _nameCtrl;
+  bool _initialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialized) return;
+    _initialized = true;
+    final tt = AppStateScope.of(context).allTimeTables[widget.timeTableIndex];
+    _nameCtrl = TextEditingController(text: tt.name);
+    _times = List.generate(20, (i) {
+      if (i < tt.times.length) return List<String>.from(tt.times[i]);
+      return List<String>.from(kDefaultTimes[i]);
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    super.dispose();
+  }
+
+  void _push() {
+    final s = AppStateScope.of(context);
+    s.updateTimeTable(widget.timeTableIndex, _times.map((t) => List<String>.from(t)).toList());
+  }
+
+  void _pushName(String name) {
+    AppStateScope.of(context).renameTimeTable(widget.timeTableIndex, name);
+  }
+
+  // ── 将 HH:mm 转成分钟数 ──
+  int _toMin(String t) {
+    final p = t.split(':');
+    return int.parse(p[0]) * 60 + int.parse(p[1]);
+  }
+
+  String _fromMin(int m) {
+    final h = m ~/ 60;
+    final min = m % 60;
+    return '${h.toString().padLeft(2, '0')}:${min.toString().padLeft(2, '0')}';
+  }
+
+  // ── 检查时间冲突 ──
+  void _checkOrder() {
+    final List<String> errors = [];
+    for (int i = 0; i < _times.length; i++) {
+      final s = _toMin(_times[i][0]);
+      final e = _toMin(_times[i][1]);
+      // 结束 <= 开始
+      if (e <= s) {
+        errors.add('第 ${i + 1} 节：结束时间不能早于或等于开始时间（${_times[i][0]} – ${_times[i][1]}）');
+      }
+      // 与下一节重叠
+      if (i < _times.length - 1) {
+        final nextS = _toMin(_times[i + 1][0]);
+        if (e > nextS) {
+          errors.add('第 ${i + 1} 节与第 ${i + 2} 节时间重叠\n  第${i+1}节结束 ${_times[i][1]} > 第${i+2}节开始 ${_times[i+1][0]}');
+        }
+      }
+    }
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Row(children: [
+          Icon(
+            errors.isEmpty ? Icons.check_circle_outline : Icons.warning_amber_rounded,
+            color: errors.isEmpty ? const Color(0xFF4ECDC4) : const Color(0xFFFFD60A),
+            size: 22,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            errors.isEmpty ? '时间顺序正常' : '发现 ${errors.length} 处冲突',
+            style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ]),
+        content: errors.isEmpty
+            ? const Text('所有节次时间区间无冲突，顺序正确。',
+                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14))
+            : SizedBox(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: errors.length,
+                  separatorBuilder: (_, __) => const Divider(color: Color(0xFFE5E5EA), height: 16),
+                  itemBuilder: (_, i) => Text(
+                    errors[i],
+                    style: const TextStyle(color: Color(0xFFF07B8A), fontSize: 13, height: 1.5),
+                  ),
+                ),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('确定', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── 编辑单节时间（弹出选开始+结束）──
+  void _editTime(int index) async {
+    final sp = _times[index][0].split(':');
+    final ep = _times[index][1].split(':');
+
+    final pickedStart = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: int.parse(sp[0]), minute: int.parse(sp[1])),
+      helpText: '第 ${index + 1} 节  开始时间',
+      builder: (ctx, child) => Theme(
+        data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(primary: Color(0xFF4ECDC4))),
+        child: child!,
+      ),
+    );
+    if (!mounted || pickedStart == null) return;
+
+    // 若"每节课时长相同"开启，自动计算结束时间
+    String newEnd;
+    if (_sameLength) {
+      final startMin = pickedStart.hour * 60 + pickedStart.minute;
+      newEnd = _fromMin(startMin + _duration);
+    } else {
+      final pickedEnd = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(hour: int.parse(ep[0]), minute: int.parse(ep[1])),
+        helpText: '第 ${index + 1} 节  结束时间',
+        builder: (ctx, child) => Theme(
+          data: ThemeData.dark().copyWith(
+              colorScheme: const ColorScheme.dark(primary: Color(0xFF4ECDC4))),
+          child: child!,
+        ),
+      );
+      if (!mounted || pickedEnd == null) return;
+      newEnd = '${pickedEnd.hour.toString().padLeft(2, '0')}:${pickedEnd.minute.toString().padLeft(2, '0')}';
+    }
+
+    setState(() {
+      _times[index][0] =
+          '${pickedStart.hour.toString().padLeft(2, '0')}:${pickedStart.minute.toString().padLeft(2, '0')}';
+      _times[index][1] = newEnd;
+    });
+    _push();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ac(context).bg,
+      appBar: AppBar(
+        backgroundColor: ac(context).card,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(width: 8),
+              Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+            ],
+          ),
+        ),
+        leadingWidth: 40,
+        title: const Text(
+          '上课时间',
+          style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600),
+        ),
+        centerTitle: true,
+        actions: [
+          TextButton(
+            onPressed: _checkOrder,
+            child: const Text('检查时间顺序',
+                style: TextStyle(color: _kAccent, fontSize: 14, fontWeight: FontWeight.w500)),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          // ── 时间表名称 ──
+          _settingCard(context, [
+            _SettingRow(
+              label: '时间表名称',
+              showDivider: false,
+              onTap: () => _editName(),
+              trailing: Text(
+                _nameCtrl.text,
+                style: const TextStyle(color: _kHint, fontSize: 15),
+              ),
+            ),
+          ]),
+          const Padding(
+            padding: EdgeInsets.only(left: 6, bottom: 12),
+            child: Text('轻触上方以编辑名称',
+                style: TextStyle(color: _kHint, fontSize: 12)),
+          ),
+
+          // ── 每节课时长 ──
+          _settingCard(context, [
+            _SettingRow(
+              label: '每节课时长相同',
+              trailing: Switch(
+                value: _sameLength,
+                onChanged: (v) => setState(() => _sameLength = v),
+                activeColor: const Color(0xFFFF3B5C),
+              ),
+            ),
+            _SettingRow(
+              label: '每节课时长（分钟）',
+              showDivider: false,
+              onTap: _sameLength ? _pickDuration : null,
+              trailing: Text(
+                '$_duration',
+                style: TextStyle(
+                  color: _sameLength ? Colors.white : _kHint,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ]),
+          Padding(
+            padding: const EdgeInsets.only(left: 6, bottom: 8),
+            child: Text(
+              _sameLength
+                  ? '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！'
+                  : '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」',
+              style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // ── 20节时间列表 ──
+          _settingCard(context, 
+            List.generate(20, (i) {
+              return _SettingRow(
+                label: '第 ${i + 1} 节',
+                showDivider: i < 19,
+                onTap: () => _editTime(i),
+                trailing: Text(
+                  '${_times[i][0]} - ${_times[i][1]}',
+                  style: const TextStyle(color: _kHint, fontSize: 15),
+                ),
+              );
+            }),
+          ),
+
+          // ── 重置 ──
+          _settingCard(context, [
+            _SettingRow(
+              label: '重置为默认时间',
+              showDivider: false,
+              trailing: const SizedBox(),
+              onTap: () {
+                setState(() {
+                  _times = kDefaultTimes
+                      .map((t) => List<String>.from(t))
+                      .toList();
+                });
+                _push();
+              },
+            ),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  void _editName() {
+    final ctrl = TextEditingController(text: _nameCtrl.text);
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: const Text('编辑名称', style: TextStyle(fontSize: 16)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: const Color(0xFF1C1C1E)),
+          decoration: const InputDecoration(
+            hintText: '请输入时间表名称',
+            hintStyle: TextStyle(color: Color(0xFF6C6C70)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF4ECDC4))),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF4ECDC4), width: 2)),
+          ),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('取消', style: TextStyle(color: _kHint))),
+          TextButton(
+              onPressed: () {
+                final newName = ctrl.text.trim().isEmpty ? '时间表' : ctrl.text.trim();
+                setState(() => _nameCtrl.text = newName);
+                _pushName(newName);
+                Navigator.pop(context);
+              },
+              child: const Text('确定', style: TextStyle(color: _kAccent))),
+        ],
+      ),
+    );
+  }
+
+  void _pickDuration() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (_) {
+        int tmp = _duration;
+        final options = [30, 35, 40, 45, 50, 55, 60, 75, 90, 100, 120];
+        return StatefulBuilder(
+          builder: (ctx, setS) => Column(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                TextButton(onPressed: () => Navigator.pop(ctx),
+                    child: const Text('取消', style: TextStyle(color: _kAccent))),
+                const Text('每节课时长（分钟）',
+                    style: TextStyle(color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
+                TextButton(
+                  onPressed: () {
+                    // 重新计算所有节的结束时间
+                    setState(() {
+                      _duration = tmp;
+                      for (int i = 0; i < _times.length; i++) {
+                        final sMin = _toMin(_times[i][0]);
+                        _times[i][1] = _fromMin(sMin + tmp);
+                      }
+                    });
+                    _push();
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('确定', style: TextStyle(color: _kAccent)),
+                ),
+              ]),
+            ),
+            SizedBox(
+              height: 200,
+              child: ListWheelScrollView.useDelegate(
+                itemExtent: 44, perspective: 0.003, diameterRatio: 1.8,
+                physics: const FixedExtentScrollPhysics(),
+                controller: FixedExtentScrollController(
+                    initialItem: options.indexOf(_duration).clamp(0, options.length - 1)),
+                onSelectedItemChanged: (i) => setS(() => tmp = options[i]),
+                childDelegate: ListWheelChildBuilderDelegate(
+                  childCount: options.length,
+                  builder: (_, i) => Center(child: Text(
+                    '${options[i]} 分钟',
+                    style: TextStyle(
+                      color: options[i] == tmp ? Colors.white : _kHint,
+                      fontSize: options[i] == tmp ? 18 : 15,
+                      fontWeight: options[i] == tmp ? FontWeight.w700 : FontWeight.w400,
+                    ),
+                  )),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ]),
+        );
+      },
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 2. 课表设置 — 三栏入口（课表数据 / 课表外观 / 调课工具）
+// ═══════════════════════════════════════════════════════════════

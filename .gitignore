@@ -20,6 +20,7 @@ ios/Flutter/Flutter.podspec
 android/.gradle/
 android/app/build/
 android/local.properties
+key_password
 
 # Mac
 .DS_Store
