@@ -95,9 +95,11 @@ dart run flutter_launcher_icons
 Android：
 
 ```bash
-flutter build apk
-# 或
-flutter build appbundle
+# 构建优化的 APK（推荐用于测试）
+flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/symbols --tree-shake-icons
+
+# 构建 App Bundle（推荐用于发布到 Google Play）
+flutter build appbundle --release --obfuscate --split-debug-info=build/symbols --tree-shake-icons
 ```
 
 iOS（需在 macOS + Xcode 环境）：
