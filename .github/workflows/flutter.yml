@@ -39,17 +39,25 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+          if [ -z "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ] || \
+             [ -z "${{ secrets.ANDROID_STORE_PASSWORD }}" ] || \
+             [ -z "${{ secrets.ANDROID_KEY_PASSWORD }}" ] || \
+             [ -z "${{ secrets.ANDROID_KEY_ALIAS }}" ]; then
             echo "Signing secrets not found, using default signing for CI build."
             exit 0
           fi
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-          cat > android/key.properties <<EOF
-          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
-          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          storeFile=../upload-keystore.jks
-          EOF
+          printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+          {
+            echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}"
+            echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}"
+            echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}"
+            echo "storeFile=../upload-keystore.jks"
+          } > android/key.properties
+          keytool -list -v \
+            -keystore android/upload-keystore.jks \
+            -storepass "${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -alias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -keypass "${{ secrets.ANDROID_KEY_PASSWORD }}" > /dev/null
 
       - name: Setup Android SDK components
         shell: bash
@@ -119,13 +127,18 @@ jobs:
           test -n "${{ secrets.ANDROID_STORE_PASSWORD }}"
           test -n "${{ secrets.ANDROID_KEY_PASSWORD }}"
           test -n "${{ secrets.ANDROID_KEY_ALIAS }}"
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-          cat > android/key.properties <<EOF
-          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
-          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
-          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          storeFile=../upload-keystore.jks
-          EOF
+          printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+          {
+            echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}"
+            echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}"
+            echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}"
+            echo "storeFile=../upload-keystore.jks"
+          } > android/key.properties
+          keytool -list -v \
+            -keystore android/upload-keystore.jks \
+            -storepass "${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -alias "${{ secrets.ANDROID_KEY_ALIAS }}" \
+            -keypass "${{ secrets.ANDROID_KEY_PASSWORD }}" > /dev/null
 
       - name: Setup Android SDK components
         shell: bash
