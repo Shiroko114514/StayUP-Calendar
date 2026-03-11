@@ -1,5 +1,8 @@
 name: Flutter CI and Release
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 on:
   workflow_dispatch:
   push:
@@ -162,6 +165,7 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          
       - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
