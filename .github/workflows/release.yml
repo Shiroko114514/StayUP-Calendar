@@ -1,0 +1,193 @@
+name: Release
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to release, for example v1.0.0
+        required: false
+        type: string
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+  actions: read
+  pull-requests: read
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.tag_version.outputs.VERSION }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract tag version
+        id: tag_version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -n "${{ github.event.inputs.tag || '' }}" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            echo "Manual release requires the tag input when not running from a tag ref." >&2
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "VERSION_NUMBER=${VERSION#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -s CHANGELOG.md ]; then
+            cp CHANGELOG.md release-notes.md
+          else
+            echo "Release ${{ steps.tag_version.outputs.VERSION }}" > release-notes.md
+          fi
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          tag: ${{ steps.tag_version.outputs.VERSION }}
+          name: ${{ steps.tag_version.outputs.VERSION }}
+          bodyFile: release-notes.md
+          draft: false
+          prerelease: ${{ contains(steps.tag_version.outputs.VERSION, 'beta') || contains(steps.tag_version.outputs.VERSION, 'alpha') || contains(steps.tag_version.outputs.VERSION, 'rc') }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify release created
+        run: |
+          echo "Successfully created release ${{ steps.tag_version.outputs.VERSION }}"
+          echo "Release notes sourced from CHANGELOG.md when available"
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag_version.outputs.VERSION }}"
+
+  build-and-upload:
+    needs: create-release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Setup Android signing
+        shell: bash
+        run: |
+          set -euxo pipefail
+          test -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}"
+          test -n "${{ secrets.ANDROID_STORE_PASSWORD }}"
+          test -n "${{ secrets.ANDROID_KEY_ALIAS }}"
+          printf '%s' "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+          {
+            echo "storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}"
+            echo "keyPassword=${{ secrets.ANDROID_STORE_PASSWORD }}"
+            echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}"
+            echo "storeFile=../upload-keystore.jks"
+          } > android/key.properties
+          keytool -list -v \
+            -keystore android/upload-keystore.jks \
+            -storepass "${{ secrets.ANDROID_STORE_PASSWORD }}" \
+            -alias "${{ secrets.ANDROID_KEY_ALIAS }}" > /dev/null
+
+      - name: Setup Android SDK components
+        shell: bash
+        env:
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+        run: |
+          set -euxo pipefail
+          SDKMANAGER="$(command -v sdkmanager || true)"
+          if [ -z "$SDKMANAGER" ]; then
+            SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+          fi
+
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;35.0.0" \
+            "cmake;3.22.1" \
+            "ndk;28.2.13676358"
+
+      - name: Build APK
+        run: flutter build apk --release --target-platform android-arm64 --obfuscate --split-debug-info=build/app/outputs/symbols --tree-shake-icons
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release --obfuscate --split-debug-info=build/app/outputs/symbols --tree-shake-icons
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload release assets
+        if: success()
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ needs.create-release.outputs.version }}
+          artifacts: build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Notify build completion
+        run: |
+          echo "Successfully built and uploaded release assets"
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.create-release.outputs.version }}"
+
+  notify-completion:
+    needs:
+      - create-release
+      - build-and-upload
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Notify success
+        if: needs.build-and-upload.result == 'success'
+        run: |
+          echo "Release ${{ needs.create-release.outputs.version }} completed successfully"
+          echo "All build artifacts have been uploaded"
+
+      - name: Notify failure
+        if: needs.build-and-upload.result == 'failure'
+        run: |
+          echo "Failed to complete release ${{ needs.create-release.outputs.version }}"
+          echo "Please check the workflow logs for details"
