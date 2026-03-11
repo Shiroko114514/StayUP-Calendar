@@ -165,7 +165,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutFooter.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'© 2026 Shiroko114514\n因一时兴起而制作的课程表，也希望能陪你走过很多节课'**
+  /// **'© 2026 StayUP Studio \n因一时兴起而制作的课程表，也希望能陪你走过很多节课'**
   String get aboutFooter;
 
   /// No description provided for @backAction.
@@ -279,25 +279,25 @@ abstract class AppLocalizations {
   /// No description provided for @languageForceChineseSimplified.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'强制简体中文'**
+  /// **'中文（简体）'**
   String get languageForceChineseSimplified;
 
   /// No description provided for @languageForceChineseTraditional.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'强制繁体中文'**
+  /// **'中文（繁體）'**
   String get languageForceChineseTraditional;
 
   /// No description provided for @languageForceEnglish.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'强制英文'**
+  /// **'English'**
   String get languageForceEnglish;
 
   /// No description provided for @languageForceJapanese.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'强制日文'**
+  /// **'日本語'**
   String get languageForceJapanese;
 
   /// No description provided for @manageScheduleTitle.

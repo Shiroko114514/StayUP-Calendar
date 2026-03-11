@@ -47,7 +47,7 @@ class AboutPage extends StatelessWidget {
         settingCard(context, [
           SettingRow(
             label: context.l10n.versionNumber,
-            trailing: const Text('0.0.1 (Beta)', style: TextStyle(color: kHint, fontSize: 14)),
+            trailing: const Text('0.2.0', style: TextStyle(color: kHint, fontSize: 14)),
             showDivider: true,
           ),
           SettingRow(
@@ -66,8 +66,23 @@ class AboutPage extends StatelessWidget {
             },
           ),
           SettingRow(
+            label: context.l10n.developer,
+            trailing: const Row(mainAxisSize: MainAxisSize.min, children: [
+              Text('Lucas', style: TextStyle(color: kHint, fontSize: 14)),
+              SizedBox(width: 4),
+              Icon(Icons.open_in_new, color: kHint, size: 14),
+            ]),
+            showDivider: true,
+            onTap: () async {
+              final uri = Uri.parse('https://github.com/Lucas04-nhr');
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+          SettingRow(
             label: context.l10n.openSourceLicense,
-            trailing: Text('MIT License', style: TextStyle(color: kHint, fontSize: 14)),
+            trailing: Text('GPLv3 License', style: TextStyle(color: kHint, fontSize: 14)),
             showDivider: true,
           ),
           SettingRow(

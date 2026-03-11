@@ -41,7 +41,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get alreadyLatest => '已是最新';
 
   @override
-  String get aboutFooter => '© 2026 Shiroko114514\n因一时兴起而制作的课程表，也希望能陪你走过很多节课';
+  String get aboutFooter => '© 2026 StayUP Studio \n因一时兴起而制作的课程表，也希望能陪你走过很多节课';
 
   @override
   String get backAction => '返回';
@@ -98,16 +98,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageFollowSystem => '跟随系统';
 
   @override
-  String get languageForceChineseSimplified => '强制简体中文';
+  String get languageForceChineseSimplified => '中文（简体）';
 
   @override
-  String get languageForceChineseTraditional => '强制繁体中文';
+  String get languageForceChineseTraditional => '中文（繁體）';
 
   @override
-  String get languageForceEnglish => '强制英文';
+  String get languageForceEnglish => 'English';
 
   @override
-  String get languageForceJapanese => '强制日文';
+  String get languageForceJapanese => '日本語';
 
   @override
   String get manageScheduleTitle => '多课表管理';
@@ -262,7 +262,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get alreadyLatest => '已是最新';
 
   @override
-  String get aboutFooter => '© 2026 Shiroko114514\n因一时兴起而制作的课程表，也希望能陪你走过很多节课';
+  String get aboutFooter => '© 2026 StayUP Studio \n因一时兴起而制作的课程表，也希望能陪你走过很多节课';
 
   @override
   String get backAction => '返回';
@@ -319,16 +319,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get languageFollowSystem => '跟随系统';
 
   @override
-  String get languageForceChineseSimplified => '强制简体中文';
+  String get languageForceChineseSimplified => '中文（简体）';
 
   @override
-  String get languageForceChineseTraditional => '强制繁体中文';
+  String get languageForceChineseTraditional => '中文（繁體）';
 
   @override
-  String get languageForceEnglish => '强制英文';
+  String get languageForceEnglish => 'English';
 
   @override
-  String get languageForceJapanese => '强制日文';
+  String get languageForceJapanese => '日本語';
 
   @override
   String get manageScheduleTitle => '多课表管理';
@@ -483,7 +483,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get alreadyLatest => '已是最新';
 
   @override
-  String get aboutFooter => '© 2026 Shiroko114514\n因一時興起而製作的課表，也希望能陪你走過很多節課';
+  String get aboutFooter => '© 2026 StayUP Studio \n因一時興起而製作的課表，也希望能陪你走過很多節課';
 
   @override
   String get backAction => '返回';
@@ -540,16 +540,16 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get languageFollowSystem => '跟隨系統';
 
   @override
-  String get languageForceChineseSimplified => '強制簡體中文';
+  String get languageForceChineseSimplified => '中文（简体）';
 
   @override
-  String get languageForceChineseTraditional => '強制繁體中文';
+  String get languageForceChineseTraditional => '中文（繁體）';
 
   @override
-  String get languageForceEnglish => '強制英文';
+  String get languageForceEnglish => 'English';
 
   @override
-  String get languageForceJapanese => '強制日文';
+  String get languageForceJapanese => '日本語';
 
   @override
   String get manageScheduleTitle => '多課表管理';

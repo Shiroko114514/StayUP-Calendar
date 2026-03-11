@@ -42,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutFooter =>
-      '© 2026 Shiroko114514\nA timetable app made on a whim, hoping it can accompany you through many classes.';
+      '© 2026 StayUP Studio \nA timetable app made on a whim, hoping it can accompany you through many classes.';
 
   @override
   String get backAction => 'Back';
@@ -100,16 +100,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageFollowSystem => 'Follow System';
 
   @override
-  String get languageForceChineseSimplified => 'Force Simplified Chinese';
+  String get languageForceChineseSimplified => '中文（简体）';
 
   @override
-  String get languageForceChineseTraditional => 'Force Traditional Chinese';
+  String get languageForceChineseTraditional => '中文（繁體）';
 
   @override
-  String get languageForceEnglish => 'Force English';
+  String get languageForceEnglish => 'English';
 
   @override
-  String get languageForceJapanese => 'Force Japanese';
+  String get languageForceJapanese => '日本語';
 
   @override
   String get manageScheduleTitle => 'Manage Schedules';

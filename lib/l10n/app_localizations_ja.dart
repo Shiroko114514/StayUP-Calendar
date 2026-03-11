@@ -42,7 +42,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get aboutFooter =>
-      '© 2026 Shiroko114514\n思いつきで作った時間割アプリですが、たくさんの授業で役立てば嬉しいです。';
+      '© 2026 StayUP Studio \n思いつきで作った時間割アプリですが、たくさんの授業で役立てば嬉しいです。';
 
   @override
   String get backAction => '戻る';
@@ -99,16 +99,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageFollowSystem => 'システム設定に従う';
 
   @override
-  String get languageForceChineseSimplified => '簡体字中国語に固定';
+  String get languageForceChineseSimplified => '中文（简体）';
 
   @override
-  String get languageForceChineseTraditional => '繁体字中国語に固定';
+  String get languageForceChineseTraditional => '中文（繁體）';
 
   @override
-  String get languageForceEnglish => '英語に固定';
+  String get languageForceEnglish => 'English';
 
   @override
-  String get languageForceJapanese => '日本語に固定';
+  String get languageForceJapanese => '日本語';
 
   @override
   String get manageScheduleTitle => '時間割管理';
