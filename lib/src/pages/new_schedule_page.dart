@@ -77,8 +77,8 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                     ),
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: Color(0xFF1C1C1E),
+                      style: TextStyle(
+                        color: ac(ctx).primaryText,
                         fontWeight: FontWeight.w600,
                         fontSize: 16,
                       ),
@@ -115,7 +115,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                         child: Text(
                           '$v',
                           style: TextStyle(
-                            color: v == tmp ? Colors.white : kHint,
+                            color: v == tmp ? ac(ctx).primaryText : ac(ctx).hint,
                             fontSize: v == tmp ? 18 : 15,
                             fontWeight: v == tmp
                                 ? FontWeight.w700
@@ -185,7 +185,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
         leadingWidth: 64,
         title: Text(
           context.l10n.newScheduleTitle,
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -213,7 +213,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 controller: _nameCtrl,
                 onChanged: (_) => setState(() {}),
                 autofocus: true,
-                style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 15),
+                style: TextStyle(color: ac(context).primaryText, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: context.l10n.scheduleNameRequiredHint,
                   hintStyle: const TextStyle(
@@ -237,13 +237,13 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5EA),
+                  color: ac(context).divider,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   _fmtDate(context, _firstDay),
-                  style: const TextStyle(
-                    color: Color(0xFF1C1C1E),
+                  style: TextStyle(
+                    color: ac(context).primaryText,
                     fontSize: 14,
                   ),
                 ),

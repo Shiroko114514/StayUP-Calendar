@@ -47,10 +47,10 @@ class _ScheduleListItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: onDelete != null
                             ? const Color(0xFFFF3B5C)
-                            : const Color(0xFFD1D1D6),
+                            : ac(context).divider,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.remove, color: Color(0xFF1C1C1E), size: 14),
+                      child: Icon(Icons.remove, color: ac(context).primaryText, size: 14),
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -36,8 +36,7 @@ class _AboutPageState extends State<AboutPage> {
             : '${info.version}+${info.buildNumber}';
 
         return SubPageScaffold(
-          title: context.l10n.backAction,
-          centerTitle: context.l10n.aboutTitle,
+          title: context.l10n.aboutTitle,
           children: [
         // App Logo 区
         Container(
@@ -57,7 +56,7 @@ class _AboutPageState extends State<AboutPage> {
               const SizedBox(height: 16),
               Text(
                 context.l10n.appName,
-                style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 20, fontWeight: FontWeight.w700),
+                style: TextStyle(color: ac(context).primaryText, fontSize: 20, fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 4),
               Text(
@@ -75,33 +74,32 @@ class _AboutPageState extends State<AboutPage> {
           ),
           SettingRow(
             label: context.l10n.developer,
-            trailing: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('Shiroko114514', style: TextStyle(color: kHint, fontSize: 14)),
-              SizedBox(width: 4),
-              Icon(Icons.open_in_new, color: kHint, size: 14),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              GestureDetector(
+                onTap: () async {
+                  final uri = Uri.parse('https://github.com/Shiroko114514');
+                  if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                },
+                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Shiroko114514', style: TextStyle(color: kHint, fontSize: 14)),
+                  SizedBox(width: 3),
+                  Icon(Icons.open_in_new, color: kHint, size: 13),
+                ]),
+              ),
+              const Text('  /  ', style: TextStyle(color: kHint, fontSize: 14)),
+              GestureDetector(
+                onTap: () async {
+                  final uri = Uri.parse('https://github.com/Lucas04-nhr');
+                  if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                },
+                child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Lucas', style: TextStyle(color: kHint, fontSize: 14)),
+                  SizedBox(width: 3),
+                  Icon(Icons.open_in_new, color: kHint, size: 13),
+                ]),
+              ),
             ]),
             showDivider: true,
-            onTap: () async {
-              final uri = Uri.parse('https://github.com/Shiroko114514');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
-          ),
-          SettingRow(
-            label: context.l10n.developer,
-            trailing: const Row(mainAxisSize: MainAxisSize.min, children: [
-              Text('Lucas', style: TextStyle(color: kHint, fontSize: 14)),
-              SizedBox(width: 4),
-              Icon(Icons.open_in_new, color: kHint, size: 14),
-            ]),
-            showDivider: true,
-            onTap: () async {
-              final uri = Uri.parse('https://github.com/Lucas04-nhr');
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.externalApplication);
-              }
-            },
           ),
           SettingRow(
             label: context.l10n.openSourceLicense,

@@ -609,7 +609,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
           child: const Row(mainAxisSize: MainAxisSize.min, children: [
             SizedBox(width: 8),
             Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-            Text('返回', style: TextStyle(color: kAccent, fontSize: 15)),
+            Text('更多', style: TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
         leadingWidth: 72,

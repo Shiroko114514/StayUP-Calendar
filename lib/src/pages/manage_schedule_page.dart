@@ -37,7 +37,7 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
         leadingWidth: 60,
         title: Text(
           context.l10n.manageScheduleTitle,
-          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
