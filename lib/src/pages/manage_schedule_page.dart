@@ -31,7 +31,7 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             context.l10n.backAction,
-            style: const TextStyle(color: kAccent, fontSize: 16),
+            style: const TextStyle(color: kAccent, fontSize: 15),
           ),
         ),
         leadingWidth: 60,
@@ -45,7 +45,7 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
             onPressed: () => setState(() => _isEditing = !_isEditing),
             child: Text(
               _isEditing ? context.l10n.doneAction : context.l10n.editAction,
-              style: const TextStyle(color: kAccent, fontSize: 16),
+              style: const TextStyle(color: kAccent, fontSize: 15),
             ),
           ),
         ],

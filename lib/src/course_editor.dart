@@ -246,8 +246,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         label(values[i]),
                         style: TextStyle(
                           color: values[i] == current
-                              ? Colors.white
-                              : const Color(0xFFC7C7CC),
+                              ? ac(context).primaryText
+                              : ac(context).hint,
                           fontSize: values[i] == current ? 18 : 15,
                           fontWeight: values[i] == current
                               ? FontWeight.w600
@@ -337,8 +337,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             child: Text('第${i + 1}周',
                               style: TextStyle(
                                 color: i + 1 == tmpStart
-                                    ? Colors.white
-                                    : const Color(0xFFC7C7CC),
+                                    ? ac(ctx).primaryText
+                                    : ac(ctx).hint,
                                 fontSize: i + 1 == tmpStart ? 17 : 14,
                                 fontWeight: i + 1 == tmpStart
                                     ? FontWeight.w600
@@ -366,8 +366,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             child: Text('第${i + 1}周',
                               style: TextStyle(
                                 color: i + 1 == tmpEnd
-                                    ? Colors.white
-                                    : const Color(0xFFC7C7CC),
+                                    ? ac(ctx).primaryText
+                                    : ac(ctx).hint,
                                 fontSize: i + 1 == tmpEnd ? 17 : 14,
                                 fontWeight: i + 1 == tmpEnd
                                     ? FontWeight.w600
@@ -466,8 +466,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             child: Text('第${i + 1}节',
                               style: TextStyle(
                                 color: i + 1 == tmpStart
-                                    ? Colors.white
-                                    : const Color(0xFFC7C7CC),
+                                    ? ac(ctx).primaryText
+                                    : ac(ctx).hint,
                                 fontSize: i + 1 == tmpStart ? 17 : 14,
                                 fontWeight: i + 1 == tmpStart
                                     ? FontWeight.w600
@@ -500,10 +500,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             child: Text('第${i + 1}节',
                               style: TextStyle(
                                 color: i + 1 == tmpEnd
-                                    ? Colors.white
-                                    : (i + 1 < tmpStart
-                                        ? const Color(0xFFD1D1D6)
-                                        : const Color(0xFFC7C7CC)),
+                                    ? ac(ctx).primaryText
+                                    : ac(ctx).hint,
                                 fontSize: i + 1 == tmpEnd ? 17 : 14,
                                 fontWeight: i + 1 == tmpEnd
                                     ? FontWeight.w600
@@ -559,31 +557,25 @@ class _AddCoursePageState extends State<AddCoursePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
-        crossAxisAlignment:
-            multiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
             width: 60,
-            child: Padding(
-              padding: EdgeInsets.only(top: multiline ? 14 : 0),
-              child: Text(label,
-                  style:
-                      TextStyle(color: colors.primaryText, fontSize: 16)),
-            ),
+            child: Text(label,
+                style: TextStyle(color: colors.primaryText, fontSize: 16)),
           ),
           Expanded(
             child: TextField(
               controller: ctrl,
-              maxLines: multiline ? 4 : 1,
+              maxLines: null,
               maxLength: maxLength,
               style: TextStyle(color: colors.primaryText, fontSize: 15),
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: TextStyle(color: colors.hint, fontSize: 15),
                 border: InputBorder.none,
-                counterStyle: TextStyle(color: colors.hint, fontSize: 11),
-                contentPadding: EdgeInsets.symmetric(
-                    vertical: multiline ? 12 : 0),
+                counterText: '',
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),
           ),
@@ -701,9 +693,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
               ),
             ),
             _buildTextRow(context, '老师', _teacherCtrls[i], '选填',
-                maxLength: 20),
+                maxLength: 50),
             _buildTextRow(context, '地点', _locCtrls[i], '选填',
-                maxLength: 30),
+                maxLength: 50),
           ]),
         ],
       ),
@@ -728,7 +720,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('取消',
-                  style: TextStyle(color: _accent, fontSize: 16)),
+                  style: TextStyle(color: _accent, fontSize: 15)),
             ),
             const Spacer(),
             Text(
@@ -744,7 +736,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               child: const Text('保存',
                   style: TextStyle(
                       color: _accent,
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600)),
             ),
           ],
@@ -758,7 +750,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             // ── 基本信息卡 ──
             _buildCard(context, [
               _buildTextRow(context, '课程', _nameCtrl, '必填',
-                  maxLength: 20),
+                  maxLength: 50),
               // 颜色行
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -793,8 +785,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 ),
               ),
               _buildTextRow(context, '学分', _creditCtrl, '选填'),
-              _buildTextRow(context, '备注', _noteCtrl, '',
-                  multiline: true),
+              _buildTextRow(context, '备注', _noteCtrl, ''),
             ]),
 
             const SizedBox(height: 24),
@@ -1168,9 +1159,10 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           child: const Row(mainAxisSize: MainAxisSize.min, children: [
             SizedBox(width: 8),
             Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+            Text('返回', style: TextStyle(color: _kAccent, fontSize: 15)),
           ]),
         ),
-        leadingWidth: 40,
+        leadingWidth: 64,
         title: const Text('上课时间',
             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
@@ -1178,7 +1170,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           TextButton(
             onPressed: () => _newTimeTable(context, s),
             child: const Text('新建',
-                style: TextStyle(color: _kAccent, fontSize: 16)),
+                style: TextStyle(color: _kAccent, fontSize: 15)),
           ),
         ],
       ),
@@ -1318,7 +1310,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
               return ListTile(
                 title: Text(s.allTimeTables[i].name,
                     style: TextStyle(
-                        color: active ? _kAccent : Colors.white,
+                        color: active ? _kAccent : ac(context).primaryText,
                         fontSize: 16)),
                 trailing: active
                     ? const Icon(Icons.check, color: _kAccent)
@@ -1623,35 +1615,44 @@ class _ClassTimePageState extends State<ClassTimePage> {
           _settingCard(context, [
             _SettingRow(
               label: '每节课时长相同',
+              showDivider: _sameLength,
               trailing: Switch(
                 value: _sameLength,
                 onChanged: (v) => setState(() => _sameLength = v),
                 activeColor: const Color(0xFFFF3B5C),
               ),
             ),
-            _SettingRow(
-              label: '每节课时长（分钟）',
-              showDivider: false,
-              onTap: _sameLength ? _pickDuration : null,
-              trailing: Text(
-                '$_duration',
-                style: TextStyle(
-                  color: _sameLength ? Colors.white : _kHint,
-                  fontSize: 15,
+            if (_sameLength) ...[
+              _SettingRow(
+                label: '每节课时长（分钟）',
+                showDivider: false,
+                onTap: _pickDuration,
+                trailing: Text(
+                  '$_duration',
+                  style: const TextStyle(color: _kHint, fontSize: 15),
                 ),
               ),
-            ),
+              GestureDetector(
+                onTap: _pickDuration,
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+                  child: Text(
+                    '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！',
+                    style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
+                  ),
+                ),
+              ),
+            ],
           ]),
-          Padding(
-            padding: const EdgeInsets.only(left: 6, bottom: 8),
-            child: Text(
-              _sameLength
-                  ? '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！'
-                  : '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」',
-              style: const TextStyle(
-                  color: _kHint, fontSize: 12, height: 1.5),
+          if (!_sameLength)
+            Padding(
+              padding: const EdgeInsets.only(left: 6, bottom: 8),
+              child: Text(
+                '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」',
+                style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
+              ),
             ),
-          ),
           const SizedBox(height: 8),
           _settingCard(
               context,
@@ -1806,8 +1807,8 @@ class _ClassTimePageState extends State<ClassTimePage> {
                         '${options[i]} 分钟',
                         style: TextStyle(
                           color: options[i] == tmp
-                              ? Colors.white
-                              : _kHint,
+                              ? ac(ctx).primaryText
+                              : ac(ctx).hint,
                           fontSize: options[i] == tmp ? 18 : 15,
                           fontWeight: options[i] == tmp
                               ? FontWeight.w700

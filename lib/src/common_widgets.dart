@@ -23,11 +23,13 @@ AppColors ac(BuildContext context) =>
 /// 子页面 Scaffold
 class SubPageScaffold extends StatelessWidget {
   final String title;
+  final String? centerTitle;
   final List<Widget> children;
 
   const SubPageScaffold({
     super.key,
     required this.title,
+    this.centerTitle,
     required this.children,
   });
 
@@ -35,40 +37,41 @@ class SubPageScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ac(context).bg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 自定义 AppBar
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              decoration: BoxDecoration(
-                color: ac(context).card,
-                border: Border(bottom: BorderSide(color: ac(context).divider, width: 0.5)),
-              ),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-                        Text(title, style: TextStyle(color: kAccent, fontSize: 15)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Body
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
-                children: children,
-              ),
-            ),
-          ],
+      appBar: AppBar(
+        backgroundColor: ac(context).card,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(width: 8),
+              Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+              Text(title, style: TextStyle(color: kAccent, fontSize: 15)),
+            ],
+          ),
         ),
+        leadingWidth: 80,
+        title: centerTitle != null
+            ? Text(
+                centerTitle!,
+                style: TextStyle(
+                  color: ac(context).primaryText,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            : null,
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(0.5),
+          child: Container(height: 0.5, color: ac(context).divider),
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: children,
       ),
     );
   }

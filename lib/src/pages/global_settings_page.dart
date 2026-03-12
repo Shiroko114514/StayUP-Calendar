@@ -143,10 +143,12 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
     return SubPageScaffold(
-      title: context.l10n.globalSettingsTitle,
+      title: context.l10n.backAction,
+      centerTitle: context.l10n.globalSettingsTitle,
       children: [
+        // ── 第一组：外观 & 通知 ──
         settingCard(context, [
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.darkMode,
             trailing: Switch(
               value: appState.isDarkMode,
@@ -154,7 +156,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.languageSettingLabel,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -169,7 +171,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             ),
             onTap: () => _showLanguagePicker(context, appState),
           ),
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.courseReminder,
             trailing: Switch(
               value: _notification,
@@ -177,7 +179,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               activeColor: const Color(0xFF4ECDC4),
             ),
           ),
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.widgetSync,
             showDivider: false,
             trailing: Switch(
@@ -187,16 +189,24 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             ),
           ),
         ]),
+
+        const SizedBox(height: 28),
+
+        // ── 第二组：背景格式 ──
         settingCard(context, [
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.setBackgroundFormat,
             showDivider: false,
             onTap: () => _showWip(context),
             trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
           ),
         ]),
+
+        const SizedBox(height: 28),
+
+        // ── 第三组：使用帮助 ──
         settingCard(context, [
-          SettingRow(
+          _WideSettingRow(
             label: context.l10n.helpUsage,
             showDivider: false,
             trailing: const Icon(Icons.open_in_new, color: kHint, size: 16),
@@ -210,6 +220,59 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             },
           ),
         ]),
+      ],
+    );
+  }
+}
+
+/// 行高更大的 SettingRow，vertical padding 从 14 加大到 20
+class _WideSettingRow extends StatelessWidget {
+  final String label;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+  final bool showDivider;
+
+  const _WideSettingRow({
+    required this.label,
+    this.trailing,
+    this.onTap,
+    this.showDivider = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = ac(context);
+    final content = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      child: Row(
+        children: [
+          Text(label,
+              style: TextStyle(color: colors.primaryText, fontSize: 15)),
+          const Spacer(),
+          onTap != null
+              ? IgnorePointer(
+                  child: trailing ??
+                      Icon(Icons.chevron_right, color: colors.hint, size: 18),
+                )
+              : (trailing ??
+                  Icon(Icons.chevron_right, color: colors.hint, size: 18)),
+        ],
+      ),
+    );
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: content,
+        ),
+        if (showDivider)
+          Container(
+            height: 0.5,
+            color: colors.divider,
+            margin: const EdgeInsets.only(left: 16),
+          ),
       ],
     );
   }

@@ -179,7 +179,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             context.l10n.cancelAction,
-            style: const TextStyle(color: kAccent, fontSize: 16),
+            style: const TextStyle(color: kAccent, fontSize: 15),
           ),
         ),
         leadingWidth: 64,
@@ -197,7 +197,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 color: isEmpty
                     ? const Color(0xFFD1D1D6)
                     : const Color(0xFF6C6C70),
-                fontSize: 16,
+                fontSize: 15,
               ),
             ),
           ),

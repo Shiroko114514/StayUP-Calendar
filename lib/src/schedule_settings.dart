@@ -11,7 +11,8 @@ class ScheduleSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SubPageScaffold(
-      title: '课表设置',
+      title: '返回',
+      centerTitle: '课表设置',
       children: [
         settingCard(context, [
           SettingRow(
@@ -608,7 +609,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
           child: const Row(mainAxisSize: MainAxisSize.min, children: [
             SizedBox(width: 8),
             Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-            Text('更多', style: TextStyle(color: kAccent, fontSize: 15)),
+            Text('返回', style: TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
         leadingWidth: 72,
