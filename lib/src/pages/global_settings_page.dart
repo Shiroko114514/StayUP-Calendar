@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../common_widgets.dart';
@@ -14,6 +15,37 @@ class GlobalSettingsPage extends StatefulWidget {
 class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   bool _notification = false;
   bool _widgetSync = false;
+  bool _isExitingForLocaleChange = false;
+
+  void _showRestartAndExitNotice(BuildContext context) {
+    if (_isExitingForLocaleChange) return;
+    _isExitingForLocaleChange = true;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(ctx).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          ctx.l10n.languageChangedRestartTitle,
+          style: TextStyle(
+            color: ac(ctx).primaryText,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          ctx.l10n.languageChangedRestartMessage,
+          style: const TextStyle(color: kHint, fontSize: 14),
+        ),
+      ),
+    );
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      SystemNavigator.pop();
+    });
+  }
 
   void _showWip(BuildContext context) {
     showDialog(
@@ -95,8 +127,12 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               ...options.map(
                 (mode) => GestureDetector(
                   onTap: () {
+                    final changed = mode != appState.localeMode;
                     appState.updateLocaleMode(mode);
                     Navigator.pop(context);
+                    if (changed) {
+                      _showRestartAndExitNotice(context);
+                    }
                   },
                   child: Container(
                     width: double.infinity,

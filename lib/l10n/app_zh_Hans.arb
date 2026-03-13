@@ -3,7 +3,7 @@
   "appTitle": "WakeUp 课程表",
   "loadingSchedule": "正在加载课表...",
   "aboutTitle": "关于",
-  "appName": "StayUP课程表",
+  "appName": "StayUP 课程表",
   "appVersionLabel": "版本 {version}",
   "@appVersionLabel": {
     "placeholders": {
@@ -34,6 +34,8 @@
   "featureInDevelopmentMessage": "该功能正在开发中，敬请期待。",
   "languageSettingLabel": "语言",
   "languageFollowSystem": "跟随系统",
+  "languageChangedRestartTitle": "语言已切换",
+  "languageChangedRestartMessage": "应用将自动退出以应用新语言，请重新打开。",
   "languageForceChineseSimplified": "中文（简体）",
   "languageForceChineseTraditional": "中文（繁體）",
   "languageForceEnglish": "English",
@@ -84,5 +86,35 @@
   "schoolSjtu": "上海交通大学",
   "schoolWhu": "武汉大学",
   "schoolCuhksz": "香港中文大学（深圳）",
-  "schoolRuc": "中国人民大学"
+  "schoolRuc": "中国人民大学",
+  "schedulePageCurrentWeek": "第{week}周",
+  "@schedulePageCurrentWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageToday": "今天",
+  "schedulePageNotCurrentWeek": "非本周",
+  "schedulePageCourseNotCurrentWeekTag": "[非本周]",
+  "schedulePageCourseTime": "周{weekday} · 第{start}-{end}节",
+  "@schedulePageCourseTime": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageDeleteCourse": "删除课程",
+  "schedulePageClose": "关闭",
+  "schedulePageToolClassTime": "上课时间",
+  "schedulePageToolScheduleSettings": "课表设置",
+  "schedulePageToolAddedCourses": "已添课程",
+  "schedulePageWeekLabel": "周数",
+  "schedulePageSwitchSchedule": "切换课表"
 }

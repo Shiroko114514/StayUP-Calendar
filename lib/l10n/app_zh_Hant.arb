@@ -34,6 +34,8 @@
   "featureInDevelopmentMessage": "該功能正在開發中，敬請期待。",
   "languageSettingLabel": "語言",
   "languageFollowSystem": "跟隨系統",
+  "languageChangedRestartTitle": "語言已切換",
+  "languageChangedRestartMessage": "應用將自動退出以套用新語言，請重新開啟。",
   "languageForceChineseSimplified": "中文（简体）",
   "languageForceChineseTraditional": "中文（繁體）",
   "languageForceEnglish": "English",
@@ -84,5 +86,35 @@
   "schoolSjtu": "上海交通大學",
   "schoolWhu": "武漢大學",
   "schoolCuhksz": "香港中文大學（深圳）",
-  "schoolRuc": "中國人民大學"
+  "schoolRuc": "中國人民大學",
+  "schedulePageCurrentWeek": "第{week}週",
+  "@schedulePageCurrentWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageToday": "今天",
+  "schedulePageNotCurrentWeek": "非本週",
+  "schedulePageCourseNotCurrentWeekTag": "[非本週]",
+  "schedulePageCourseTime": "週{weekday} · 第{start}-{end}節",
+  "@schedulePageCourseTime": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageDeleteCourse": "刪除課程",
+  "schedulePageClose": "關閉",
+  "schedulePageToolClassTime": "上課時間",
+  "schedulePageToolScheduleSettings": "課表設定",
+  "schedulePageToolAddedCourses": "已添課程",
+  "schedulePageWeekLabel": "週數",
+  "schedulePageSwitchSchedule": "切換課表"
 }

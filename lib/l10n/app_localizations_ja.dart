@@ -99,6 +99,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageFollowSystem => 'システム設定に従う';
 
   @override
+  String get languageChangedRestartTitle => '言語を変更しました';
+
+  @override
+  String get languageChangedRestartMessage =>
+      '新しい言語を適用するため、アプリを自動終了します。再度起動してください。';
+
+  @override
   String get languageForceChineseSimplified => '中文（简体）';
 
   @override
@@ -224,4 +231,44 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String schedulePageCurrentWeek(int week) {
+    return '第$week週';
+  }
+
+  @override
+  String get schedulePageToday => '今日';
+
+  @override
+  String get schedulePageNotCurrentWeek => '今週以外';
+
+  @override
+  String get schedulePageCourseNotCurrentWeekTag => '[今週以外]';
+
+  @override
+  String schedulePageCourseTime(Object weekday, int start, int end) {
+    return '$weekday ・ $start-$end限';
+  }
+
+  @override
+  String get schedulePageDeleteCourse => '授業を削除';
+
+  @override
+  String get schedulePageClose => '閉じる';
+
+  @override
+  String get schedulePageToolClassTime => '授業時間';
+
+  @override
+  String get schedulePageToolScheduleSettings => '時間割設定';
+
+  @override
+  String get schedulePageToolAddedCourses => '追加済み授業';
+
+  @override
+  String get schedulePageWeekLabel => '週数';
+
+  @override
+  String get schedulePageSwitchSchedule => '時間割を切替';
 }

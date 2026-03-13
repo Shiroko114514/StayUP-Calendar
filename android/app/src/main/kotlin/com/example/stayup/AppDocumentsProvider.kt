@@ -48,7 +48,7 @@ class AppDocumentsProvider : DocumentsProvider() {
         // Add app's files directory as root
         result.newRow().apply {
             add(Root.COLUMN_ROOT_ID, "app_data")
-            add(Root.COLUMN_TITLE, "StayUP课程表")
+            add(Root.COLUMN_TITLE, "StayUP 课程表")
             add(Root.COLUMN_SUMMARY, null)
             add(Root.COLUMN_DOCUMENT_ID, getDocIdForFile(context.filesDir))
             add(Root.COLUMN_ICON, context.applicationInfo.icon)
@@ -59,7 +59,7 @@ class AppDocumentsProvider : DocumentsProvider() {
 
         result.newRow().apply {
             add(Root.COLUMN_ROOT_ID, "data_data")
-            add(Root.COLUMN_TITLE, "StayUP课程表")
+            add(Root.COLUMN_TITLE, "StayUP 课程表")
             add(Root.COLUMN_SUMMARY, null)
             add(Root.COLUMN_DOCUMENT_ID, getDocIdForFile(context.filesDir))
             add(Root.COLUMN_ICON, context.applicationInfo.icon)

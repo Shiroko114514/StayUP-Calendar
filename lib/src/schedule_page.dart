@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'models.dart';
 import 'common_widgets.dart';
 import 'course_editor.dart';
 import 'schedule_settings.dart';
 import 'app_pages.dart';
+import 'l10n.dart';
+
+String _weekdayShort(BuildContext context, int weekday) {
+  final locale = Localizations.localeOf(context).toLanguageTag();
+  final base = DateTime(2020, 1, 6).add(Duration(days: weekday - 1));
+  return DateFormat.E(locale).format(base);
+}
 
 class SchedulePage extends StatefulWidget {
   const SchedulePage({super.key});
@@ -272,7 +280,7 @@ class _Header extends StatelessWidget {
         weekMonday.month == thisWeekMonday.month &&
         weekMonday.day == thisWeekMonday.day;
 
-    final weekDayStr = kWeekDays[todayCol - 1];
+    final weekDayStr = _weekdayShort(context, todayCol);
     final appState = AppStateScope.of(context);
     final scheduleName = appState.scheduleNames[appState.activeScheduleIndex];
 
@@ -313,13 +321,13 @@ class _Header extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    '第$currentWeek周',
+                    context.l10n.schedulePageCurrentWeek(currentWeek),
                     style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
                   ),
                   const SizedBox(width: 6),
                   if (isThisWeek)
                     Text(
-                      '周$weekDayStr',
+                      context.l10n.schedulePageToday,
                       style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
                     )
                   else
@@ -329,9 +337,9 @@ class _Header extends StatelessWidget {
                         color: const Color(0xFFF07B8A).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        '非本周',
-                        style: TextStyle(
+                      child: Text(
+                        context.l10n.schedulePageNotCurrentWeek,
+                        style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFFF07B8A),
                           fontWeight: FontWeight.w500,
@@ -421,7 +429,7 @@ class _DayHeader extends StatelessWidget {
                     style: const TextStyle(fontSize: 10, color: Color(0xFF999999)),
                   ),
                   const Text(
-                    '月',
+                    'M',
                     style: TextStyle(fontSize: 10, color: Color(0xFF999999)),
                   ),
                 ],
@@ -442,7 +450,7 @@ class _DayHeader extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      kWeekDays[i],
+                      _weekdayShort(context, col),
                       style: TextStyle(
                         fontSize: 11,
                         color: isToday ? const Color(0xFF4ECDC4) : const Color(0xFF999999),
@@ -719,7 +727,7 @@ class _CourseCard extends StatelessWidget {
             children: [
               if (course.isNonWeek)
                 Text(
-                  '[非本周]',
+                  context.l10n.schedulePageCourseNotCurrentWeekTag,
                   style: TextStyle(
                     fontSize: 7,
                     color: ac(context).hint,
@@ -824,9 +832,13 @@ class _CourseDetailSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '周${kWeekDays[course.day - 1]}  ·  第${course.startSection}–${course.startSection + course.span - 1}节',
-                        style: TextStyle(
-                            fontSize: 12, color: ac(context).primaryText, fontWeight: FontWeight.w500),
+                        context.l10n.schedulePageCourseTime(
+                          _weekdayShort(context, course.day),
+                          course.startSection,
+                          course.startSection + course.span - 1,
+                        ),
+                        style: const TextStyle(
+                            fontSize: 12, color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -847,10 +859,10 @@ class _CourseDetailSheet extends StatelessWidget {
                     color: const Color(0xFFF0F0F0),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.edit_outlined, size: 15, color: Color(0xFF555555)),
                     SizedBox(width: 4),
-                    Text('编辑', style: TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
+                    Text(context.l10n.editAction, style: const TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
                   ]),
                 ),
               ),
@@ -889,8 +901,8 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('删除课程',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                child: Text(context.l10n.schedulePageDeleteCourse,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(width: 10),
@@ -903,7 +915,8 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('关闭', style: TextStyle(fontSize: 15)),
+                child: Text(context.l10n.schedulePageClose,
+                  style: const TextStyle(fontSize: 15)),
               ),
             ),
           ]),
@@ -942,18 +955,17 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
   }
 
   // 工具格子数据
-  static const List<_MenuTool> _tools = [
-    _MenuTool(icon: Icons.access_time_outlined, label: '上课时间',  route: 'class_time'),
-    _MenuTool(icon: Icons.tune_outlined,         label: '课表设置',  route: 'schedule_settings'),
-    _MenuTool(icon: Icons.inbox_outlined,        label: '已添课程',  route: 'added_courses'),
-    _MenuTool(icon: Icons.settings_outlined,     label: '全局设置',  route: 'global_settings'),
-    _MenuTool(icon: Icons.ios_share_outlined,    label: '导出课表',  route: 'export'),
-    _MenuTool(icon: Icons.info_outline,          label: '关于',      route: 'about'),
-  ];
-
   @override
   Widget build(BuildContext context) {
     final colors = ac(context);
+    final tools = [
+      _MenuTool(icon: Icons.access_time_outlined, label: context.l10n.schedulePageToolClassTime, route: 'class_time'),
+      _MenuTool(icon: Icons.tune_outlined, label: context.l10n.schedulePageToolScheduleSettings, route: 'schedule_settings'),
+      _MenuTool(icon: Icons.inbox_outlined, label: context.l10n.schedulePageToolAddedCourses, route: 'added_courses'),
+      _MenuTool(icon: Icons.settings_outlined, label: context.l10n.globalSettingsTitle, route: 'global_settings'),
+      _MenuTool(icon: Icons.ios_share_outlined, label: context.l10n.exportScheduleTitle, route: 'export'),
+      _MenuTool(icon: Icons.info_outline, label: context.l10n.aboutTitle, route: 'about'),
+    ];
     return Container(
       decoration: BoxDecoration(
         color: colors.bg,
@@ -986,7 +998,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('周数', style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                      Text(context.l10n.schedulePageWeekLabel, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       // 带数字标签的滑块
                       Row(
@@ -1043,7 +1055,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     children: [
                       Row(
                         children: [
-                          Text('切换课表', style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                          Text(context.l10n.schedulePageSwitchSchedule, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
@@ -1053,7 +1065,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const NewSchedulePage(),
                               ));
                             },
-                            child: const Text('新建课表  ', style: TextStyle(color: _accent, fontSize: 13)),
+                            child: Text('${context.l10n.newScheduleButton}  ', style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -1062,7 +1074,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const ManageSchedulePage(),
                               ));
                             },
-                            child: const Text('管理课表', style: TextStyle(color: _accent, fontSize: 13)),
+                            child: Text(context.l10n.manageScheduleTitle, style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                         ],
                       ),
@@ -1100,7 +1112,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 1.1,
-                    children: _tools.map((t) => _ToolCell(tool: t)).toList(),
+                    children: tools.map((t) => _ToolCell(tool: t)).toList(),
                   ),
                 ),
               ),
@@ -1203,20 +1215,20 @@ class _ToolCell extends StatelessWidget {
               backgroundColor: ac(ctx).card,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               title: Row(children: [
-                Icon(Icons.ios_share_outlined, color: ac(context).hint, size: 20),
+                Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
                 SizedBox(width: 8),
-                Text('导出课表', style: TextStyle(
-                    color: ac(context).primaryText, fontSize: 16, fontWeight: FontWeight.w600)),
+                Text(ctx.l10n.exportScheduleTitle, style: const TextStyle(
+                    color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
               ]),
               content: Text(
-                '「导出课表」功能正在开发中，敬请期待。',
-                style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
+                ctx.l10n.featureInDevelopmentMessage,
+                style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('好的',
-                      style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
+                  child: Text(ctx.l10n.okAction,
+                      style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
                 ),
               ],
             ),

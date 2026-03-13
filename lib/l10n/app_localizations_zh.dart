@@ -18,7 +18,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutTitle => '关于';
 
   @override
-  String get appName => 'StayUP课程表';
+  String get appName => 'StayUP 课程表';
 
   @override
   String appVersionLabel(Object version) {
@@ -96,6 +96,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get languageFollowSystem => '跟随系统';
+
+  @override
+  String get languageChangedRestartTitle => '语言已切换';
+
+  @override
+  String get languageChangedRestartMessage => '应用将自动退出以应用新语言，请重新打开。';
 
   @override
   String get languageForceChineseSimplified => '中文（简体）';
@@ -223,6 +229,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String schedulePageCurrentWeek(int week) {
+    return '第$week周';
+  }
+
+  @override
+  String get schedulePageToday => '今天';
+
+  @override
+  String get schedulePageNotCurrentWeek => '非本周';
+
+  @override
+  String get schedulePageCourseNotCurrentWeekTag => '[非本周]';
+
+  @override
+  String schedulePageCourseTime(Object weekday, int start, int end) {
+    return '周$weekday · 第$start-$end节';
+  }
+
+  @override
+  String get schedulePageDeleteCourse => '删除课程';
+
+  @override
+  String get schedulePageClose => '关闭';
+
+  @override
+  String get schedulePageToolClassTime => '上课时间';
+
+  @override
+  String get schedulePageToolScheduleSettings => '课表设置';
+
+  @override
+  String get schedulePageToolAddedCourses => '已添课程';
+
+  @override
+  String get schedulePageWeekLabel => '周数';
+
+  @override
+  String get schedulePageSwitchSchedule => '切换课表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -239,7 +285,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get aboutTitle => '关于';
 
   @override
-  String get appName => 'StayUP课程表';
+  String get appName => 'StayUP 课程表';
 
   @override
   String appVersionLabel(Object version) {
@@ -317,6 +363,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get languageFollowSystem => '跟随系统';
+
+  @override
+  String get languageChangedRestartTitle => '语言已切换';
+
+  @override
+  String get languageChangedRestartMessage => '应用将自动退出以应用新语言，请重新打开。';
 
   @override
   String get languageForceChineseSimplified => '中文（简体）';
@@ -444,6 +496,46 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String schedulePageCurrentWeek(int week) {
+    return '第$week周';
+  }
+
+  @override
+  String get schedulePageToday => '今天';
+
+  @override
+  String get schedulePageNotCurrentWeek => '非本周';
+
+  @override
+  String get schedulePageCourseNotCurrentWeekTag => '[非本周]';
+
+  @override
+  String schedulePageCourseTime(Object weekday, int start, int end) {
+    return '周$weekday · 第$start-$end节';
+  }
+
+  @override
+  String get schedulePageDeleteCourse => '删除课程';
+
+  @override
+  String get schedulePageClose => '关闭';
+
+  @override
+  String get schedulePageToolClassTime => '上课时间';
+
+  @override
+  String get schedulePageToolScheduleSettings => '课表设置';
+
+  @override
+  String get schedulePageToolAddedCourses => '已添课程';
+
+  @override
+  String get schedulePageWeekLabel => '周数';
+
+  @override
+  String get schedulePageSwitchSchedule => '切换课表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -538,6 +630,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get languageFollowSystem => '跟隨系統';
+
+  @override
+  String get languageChangedRestartTitle => '語言已切換';
+
+  @override
+  String get languageChangedRestartMessage => '應用將自動退出以套用新語言，請重新開啟。';
 
   @override
   String get languageForceChineseSimplified => '中文（简体）';
@@ -665,4 +763,44 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get schoolRuc => '中國人民大學';
+
+  @override
+  String schedulePageCurrentWeek(int week) {
+    return '第$week週';
+  }
+
+  @override
+  String get schedulePageToday => '今天';
+
+  @override
+  String get schedulePageNotCurrentWeek => '非本週';
+
+  @override
+  String get schedulePageCourseNotCurrentWeekTag => '[非本週]';
+
+  @override
+  String schedulePageCourseTime(Object weekday, int start, int end) {
+    return '週$weekday · 第$start-$end節';
+  }
+
+  @override
+  String get schedulePageDeleteCourse => '刪除課程';
+
+  @override
+  String get schedulePageClose => '關閉';
+
+  @override
+  String get schedulePageToolClassTime => '上課時間';
+
+  @override
+  String get schedulePageToolScheduleSettings => '課表設定';
+
+  @override
+  String get schedulePageToolAddedCourses => '已添課程';
+
+  @override
+  String get schedulePageWeekLabel => '週數';
+
+  @override
+  String get schedulePageSwitchSchedule => '切換課表';
 }
