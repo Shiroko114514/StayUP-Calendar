@@ -1244,8 +1244,8 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                             title: Text(_t(context, '删除时间表', 'Delete timetable', ja: '時間割を削除'),
                               style: const TextStyle(fontSize: 16)),
                             content: Text(
-                                '确定删除「${tables[i].name}」？',
-                                style: TextStyle(
+                              _t(context, '确定删除「${tables[i].name}」？', 'Delete "${tables[i].name}"?', ja: '「${tables[i].name}」を削除しますか？'),
+                                style: const TextStyle(
                                     color: _kHint, fontSize: 14)),
                             actions: [
                               TextButton(
