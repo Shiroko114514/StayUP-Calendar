@@ -180,9 +180,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 8),
-            Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
             Text(_t(context, '课表设置', 'Settings', ja: '設定'), style: const TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
@@ -397,9 +397,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 8),
-            Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
             Text(_t(context, '全局设置', 'Global Settings', ja: '全体設定'), style: const TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
@@ -622,9 +622,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 8),
-            Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
             Text(_t(context, '更多', 'More', ja: 'その他'), style: const TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
@@ -683,12 +683,12 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
               ),
 
               if (courses.isEmpty)
-                const Center(
+                Center(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 60),
+                    padding: const EdgeInsets.symmetric(vertical: 60),
                     child: Column(children: [
-                      Icon(Icons.library_books_outlined, color: kHint, size: 48),
-                      SizedBox(height: 12),
+                      const Icon(Icons.library_books_outlined, color: kHint, size: 48),
+                      const SizedBox(height: 12),
                       Text(_t(context, '还没有课程', 'No courses yet', ja: '授業がありません'), style: const TextStyle(color: kHint, fontSize: 15)),
                     ]),
                   ),
