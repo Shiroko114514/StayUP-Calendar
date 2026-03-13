@@ -11,8 +11,7 @@ class ScheduleSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SubPageScaffold(
-      title: '返回',
-      centerTitle: '课表设置',
+      title: '课表设置',
       children: [
         settingCard(context, [
           SettingRow(
@@ -40,14 +39,14 @@ class ScheduleSettingsPage extends StatelessWidget {
       builder: (_) => AlertDialog(
         backgroundColor: ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Row(children: [
-          Icon(Icons.lock_outline, color: Color(0xFF6C6C70), size: 20),
-          SizedBox(width: 8),
-          Text('暂未开放', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+        title: Row(children: [
+          Icon(Icons.lock_outline, color: ac(context).hint, size: 20),
+          const SizedBox(width: 8),
+          Text('暂未开放', style: TextStyle(color: ac(context).primaryText, fontSize: 16, fontWeight: FontWeight.w600)),
         ]),
-        content: const Text(
+        content: Text(
           '「课表外观」功能正在开发中，敬请期待。',
-          style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
+          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -77,7 +76,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
       backgroundColor: ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) {
+      builder: (bCtx) {
         int tmp = current;
         return StatefulBuilder(builder: (ctx, setS) => Column(
           mainAxisSize: MainAxisSize.min,
@@ -88,8 +87,8 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 TextButton(onPressed: () => Navigator.pop(ctx),
                     child: const Text('取消', style: TextStyle(color: kAccent))),
-                Text(title, style: const TextStyle(
-                    color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
+                Text(title, style: TextStyle(
+                    color: ac(ctx).primaryText, fontWeight: FontWeight.w600, fontSize: 16)),
                 TextButton(
                     onPressed: () { onPick(tmp); Navigator.pop(ctx); },
                     child: const Text('确定', style: TextStyle(color: kAccent))),
@@ -107,7 +106,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                   builder: (_, i) {
                     final v = min + i;
                     return Center(child: Text('$v', style: TextStyle(
-                      color: v == tmp ? Colors.white : kHint,
+                      color: v == tmp ? ac(ctx).primaryText : ac(ctx).hint,
                       fontSize: v == tmp ? 18 : 15,
                       fontWeight: v == tmp ? FontWeight.w700 : FontWeight.w400,
                     )));
@@ -171,9 +170,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
             Text('课表设置', style: TextStyle(color: kAccent, fontSize: 15)),
           ]),
         ),
-        leadingWidth: 100,
-        title: const Text('课表数据',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        leadingWidth: 120,
+        title: Text('课表数据',
+            style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
       ),
       body: ListView(
@@ -196,7 +195,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                     content: TextField(
                       controller: ctrl,
                       autofocus: true,
-                      style: const TextStyle(color: const Color(0xFF1C1C1E)),
+                      style: TextStyle(color: ac(context).primaryText),
                       decoration: const InputDecoration(
                         hintText: '请输入课表名称',
                         hintStyle: TextStyle(color: kHint),
@@ -251,7 +250,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(_fmtDate(cfg.firstWeekDay),
-                    style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                    style: TextStyle(color: ac(context).primaryText, fontSize: 14)),
               ),
             ),
             SettingRow(
@@ -388,8 +387,8 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
           ]),
         ),
         leadingWidth: 100,
-        title: const Text('调课工具',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text('调课工具',
+            style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -432,23 +431,28 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                const Text('将', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
+                Text('将', style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
                 const SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () => _pickDate(_fromDate, (d) => setState(() => _fromDate = d)),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5E5EA),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(_fmtDate(_fromDate),
-                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _pickDate(_fromDate, (d) => setState(() => _fromDate = d)),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE5E5EA),
+                        borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          _fmtDate(_fromDate),
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: ac(context).primaryText, fontSize: 14),
+                        ),
+                      ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                const Text('的课程', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
-              ]),
+                 ),
+                          const SizedBox(width: 10),
+                          Text('的课程', style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
+                ])
             ),
             // 分隔线
             Container(height: 0.5, color: const Color(0xFFE5E5EA), margin: const EdgeInsets.only(left: 16)),
@@ -456,7 +460,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                const Text('移动到', style: TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15)),
+                Text('移动到', style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () => _pickDate(_toDate, (d) => setState(() => _toDate = d)),
@@ -467,7 +471,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_fmtDate(_toDate),
-                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                        style: TextStyle(color: ac(context).primaryText, fontSize: 14)),
                   ),
                 ),
               ]),
@@ -617,7 +621,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
           _editing
               ? (_selected.isEmpty ? '选择课程' : '已选 ${_selected.length} 门')
               : '已添课程',
-          style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -719,12 +723,12 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                   shape: BoxShape.circle,
                                   color: isSelected ? const Color(0xFFFF3B5C) : Colors.transparent,
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFFFF3B5C) : const Color(0xFF6C6C70),
+                                    color: isSelected ? const Color(0xFFFF3B5C) : ac(context).hint,
                                     width: 2,
                                   ),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check, color: const Color(0xFF1C1C1E), size: 13)
+                                    ? Icon(Icons.check, color: ac(context).primaryText, size: 13)
                                     : null,
                               ),
                               const SizedBox(width: 12),
@@ -738,7 +742,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                             // 课程名
                             Expanded(
                               child: Text(c.name,
-                                  style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15),
+                                  style: TextStyle(color: ac(context).primaryText, fontSize: 15),
                                   overflow: TextOverflow.ellipsis),
                             ),
                             // 时间信息
