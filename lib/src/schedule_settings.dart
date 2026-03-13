@@ -91,7 +91,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
       backgroundColor: ac(context).card,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) {
+      builder: (bCtx) {
         int tmp = current;
         return StatefulBuilder(builder: (ctx, setS) => Column(
           mainAxisSize: MainAxisSize.min,
@@ -121,7 +121,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                   builder: (_, i) {
                     final v = min + i;
                     return Center(child: Text('$v', style: TextStyle(
-                      color: v == tmp ? Colors.white : kHint,
+                      color: v == tmp ? ac(ctx).primaryText : ac(ctx).hint,
                       fontSize: v == tmp ? 18 : 15,
                       fontWeight: v == tmp ? FontWeight.w700 : FontWeight.w400,
                     )));
@@ -735,12 +735,12 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                   shape: BoxShape.circle,
                                   color: isSelected ? const Color(0xFFFF3B5C) : Colors.transparent,
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFFFF3B5C) : const Color(0xFF6C6C70),
+                                    color: isSelected ? const Color(0xFFFF3B5C) : ac(context).hint,
                                     width: 2,
                                   ),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check, color: const Color(0xFF1C1C1E), size: 13)
+                                    ? Icon(Icons.check, color: ac(context).primaryText, size: 13)
                                     : null,
                               ),
                               const SizedBox(width: 12),
@@ -754,7 +754,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                             // 课程名
                             Expanded(
                               child: Text(c.name,
-                                  style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 15),
+                                  style: TextStyle(color: ac(context).primaryText, fontSize: 15),
                                   overflow: TextOverflow.ellipsis),
                             ),
                             // 时间信息

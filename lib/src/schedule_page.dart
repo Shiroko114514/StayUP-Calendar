@@ -92,12 +92,9 @@ class _SchedulePageState extends State<SchedulePage> {
     final totalWeeks  = cfg.totalWeeks;
 
     return Scaffold(
-      backgroundColor: ac(context).card,
+      backgroundColor: const Color(0xFFF0F4F8),
       body: SafeArea(
-        bottom: false,
-        child: ColoredBox(
-          color: const Color(0xFFF0F4F8),
-          child: Column(
+        child: Column(
           children: [
             _Header(
               weekMonday: _currentWeekMonday,
@@ -189,10 +186,10 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
           ],
         ),
-        ),
       ),
     );
   }
+
   // ── 详情底部弹窗 ──
   void _showDetailSheet(BuildContext context, Course course) {
     showModalBottomSheet(
@@ -519,9 +516,7 @@ class _ScheduleGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double totalHeight = customTimes.length * kSlotHeight;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: bottomPadding),
       child: SizedBox(
         height: totalHeight,
         child: Row(
@@ -735,16 +730,16 @@ class _CourseCard extends StatelessWidget {
                   context.l10n.schedulePageCourseNotCurrentWeekTag,
                   style: TextStyle(
                     fontSize: 7,
-                    color: const Color(0xFF3C3C43),
+                    color: ac(context).hint,
                   ),
                   textAlign: TextAlign.center,
                 ),
               Text(
                 course.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1C1C1E),
+                  color: ac(context).primaryText,
                   height: 1.3,
                 ),
                 textAlign: TextAlign.center,
@@ -755,9 +750,9 @@ class _CourseCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   '@${course.location}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 8,
-                    color: const Color(0xFF3C3C43),
+                    color: ac(context).hint,
                     height: 1.2,
                   ),
                   textAlign: TextAlign.center,
@@ -801,8 +796,8 @@ class _CourseDetailSheet extends StatelessWidget {
         : '';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: const Color(0xFF1C1C1E),
+      decoration: BoxDecoration(
+        color: ac(context).primaryText,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(

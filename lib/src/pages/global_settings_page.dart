@@ -117,8 +117,8 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             children: [
               Text(
                 context.l10n.languageSettingLabel,
-                style: const TextStyle(
-                  color: Color(0xFF1C1C1E),
+                style: TextStyle(
+                  color: ac(context).primaryText,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -179,8 +179,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
     return SubPageScaffold(
-      title: context.l10n.backAction,
-      centerTitle: context.l10n.globalSettingsTitle,
+      title: context.l10n.globalSettingsTitle,
       children: [
         // ── 第一组：外观 & 通知 ──
         settingCard(context, [
@@ -279,7 +278,7 @@ class _WideSettingRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = ac(context);
     final content = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Row(
         children: [
           Text(label,

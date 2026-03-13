@@ -206,7 +206,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Container(
                 width: 36, height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD1D1D6),
+                  color: ac(context).divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -221,8 +221,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
                     Text(title,
-                        style: const TextStyle(
-                            color: Color(0xFF1C1C1E),
+                        style: TextStyle(
+                            color: ac(context).primaryText,
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),
                     TextButton(
@@ -292,7 +292,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Container(
                 width: 36, height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD1D1D6),
+                  color: ac(context).divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -306,9 +306,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                       child: const Text('取消',
                           style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
-                    const Text('周数',
+                    Text('周数',
                         style: TextStyle(
-                            color: Color(0xFF1C1C1E),
+                            color: ac(context).primaryText,
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),
                     TextButton(
@@ -327,8 +327,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    const Text('开始',
-                        style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    Text('开始',
+                        style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
                       child: ListWheelScrollView.useDelegate(
@@ -357,8 +357,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     ),
                   ])),
                   Expanded(child: Column(children: [
-                    const Text('结束',
-                        style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    Text('结束',
+                        style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
                       child: ListWheelScrollView.useDelegate(
@@ -416,7 +416,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Container(
                 width: 36, height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD1D1D6),
+                  color: ac(context).divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -430,9 +430,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                       child: const Text('取消',
                           style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
-                    const Text('选择节次',
+                    Text('选择节次',
                         style: TextStyle(
-                            color: Color(0xFF1C1C1E),
+                            color: ac(context).primaryText,
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),
                     TextButton(
@@ -452,8 +452,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    const Text('开始节',
-                        style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    Text('开始节',
+                        style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
                       child: ListWheelScrollView.useDelegate(
@@ -486,8 +486,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     ),
                   ])),
                   Expanded(child: Column(children: [
-                    const Text('结束节',
-                        style: TextStyle(color: Color(0xFFC7C7CC), fontSize: 12)),
+                    Text('结束节',
+                        style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
                       child: ListWheelScrollView.useDelegate(
@@ -732,8 +732,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
             const Spacer(),
             Text(
               widget.editCourse != null ? '编辑课程' : '添加课程',
-              style: const TextStyle(
-                  color: Color(0xFF1C1C1E),
+              style: TextStyle(
+                  color: ac(context).primaryText,
                   fontSize: 17,
                   fontWeight: FontWeight.w600),
             ),
@@ -889,7 +889,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     width: 36,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD1D1D6),
+                      color: ac(context).divider,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
@@ -898,9 +898,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('选择颜色',
+                    Text('选择颜色',
                         style: TextStyle(
-                            color: Color(0xFF1C1C1E),
+                            color: ac(context).primaryText,
                             fontSize: 16,
                             fontWeight: FontWeight.w600)),
                     Row(children: [
@@ -927,9 +927,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
-                        child: const Text('确定',
+                        child: Text('确定',
                             style: TextStyle(
-                                color: Color(0xFF1C1C1E),
+                                color: ac(context).primaryText,
                                 fontSize: 14)),
                       ),
                     ]),
@@ -977,9 +977,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      const Text('自动选色（不与已有课程冲突）',
+                      Text('自动选色（不与已有课程冲突）',
                           style: TextStyle(
-                              color: Color(0xFF1C1C1E),
+                              color: ac(context).primaryText,
                               fontSize: 13)),
                       if (_customColor == null) ...[
                         const Spacer(),
@@ -1013,7 +1013,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           shape: BoxShape.circle,
                           border: isSelected
                               ? Border.all(
-                                  color: const Color(0xFF1C1C1E),
+                                  color: ac(context).primaryText,
                                   width: 2.5)
                               : null,
                           boxShadow: isSelected
@@ -1025,8 +1025,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                               : null,
                         ),
                         child: isSelected
-                            ? const Icon(Icons.check,
-                                color: Color(0xFF1C1C1E), size: 14)
+                            ? Icon(Icons.check,
+                                color: ac(context).primaryText, size: 14)
                             : null,
                       ),
                     );
@@ -1047,7 +1047,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
 // ═══════════════════════════════════════════════════════════════
 const Color _kAccent  = Color(0xFFFF3B5C);
 const Color _kHint    = Color(0xFF8E8E93);
-const Color _kDivider = Color(0xFFD1D1D6);
+const Color _kDivider = Color(0xFFE5E5EA);
 
 // 通用子页面脚手架
 class _SubPageScaffold extends StatelessWidget {
@@ -1170,8 +1170,8 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           ]),
         ),
         leadingWidth: 64,
-        title: Text(_t(context, '上课时间', 'Class Time', ja: '授業時間'),
-            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text('上课时间',
+            style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
@@ -1191,7 +1191,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
               onTap: () => _pickActive(context, s),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(tables[activeIdx].name,
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
+                    style: TextStyle(color: _kHint, fontSize: 15)),
                 const SizedBox(width: 4),
                 const Icon(Icons.unfold_more, color: _kHint, size: 16),
               ]),
@@ -1229,8 +1229,8 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                       borderRadius:
                           BorderRadius.all(Radius.circular(12)),
                     ),
-                    child: const Icon(Icons.delete_outline,
-                        color: Color(0xFF1C1C1E)),
+                    child: Icon(Icons.delete_outline,
+                        color: ac(context).primaryText),
                   ),
                   confirmDismiss: (_) async {
                     if (tables.length <= 1) return false;
@@ -1301,7 +1301,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: const Color(0xFFD1D1D6),
+                    color: ac(context).divider,
                     borderRadius: BorderRadius.circular(2))),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
@@ -1496,7 +1496,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                       color: Color(0xFFE5E5EA), height: 16),
                   itemBuilder: (_, i) => Text(
                     errors[i],
-                    style: const TextStyle(
+                    style: TextStyle(
                         color: Color(0xFFF07B8A),
                         fontSize: 13,
                         height: 1.5),
@@ -1586,7 +1586,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
         title: Text(
           _t(context, '时间表编辑', 'Edit Timetable', ja: '時間割を編集'),
           style: TextStyle(
-              color: Color(0xFF1C1C1E),
+              color: ac(context).primaryText,
               fontSize: 17,
               fontWeight: FontWeight.w600),
         ),
@@ -1612,7 +1612,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
               onTap: () => _editName(),
               trailing: Text(
                 _nameCtrl.text,
-                style: const TextStyle(color: _kHint, fontSize: 15),
+                style: TextStyle(color: _kHint, fontSize: 15),
               ),
             ),
           ]),
@@ -1638,7 +1638,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                 onTap: _pickDuration,
                 trailing: Text(
                   '$_duration',
-                  style: const TextStyle(color: _kHint, fontSize: 15),
+                  style: TextStyle(color: _kHint, fontSize: 15),
                 ),
               ),
               GestureDetector(
@@ -1673,7 +1673,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                   trailing: Text(
                     '${_times[i][0]} - ${_times[i][1]}',
                     style:
-                        const TextStyle(color: _kHint, fontSize: 15),
+                        TextStyle(color: _kHint, fontSize: 15),
                   ),
                 );
               })),
