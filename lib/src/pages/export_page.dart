@@ -131,8 +131,8 @@ class _ExportPageState extends State<ExportPage> {
           children: [
             Text(
               context.l10n.exportSelectFormat,
-              style: const TextStyle(
-                color: Color(0xFF1C1C1E),
+              style: TextStyle(
+                color: ac(context).primaryText,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),

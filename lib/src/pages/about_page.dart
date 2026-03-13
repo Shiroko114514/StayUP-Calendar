@@ -36,7 +36,8 @@ class _AboutPageState extends State<AboutPage> {
             : '${info.version}+${info.buildNumber}';
 
         return SubPageScaffold(
-          title: context.l10n.aboutTitle,
+          title: context.l10n.backAction,
+          centerTitle: context.l10n.aboutTitle,
           children: [
         // App Logo 区
         Container(

@@ -141,17 +141,17 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Row(
           children: [
-            const Icon(
+            Icon(
               Icons.school_outlined,
-              color: Color(0xFF6C6C70),
+              color: ac(context).hint,
               size: 20,
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 name,
-                style: const TextStyle(
-                  color: const Color(0xFF1C1C1E),
+                style: TextStyle(
+                  color: ac(context).primaryText,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -161,8 +161,8 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
         ),
         content: Text(
           context.l10n.schoolImportWipMessage,
-          style: const TextStyle(
-            color: Color(0xFF6C6C70),
+          style: TextStyle(
+            color: ac(context).hint,
             fontSize: 14,
             height: 1.5,
           ),
@@ -218,19 +218,19 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
                       ),
                       child: TextField(
                         controller: _searchCtrl,
-                        style: const TextStyle(
-                          color: const Color(0xFF1C1C1E),
+                        style: TextStyle(
+                          color: ac(context).primaryText,
                           fontSize: 15,
                         ),
                         decoration: InputDecoration(
                           hintText: context.l10n.searchSchoolHint,
-                          hintStyle: const TextStyle(
-                            color: Color(0xFF6C6C70),
+                          hintStyle: TextStyle(
+                            color: ac(context).hint,
                             fontSize: 15,
                           ),
-                          prefixIcon: const Icon(
+                          prefixIcon: Icon(
                             Icons.search,
-                            color: Color(0xFF6C6C70),
+                            color: ac(context).hint,
                             size: 20,
                           ),
                           border: InputBorder.none,
@@ -250,7 +250,7 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
               padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
               child: Text(
                 context.l10n.schoolImportTip,
-                style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 13),
+                style: TextStyle(color: ac(context).hint, fontSize: 13),
               ),
             ),
 

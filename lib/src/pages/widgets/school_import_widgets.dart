@@ -9,8 +9,8 @@ class _SectionHeader extends StatelessWidget {
     padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
     child: Text(
       letter,
-      style: const TextStyle(
-        color: Color(0xFF6C6C70),
+      style: TextStyle(
+        color: ac(context).hint,
         fontSize: 13,
         fontWeight: FontWeight.w600,
       ),
@@ -43,10 +43,10 @@ class _SchoolRow extends StatelessWidget {
                   Expanded(
                     child: Text(
                       name,
-                      style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 16),
+                      style: TextStyle(color: ac(context).primaryText, fontSize: 16),
                     ),
                   ),
-                  const Icon(Icons.chevron_right, color: Color(0xFFD1D1D6), size: 20),
+                  Icon(Icons.chevron_right, color: ac(context).divider, size: 20),
                 ],
               ),
             ),
@@ -79,8 +79,8 @@ class _AlphaIndexBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 4),
                   child: Text(
                     l,
-                    style: const TextStyle(
-                      color: Color(0xFF6C6C70),
+                    style: TextStyle(
+                      color: ac(context).hint,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),

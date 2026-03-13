@@ -38,37 +38,42 @@ class SubPageScaffold extends StatelessWidget {
     return Scaffold(
       backgroundColor: ac(context).bg,
       appBar: AppBar(
-        backgroundColor: ac(context).card,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(width: 8),
-              Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-              Text(title, style: TextStyle(color: kAccent, fontSize: 15)),
-            ],
-          ),
+  backgroundColor: ac(context).card,
+  elevation: 0,
+  scrolledUnderElevation: 0,
+
+  leading: GestureDetector(
+    onTap: () => Navigator.pop(context),
+    child: const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(width: 8),
+        Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+        Text(
+          '返回',
+          style: TextStyle(color: kAccent, fontSize: 15),
         ),
-        leadingWidth: 80,
-        title: centerTitle != null
-            ? Text(
-                centerTitle!,
-                style: TextStyle(
-                  color: ac(context).primaryText,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            : null,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: ac(context).divider),
-        ),
-      ),
+      ],
+    ),
+  ),
+  leadingWidth: 80,
+
+  title: Text(
+    centerTitle ?? title,
+    style: TextStyle(
+      color: ac(context).primaryText,
+      fontSize: 17,
+      fontWeight: FontWeight.w600,
+    ),
+  ),
+
+  centerTitle: true,
+
+  bottom: PreferredSize(
+    preferredSize: const Size.fromHeight(0.5),
+    child: Container(height: 0.5, color: ac(context).divider),
+  ),
+),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: children,
