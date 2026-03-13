@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'models.dart';
 import 'common_widgets.dart';
 
+String _t(BuildContext context, String zh, String en, {String? ja}) {
+  final code = Localizations.localeOf(context).languageCode;
+  if (code == 'zh') return zh;
+  if (code == 'ja') return ja ?? en;
+  return en;
+}
+
 class AddCoursePage extends StatefulWidget {
   final ValueChanged<Course>? onAdd;
   final ValueChanged<Course>? onEdit;
@@ -1159,18 +1166,18 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           child: const Row(mainAxisSize: MainAxisSize.min, children: [
             SizedBox(width: 8),
             Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-            Text('返回', style: TextStyle(color: _kAccent, fontSize: 15)),
+            Text('Back', style: TextStyle(color: _kAccent, fontSize: 15)),
           ]),
         ),
         leadingWidth: 64,
-        title: const Text('上课时间',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+        title: Text(_t(context, '上课时间', 'Class Time', ja: '授業時間'),
+            style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
             onPressed: () => _newTimeTable(context, s),
-            child: const Text('新建',
-                style: TextStyle(color: _kAccent, fontSize: 15)),
+            child: Text(_t(context, '新建', 'New', ja: '新規'),
+                style: const TextStyle(color: _kAccent, fontSize: 15)),
           ),
         ],
       ),
@@ -1179,7 +1186,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         children: [
           _settingCard(context, [
             _SettingRow(
-              label: '当前课表显示的时间表',
+              label: _t(context, '当前课表显示的时间表', 'Current timetable', ja: '現在の時間割'),
               showDivider: false,
               onTap: () => _pickActive(context, s),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1190,20 +1197,20 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
               ]),
             ),
           ]),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(left: 6, bottom: 16, top: 4),
-            child: Text('轻触右侧选择当前使用的时间表',
-                style: TextStyle(color: _kHint, fontSize: 12)),
+            child: Text(_t(context, '轻触右侧选择当前使用的时间表', 'Tap right side to choose active timetable', ja: '右側をタップして使用中の時間割を選択'),
+                style: const TextStyle(color: _kHint, fontSize: 12)),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 6, bottom: 6),
             child: Row(children: [
-              const Text('时间表',
-                  style: TextStyle(color: _kHint, fontSize: 12)),
+              Text(_t(context, '时间表', 'Timetable', ja: '時間割'),
+                  style: const TextStyle(color: _kHint, fontSize: 12)),
               const Spacer(),
               if (tables.length > 1)
-                const Text('条目上左划删除',
-                    style: TextStyle(color: _kHint, fontSize: 12)),
+                Text(_t(context, '条目上左划删除', 'Swipe left to delete', ja: '左スワイプで削除'),
+                    style: const TextStyle(color: _kHint, fontSize: 12)),
             ]),
           ),
           _settingCard(
@@ -1234,23 +1241,22 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                             shape: RoundedRectangleBorder(
                                 borderRadius:
                                     BorderRadius.circular(14)),
-                            title: const Text('删除时间表',
-                                style: TextStyle(fontSize: 16)),
+                            title: Text(_t(context, '删除时间表', 'Delete timetable', ja: '時間割を削除'),
+                              style: const TextStyle(fontSize: 16)),
                             content: Text(
-                                '确定删除「${tables[i].name}」？',
+                              _t(context, '确定删除「${tables[i].name}」？', 'Delete "${tables[i].name}"?', ja: '「${tables[i].name}」を削除しますか？'),
                                 style: const TextStyle(
                                     color: _kHint, fontSize: 14)),
                             actions: [
                               TextButton(
                                   onPressed: () =>
                                       Navigator.pop(ctx, false),
-                                  child: const Text('取消',
-                                      style:
-                                          TextStyle(color: _kHint))),
+                                child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'),
+                                  style: const TextStyle(color: _kHint))),
                               TextButton(
                                   onPressed: () =>
                                       Navigator.pop(ctx, true),
-                                  child: const Text('删除',
+                                child: Text(_t(context, '删除', 'Delete', ja: '削除'),
                                       style: TextStyle(
                                           color:
                                               Color(0xFFFF3B5C)))),
@@ -1297,10 +1303,10 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                 decoration: BoxDecoration(
                     color: const Color(0xFFD1D1D6),
                     borderRadius: BorderRadius.circular(2))),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 14),
-              child: Text('选择时间表',
-                  style: TextStyle(
+              child: Text(_t(context, '选择时间表', 'Select timetable', ja: '時間割を選択'),
+                  style: const TextStyle(
                       color: Color(0xFF1C1C1E),
                       fontSize: 16,
                       fontWeight: FontWeight.w600)),
@@ -1336,14 +1342,14 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         backgroundColor: ac(context).card,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14)),
-        title: const Text('新建时间表',
-            style: TextStyle(fontSize: 16)),
+        title: Text(_t(context, '新建时间表', 'New timetable', ja: '時間割を新規作成'),
+          style: const TextStyle(fontSize: 16)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: const TextStyle(color: Color(0xFF1C1C1E)),
-          decoration: const InputDecoration(
-            hintText: '请输入时间表名称',
+          decoration: InputDecoration(
+            hintText: _t(context, '请输入时间表名称', 'Enter timetable name', ja: '時間割名を入力してください'),
             hintStyle: TextStyle(color: _kHint),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFF4ECDC4))),
@@ -1355,18 +1361,18 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('取消',
-                  style: TextStyle(color: _kHint))),
+              child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'),
+                  style: const TextStyle(color: _kHint))),
           TextButton(
             onPressed: () {
               final name = ctrl.text.trim().isEmpty
-                  ? '时间表'
+                  ? _t(context, '时间表', 'Timetable', ja: '時間割')
                   : ctrl.text.trim();
               s.addTimeTable(name);
               Navigator.pop(ctx);
             },
-            child: const Text('新建',
-                style: TextStyle(color: _kAccent)),
+            child: Text(_t(context, '新建', 'Create', ja: '作成'),
+                style: const TextStyle(color: _kAccent)),
           ),
         ],
       ),
@@ -1440,13 +1446,13 @@ class _ClassTimePageState extends State<ClassTimePage> {
       final e = _toMin(_times[i][1]);
       if (e <= s) {
         errors.add(
-            '第 ${i + 1} 节：结束时间不能早于或等于开始时间（${_times[i][0]} – ${_times[i][1]}）');
+            _t(context, '第 ${i + 1} 节：结束时间不能早于或等于开始时间（${_times[i][0]} – ${_times[i][1]}）', 'Section ${i + 1}: end time must be later than start time (${_times[i][0]} - ${_times[i][1]})', ja: '第${i + 1}限：終了時刻は開始時刻より後である必要があります（${_times[i][0]} - ${_times[i][1]}）'));
       }
       if (i < _times.length - 1) {
         final nextS = _toMin(_times[i + 1][0]);
         if (e > nextS) {
           errors.add(
-              '第 ${i + 1} 节与第 ${i + 2} 节时间重叠\n  第${i + 1}节结束 ${_times[i][1]} > 第${i + 2}节开始 ${_times[i + 1][0]}');
+              _t(context, '第 ${i + 1} 节与第 ${i + 2} 节时间重叠\n  第${i + 1}节结束 ${_times[i][1]} > 第${i + 2}节开始 ${_times[i + 1][0]}', 'Sections ${i + 1} and ${i + 2} overlap\n  End ${_times[i][1]} > Next start ${_times[i + 1][0]}', ja: '第${i + 1}限と第${i + 2}限の時間が重複しています\n  終了 ${_times[i][1]} > 次の開始 ${_times[i + 1][0]}'));
         }
       }
     }
@@ -1468,7 +1474,9 @@ class _ClassTimePageState extends State<ClassTimePage> {
           ),
           const SizedBox(width: 8),
           Text(
-            errors.isEmpty ? '时间顺序正常' : '发现 ${errors.length} 处冲突',
+            errors.isEmpty
+              ? _t(context, '时间顺序正常', 'Time order is valid', ja: '時間順序は正常です')
+              : _t(context, '发现 ${errors.length} 处冲突', '${errors.length} conflict(s) found', ja: '${errors.length}件の競合が見つかりました'),
             style: const TextStyle(
                 color: Color(0xFF1C1C1E),
                 fontSize: 16,
@@ -1476,8 +1484,8 @@ class _ClassTimePageState extends State<ClassTimePage> {
           ),
         ]),
         content: errors.isEmpty
-            ? const Text('所有节次时间区间无冲突，顺序正确。',
-                style: TextStyle(
+            ? Text(_t(context, '所有节次时间区间无冲突，顺序正确。', 'No overlaps detected. Section order is correct.', ja: '時間帯の重複はありません。順序は正しいです。'),
+              style: const TextStyle(
                     color: Color(0xFF6C6C70), fontSize: 14))
             : SizedBox(
                 width: double.maxFinite,
@@ -1498,8 +1506,8 @@ class _ClassTimePageState extends State<ClassTimePage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('确定',
-                style: TextStyle(
+            child: Text(_t(context, '确定', 'Confirm', ja: '確認'),
+                style: const TextStyle(
                     color: Color(0xFFFF3B5C), fontSize: 15)),
           ),
         ],
@@ -1515,7 +1523,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
       context: context,
       initialTime: TimeOfDay(
           hour: int.parse(sp[0]), minute: int.parse(sp[1])),
-      helpText: '第 ${index + 1} 节  开始时间',
+        helpText: _t(context, '第 ${index + 1} 节  开始时间', 'Section ${index + 1} Start', ja: '第${index + 1}限 開始時刻'),
       builder: (ctx, child) => Theme(
         data: ThemeData.dark().copyWith(
             colorScheme: const ColorScheme.dark(
@@ -1535,7 +1543,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
         context: context,
         initialTime: TimeOfDay(
             hour: int.parse(ep[0]), minute: int.parse(ep[1])),
-        helpText: '第 ${index + 1} 节  结束时间',
+        helpText: _t(context, '第 ${index + 1} 节  结束时间', 'Section ${index + 1} End', ja: '第${index + 1}限 終了時刻'),
         builder: (ctx, child) => Theme(
           data: ThemeData.dark().copyWith(
               colorScheme: const ColorScheme.dark(
@@ -1565,18 +1573,18 @@ class _ClassTimePageState extends State<ClassTimePage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(width: 8),
-              Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-              Text('上课时间', style: TextStyle(color: _kAccent, fontSize: 15)),
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+              Text(_t(context, '上课时间', 'Class Time', ja: '授業時間'), style: const TextStyle(color: _kAccent, fontSize: 15)),
             ],
           ),
         ),
         leadingWidth: 88,
-        title: const Text(
-          '时间表编辑',
+        title: Text(
+          _t(context, '时间表编辑', 'Edit Timetable', ja: '時間割を編集'),
           style: TextStyle(
               color: Color(0xFF1C1C1E),
               fontSize: 17,
@@ -1586,8 +1594,8 @@ class _ClassTimePageState extends State<ClassTimePage> {
         actions: [
           TextButton(
             onPressed: _checkOrder,
-            child: const Text('检查时间顺序',
-                style: TextStyle(
+            child: Text(_t(context, '检查时间顺序', 'Check time order', ja: '時間順序を確認'),
+              style: const TextStyle(
                     color: _kAccent,
                     fontSize: 14,
                     fontWeight: FontWeight.w500)),
@@ -1599,7 +1607,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
         children: [
           _settingCard(context, [
             _SettingRow(
-              label: '时间表名称',
+              label: _t(context, '时间表名称', 'Timetable Name', ja: '時間割名'),
               showDivider: false,
               onTap: () => _editName(),
               trailing: Text(
@@ -1608,14 +1616,14 @@ class _ClassTimePageState extends State<ClassTimePage> {
               ),
             ),
           ]),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(left: 6, bottom: 12),
-            child: Text('轻触上方以编辑名称',
-                style: TextStyle(color: _kHint, fontSize: 12)),
+            child: Text(_t(context, '轻触上方以编辑名称', 'Tap above to edit name', ja: '上をタップして名前を編集'),
+                style: const TextStyle(color: _kHint, fontSize: 12)),
           ),
           _settingCard(context, [
             _SettingRow(
-              label: '每节课时长相同',
+              label: _t(context, '每节课时长相同', 'Same duration for each class', ja: '各コマの授業時間を同一にする'),
               showDivider: _sameLength,
               trailing: Switch(
                 value: _sameLength,
@@ -1625,7 +1633,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
             ),
             if (_sameLength) ...[
               _SettingRow(
-                label: '每节课时长（分钟）',
+                label: _t(context, '每节课时长（分钟）', 'Duration per class (min)', ja: '1コマの時間（分）'),
                 showDivider: false,
                 onTap: _pickDuration,
                 trailing: Text(
@@ -1639,7 +1647,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                   child: Text(
-                    '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！',
+                    _t(context, '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！', 'Use with caution. End times will be recalculated from start times plus this duration, and previous end times will be overwritten.', ja: '注意して変更してください。開始時刻にこの時間を加算して終了時刻を再計算するため、既存の終了時刻は上書きされます。'),
                     style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
                   ),
                 ),
@@ -1650,7 +1658,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
             Padding(
               padding: const EdgeInsets.only(left: 6, bottom: 8),
               child: Text(
-                '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」',
+                _t(context, '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」', 'Adjust times as needed.\nTo change displayed section count, go to Schedule Settings > Sections per day.', ja: '必要なコマだけ時刻を調整してください。\n表示コマ数を変更する場合は、時間割設定の「1日の授業数」を変更してください。'),
                 style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
               ),
             ),
@@ -1659,7 +1667,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
               context,
               List.generate(20, (i) {
                 return _SettingRow(
-                  label: '第 ${i + 1} 节',
+                  label: _t(context, '第 ${i + 1} 节', 'Section ${i + 1}', ja: '第${i + 1}限'),
                   showDivider: i < 19,
                   onTap: () => _editTime(i),
                   trailing: Text(
@@ -1671,7 +1679,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
               })),
           _settingCard(context, [
             _SettingRow(
-              label: '重置为默认时间',
+              label: _t(context, '重置为默认时间', 'Reset to default times', ja: 'デフォルト時刻にリセット'),
               showDivider: false,
               trailing: const SizedBox(),
               onTap: () {
@@ -1697,14 +1705,14 @@ class _ClassTimePageState extends State<ClassTimePage> {
         backgroundColor: ac(context).card,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14)),
-        title: const Text('编辑名称',
-            style: TextStyle(fontSize: 16)),
+        title: Text(_t(context, '编辑名称', 'Edit Name', ja: '名前を編集'),
+          style: const TextStyle(fontSize: 16)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: const TextStyle(color: Color(0xFF1C1C1E)),
-          decoration: const InputDecoration(
-            hintText: '请输入时间表名称',
+          decoration: InputDecoration(
+            hintText: _t(context, '请输入时间表名称', 'Enter timetable name', ja: '時間割名を入力してください'),
             hintStyle: TextStyle(color: Color(0xFF6C6C70)),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFF4ECDC4))),
@@ -1716,19 +1724,19 @@ class _ClassTimePageState extends State<ClassTimePage> {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消',
-                  style: TextStyle(color: _kHint))),
+              child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'),
+                  style: const TextStyle(color: _kHint))),
           TextButton(
               onPressed: () {
                 final newName = ctrl.text.trim().isEmpty
-                    ? '时间表'
+                    ? _t(context, '时间表', 'Timetable', ja: '時間割')
                     : ctrl.text.trim();
                 setState(() => _nameCtrl.text = newName);
                 _pushName(newName);
                 Navigator.pop(context);
               },
-              child: const Text('确定',
-                  style: TextStyle(color: _kAccent))),
+              child: Text(_t(context, '确定', 'Confirm', ja: '確認'),
+                  style: const TextStyle(color: _kAccent))),
         ],
       ),
     );
@@ -1758,11 +1766,10 @@ class _ClassTimePageState extends State<ClassTimePage> {
                       children: [
                         TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('取消',
-                                style:
-                                    TextStyle(color: _kAccent))),
-                        const Text('每节课时长（分钟）',
-                            style: TextStyle(
+                            child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'),
+                              style: const TextStyle(color: _kAccent))),
+                          Text(_t(context, '每节课时长（分钟）', 'Duration per class (min)', ja: '1コマの時間（分）'),
+                            style: const TextStyle(
                                 color: Color(0xFF1C1C1E),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 16)),
@@ -1782,9 +1789,8 @@ class _ClassTimePageState extends State<ClassTimePage> {
                             _push();
                             Navigator.pop(ctx);
                           },
-                          child: const Text('确定',
-                              style:
-                                  TextStyle(color: _kAccent)),
+                            child: Text(_t(context, '确定', 'Confirm', ja: '確認'),
+                              style: const TextStyle(color: _kAccent)),
                         ),
                       ]),
                 ),
@@ -1805,7 +1811,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                       childCount: options.length,
                       builder: (_, i) => Center(
                           child: Text(
-                        '${options[i]} 分钟',
+                        _t(context, '${options[i]} 分钟', '${options[i]} min', ja: '${options[i]}分'),
                         style: TextStyle(
                           color: options[i] == tmp
                               ? ac(ctx).primaryText
