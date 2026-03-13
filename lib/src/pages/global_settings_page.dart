@@ -247,7 +247,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             trailing: const Icon(Icons.open_in_new, color: kHint, size: 16),
             onTap: () async {
               final uri = Uri.parse(
-                'https://github.com/Shiroko114514/StayUP-Calendar',
+                'https://blog.lucas04.top/docs/stayup-schedule',
               );
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
