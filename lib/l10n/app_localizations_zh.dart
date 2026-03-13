@@ -98,6 +98,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageFollowSystem => '跟随系统';
 
   @override
+  String get languageChangedRestartTitle => '语言已切换';
+
+  @override
+  String get languageChangedRestartMessage => '应用将自动退出以应用新语言，请重新打开。';
+
+  @override
   String get languageForceChineseSimplified => '中文（简体）';
 
   @override
@@ -319,6 +325,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get languageFollowSystem => '跟随系统';
 
   @override
+  String get languageChangedRestartTitle => '语言已切换';
+
+  @override
+  String get languageChangedRestartMessage => '应用将自动退出以应用新语言，请重新打开。';
+
+  @override
   String get languageForceChineseSimplified => '中文（简体）';
 
   @override
@@ -538,6 +550,12 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get languageFollowSystem => '跟隨系統';
+
+  @override
+  String get languageChangedRestartTitle => '語言已切換';
+
+  @override
+  String get languageChangedRestartMessage => '應用將自動退出以套用新語言，請重新開啟。';
 
   @override
   String get languageForceChineseSimplified => '中文（简体）';

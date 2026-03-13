@@ -34,6 +34,8 @@
   "featureInDevelopmentMessage": "This feature is currently under development.",
   "languageSettingLabel": "Language",
   "languageFollowSystem": "Follow System",
+  "languageChangedRestartTitle": "Language changed",
+  "languageChangedRestartMessage": "The app will close to apply the new language. Please reopen it.",
   "languageForceChineseSimplified": "中文（简体）",
   "languageForceChineseTraditional": "中文（繁體）",
   "languageForceEnglish": "English",

@@ -34,6 +34,8 @@
   "featureInDevelopmentMessage": "この機能は現在開発中です。",
   "languageSettingLabel": "言語",
   "languageFollowSystem": "システム設定に従う",
+  "languageChangedRestartTitle": "言語を変更しました",
+  "languageChangedRestartMessage": "新しい言語を適用するため、アプリを自動終了します。再度起動してください。",
   "languageForceChineseSimplified": "中文（简体）",
   "languageForceChineseTraditional": "中文（繁體）",
   "languageForceEnglish": "English",

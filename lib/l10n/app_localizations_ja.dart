@@ -99,6 +99,13 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageFollowSystem => 'システム設定に従う';
 
   @override
+  String get languageChangedRestartTitle => '言語を変更しました';
+
+  @override
+  String get languageChangedRestartMessage =>
+      '新しい言語を適用するため、アプリを自動終了します。再度起動してください。';
+
+  @override
   String get languageForceChineseSimplified => '中文（简体）';
 
   @override

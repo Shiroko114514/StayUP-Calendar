@@ -34,6 +34,8 @@
   "featureInDevelopmentMessage": "該功能正在開發中，敬請期待。",
   "languageSettingLabel": "語言",
   "languageFollowSystem": "跟隨系統",
+  "languageChangedRestartTitle": "語言已切換",
+  "languageChangedRestartMessage": "應用將自動退出以套用新語言，請重新開啟。",
   "languageForceChineseSimplified": "中文（简体）",
   "languageForceChineseTraditional": "中文（繁體）",
   "languageForceEnglish": "English",

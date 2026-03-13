@@ -276,6 +276,18 @@ abstract class AppLocalizations {
   /// **'跟随系统'**
   String get languageFollowSystem;
 
+  /// No description provided for @languageChangedRestartTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'语言已切换'**
+  String get languageChangedRestartTitle;
+
+  /// No description provided for @languageChangedRestartMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'应用将自动退出以应用新语言，请重新打开。'**
+  String get languageChangedRestartMessage;
+
   /// No description provided for @languageForceChineseSimplified.
   ///
   /// In zh_Hans, this message translates to:
