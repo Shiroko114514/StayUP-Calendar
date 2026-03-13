@@ -86,5 +86,35 @@
   "schoolSjtu": "Shanghai Jiao Tong University",
   "schoolWhu": "Wuhan University",
   "schoolCuhksz": "The Chinese University of Hong Kong, Shenzhen",
-  "schoolRuc": "Renmin University of China"
+  "schoolRuc": "Renmin University of China",
+  "schedulePageCurrentWeek": "Week {week}",
+  "@schedulePageCurrentWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageToday": "Today",
+  "schedulePageNotCurrentWeek": "Not this week",
+  "schedulePageCourseNotCurrentWeekTag": "[Not this week]",
+  "schedulePageCourseTime": "{weekday} · {start}-{end}",
+  "@schedulePageCourseTime": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageDeleteCourse": "Delete Course",
+  "schedulePageClose": "Close",
+  "schedulePageToolClassTime": "Class Time",
+  "schedulePageToolScheduleSettings": "Schedule Settings",
+  "schedulePageToolAddedCourses": "Added Courses",
+  "schedulePageWeekLabel": "Week",
+  "schedulePageSwitchSchedule": "Switch Schedule"
 }

@@ -533,6 +533,78 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'中国人民大学'**
   String get schoolRuc;
+
+  /// No description provided for @schedulePageCurrentWeek.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第{week}周'**
+  String schedulePageCurrentWeek(int week);
+
+  /// No description provided for @schedulePageToday.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'今天'**
+  String get schedulePageToday;
+
+  /// No description provided for @schedulePageNotCurrentWeek.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'非本周'**
+  String get schedulePageNotCurrentWeek;
+
+  /// No description provided for @schedulePageCourseNotCurrentWeekTag.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'[非本周]'**
+  String get schedulePageCourseNotCurrentWeekTag;
+
+  /// No description provided for @schedulePageCourseTime.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'周{weekday} · 第{start}-{end}节'**
+  String schedulePageCourseTime(Object weekday, int start, int end);
+
+  /// No description provided for @schedulePageDeleteCourse.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'删除课程'**
+  String get schedulePageDeleteCourse;
+
+  /// No description provided for @schedulePageClose.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'关闭'**
+  String get schedulePageClose;
+
+  /// No description provided for @schedulePageToolClassTime.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'上课时间'**
+  String get schedulePageToolClassTime;
+
+  /// No description provided for @schedulePageToolScheduleSettings.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表设置'**
+  String get schedulePageToolScheduleSettings;
+
+  /// No description provided for @schedulePageToolAddedCourses.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已添课程'**
+  String get schedulePageToolAddedCourses;
+
+  /// No description provided for @schedulePageWeekLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'周数'**
+  String get schedulePageWeekLabel;
+
+  /// No description provided for @schedulePageSwitchSchedule.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'切换课表'**
+  String get schedulePageSwitchSchedule;
 }
 
 class _AppLocalizationsDelegate

@@ -86,5 +86,35 @@
   "schoolSjtu": "上海交通大学",
   "schoolWhu": "武漢大学",
   "schoolCuhksz": "香港中文大学（深圳）",
-  "schoolRuc": "中国人民大学"
+  "schoolRuc": "中国人民大学",
+  "schedulePageCurrentWeek": "第{week}週",
+  "@schedulePageCurrentWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageToday": "今日",
+  "schedulePageNotCurrentWeek": "今週以外",
+  "schedulePageCourseNotCurrentWeekTag": "[今週以外]",
+  "schedulePageCourseTime": "{weekday} ・ {start}-{end}限",
+  "@schedulePageCourseTime": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageDeleteCourse": "授業を削除",
+  "schedulePageClose": "閉じる",
+  "schedulePageToolClassTime": "授業時間",
+  "schedulePageToolScheduleSettings": "時間割設定",
+  "schedulePageToolAddedCourses": "追加済み授業",
+  "schedulePageWeekLabel": "週数",
+  "schedulePageSwitchSchedule": "時間割を切替"
 }

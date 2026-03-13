@@ -235,4 +235,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schoolRuc => 'Renmin University of China';
+
+  @override
+  String schedulePageCurrentWeek(int week) {
+    return 'Week $week';
+  }
+
+  @override
+  String get schedulePageToday => 'Today';
+
+  @override
+  String get schedulePageNotCurrentWeek => 'Not this week';
+
+  @override
+  String get schedulePageCourseNotCurrentWeekTag => '[Not this week]';
+
+  @override
+  String schedulePageCourseTime(Object weekday, int start, int end) {
+    return '$weekday · $start-$end';
+  }
+
+  @override
+  String get schedulePageDeleteCourse => 'Delete Course';
+
+  @override
+  String get schedulePageClose => 'Close';
+
+  @override
+  String get schedulePageToolClassTime => 'Class Time';
+
+  @override
+  String get schedulePageToolScheduleSettings => 'Schedule Settings';
+
+  @override
+  String get schedulePageToolAddedCourses => 'Added Courses';
+
+  @override
+  String get schedulePageWeekLabel => 'Week';
+
+  @override
+  String get schedulePageSwitchSchedule => 'Switch Schedule';
 }

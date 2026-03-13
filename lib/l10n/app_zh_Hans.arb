@@ -86,5 +86,35 @@
   "schoolSjtu": "上海交通大学",
   "schoolWhu": "武汉大学",
   "schoolCuhksz": "香港中文大学（深圳）",
-  "schoolRuc": "中国人民大学"
+  "schoolRuc": "中国人民大学",
+  "schedulePageCurrentWeek": "第{week}周",
+  "@schedulePageCurrentWeek": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageToday": "今天",
+  "schedulePageNotCurrentWeek": "非本周",
+  "schedulePageCourseNotCurrentWeekTag": "[非本周]",
+  "schedulePageCourseTime": "周{weekday} · 第{start}-{end}节",
+  "@schedulePageCourseTime": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "schedulePageDeleteCourse": "删除课程",
+  "schedulePageClose": "关闭",
+  "schedulePageToolClassTime": "上课时间",
+  "schedulePageToolScheduleSettings": "课表设置",
+  "schedulePageToolAddedCourses": "已添课程",
+  "schedulePageWeekLabel": "周数",
+  "schedulePageSwitchSchedule": "切换课表"
 }

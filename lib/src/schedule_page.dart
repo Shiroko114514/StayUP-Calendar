@@ -5,13 +5,7 @@ import 'common_widgets.dart';
 import 'course_editor.dart';
 import 'schedule_settings.dart';
 import 'app_pages.dart';
-
-String _t(BuildContext context, String zh, String en, {String? ja}) {
-  final code = Localizations.localeOf(context).languageCode;
-  if (code == 'zh') return zh;
-  if (code == 'ja') return ja ?? en;
-  return en;
-}
+import 'l10n.dart';
 
 String _weekdayShort(BuildContext context, int weekday) {
   final locale = Localizations.localeOf(context).toLanguageTag();
@@ -330,13 +324,13 @@ class _Header extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    _t(context, '第$currentWeek周', 'Week $currentWeek', ja: '第$currentWeek週'),
+                    context.l10n.schedulePageCurrentWeek(currentWeek),
                     style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
                   ),
                   const SizedBox(width: 6),
                   if (isThisWeek)
                     Text(
-                      _t(context, '周$weekDayStr', 'Today', ja: '今日'),
+                      context.l10n.schedulePageToday,
                       style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
                     )
                   else
@@ -347,7 +341,7 @@ class _Header extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        _t(context, '非本周', 'Not this week', ja: '今週以外'),
+                        context.l10n.schedulePageNotCurrentWeek,
                         style: const TextStyle(
                           fontSize: 11,
                           color: Color(0xFFF07B8A),
@@ -738,7 +732,7 @@ class _CourseCard extends StatelessWidget {
             children: [
               if (course.isNonWeek)
                 Text(
-                  _t(context, '[非本周]', '[Not this week]', ja: '[今週以外]'),
+                  context.l10n.schedulePageCourseNotCurrentWeekTag,
                   style: TextStyle(
                     fontSize: 7,
                     color: const Color(0xFF3C3C43),
@@ -843,11 +837,10 @@ class _CourseDetailSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        _t(
-                          context,
-                          '周${_weekdayShort(context, course.day)}  ·  第${course.startSection}–${course.startSection + course.span - 1}节',
-                          '${_weekdayShort(context, course.day)}  ·  ${course.startSection}-${course.startSection + course.span - 1}',
-                          ja: '${_weekdayShort(context, course.day)}  ・  ${course.startSection}-${course.startSection + course.span - 1}限',
+                        context.l10n.schedulePageCourseTime(
+                          _weekdayShort(context, course.day),
+                          course.startSection,
+                          course.startSection + course.span - 1,
                         ),
                         style: const TextStyle(
                             fontSize: 12, color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w500),
@@ -874,7 +867,7 @@ class _CourseDetailSheet extends StatelessWidget {
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     Icon(Icons.edit_outlined, size: 15, color: Color(0xFF555555)),
                     SizedBox(width: 4),
-                    Text(_t(context, '编辑', 'Edit', ja: '編集'), style: const TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
+                    Text(context.l10n.editAction, style: const TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
                   ]),
                 ),
               ),
@@ -913,7 +906,7 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text(_t(context, '删除课程', 'Delete Course', ja: '授業を削除'),
+                child: Text(context.l10n.schedulePageDeleteCourse,
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               ),
             ),
@@ -927,7 +920,8 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: Text(_t(context, '关闭', 'Close', ja: '閉じる'), style: const TextStyle(fontSize: 15)),
+                child: Text(context.l10n.schedulePageClose,
+                  style: const TextStyle(fontSize: 15)),
               ),
             ),
           ]),
@@ -970,12 +964,12 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
   Widget build(BuildContext context) {
     final colors = ac(context);
     final tools = [
-      _MenuTool(icon: Icons.access_time_outlined, label: _t(context, '上课时间', 'Class Time', ja: '授業時間'), route: 'class_time'),
-      _MenuTool(icon: Icons.tune_outlined, label: _t(context, '课表设置', 'Schedule Settings', ja: '時間割設定'), route: 'schedule_settings'),
-      _MenuTool(icon: Icons.inbox_outlined, label: _t(context, '已添课程', 'Added Courses', ja: '追加済み授業'), route: 'added_courses'),
-      _MenuTool(icon: Icons.settings_outlined, label: _t(context, '全局设置', 'Global Settings', ja: '全体設定'), route: 'global_settings'),
-      _MenuTool(icon: Icons.ios_share_outlined, label: _t(context, '导出课表', 'Export Schedule', ja: '時間割をエクスポート'), route: 'export'),
-      _MenuTool(icon: Icons.info_outline, label: _t(context, '关于', 'About', ja: 'このアプリについて'), route: 'about'),
+      _MenuTool(icon: Icons.access_time_outlined, label: context.l10n.schedulePageToolClassTime, route: 'class_time'),
+      _MenuTool(icon: Icons.tune_outlined, label: context.l10n.schedulePageToolScheduleSettings, route: 'schedule_settings'),
+      _MenuTool(icon: Icons.inbox_outlined, label: context.l10n.schedulePageToolAddedCourses, route: 'added_courses'),
+      _MenuTool(icon: Icons.settings_outlined, label: context.l10n.globalSettingsTitle, route: 'global_settings'),
+      _MenuTool(icon: Icons.ios_share_outlined, label: context.l10n.exportScheduleTitle, route: 'export'),
+      _MenuTool(icon: Icons.info_outline, label: context.l10n.aboutTitle, route: 'about'),
     ];
     return Container(
       decoration: BoxDecoration(
@@ -1009,7 +1003,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_t(context, '周数', 'Week', ja: '週数'), style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                      Text(context.l10n.schedulePageWeekLabel, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       // 带数字标签的滑块
                       Row(
@@ -1066,7 +1060,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     children: [
                       Row(
                         children: [
-                          Text(_t(context, '切换课表', 'Switch Schedule', ja: '時間割を切替'), style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                          Text(context.l10n.schedulePageSwitchSchedule, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
@@ -1076,7 +1070,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const NewSchedulePage(),
                               ));
                             },
-                            child: Text(_t(context, '新建课表  ', 'New Schedule  ', ja: '新規時間割  '), style: const TextStyle(color: _accent, fontSize: 13)),
+                            child: Text('${context.l10n.newScheduleButton}  ', style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -1085,7 +1079,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const ManageSchedulePage(),
                               ));
                             },
-                            child: Text(_t(context, '管理课表', 'Manage', ja: '管理'), style: const TextStyle(color: _accent, fontSize: 13)),
+                            child: Text(context.l10n.manageScheduleTitle, style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                         ],
                       ),
@@ -1228,17 +1222,17 @@ class _ToolCell extends StatelessWidget {
               title: Row(children: [
                 Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
                 SizedBox(width: 8),
-                Text(_t(ctx, '导出课表', 'Export Schedule', ja: '時間割をエクスポート'), style: const TextStyle(
+                Text(ctx.l10n.exportScheduleTitle, style: const TextStyle(
                     color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
               ]),
               content: Text(
-                _t(ctx, '「导出课表」功能正在开发中，敬请期待。', 'This feature is currently under development.', ja: 'この機能は現在開発中です。'),
+                ctx.l10n.featureInDevelopmentMessage,
                 style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: Text(_t(ctx, '好的', 'OK', ja: 'OK'),
+                  child: Text(ctx.l10n.okAction,
                       style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
                 ),
               ],
