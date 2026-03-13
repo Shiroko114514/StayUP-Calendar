@@ -78,6 +78,7 @@ jobs:
     outputs:
       version: ${{ steps.tag_version.outputs.VERSION }}
       version_number: ${{ steps.tag_version.outputs.VERSION_NUMBER }}
+      should_exit: ${{ steps.tag_version.outputs.SHOULD_EXIT }}
 
     steps:
       - name: Checkout repository
@@ -111,8 +112,49 @@ jobs:
 
           PUBSPEC_VERSION="${VERSION_LINE%%+*}"
           if [ "$PUBSPEC_VERSION" != "${VERSION#v}" ]; then
-            echo "Tag version (${VERSION#v}) does not match pubspec version ($PUBSPEC_VERSION)." >&2
-            exit 1
+            echo "Tag version (${VERSION#v}) does not match pubspec version ($PUBSPEC_VERSION)."
+            echo "Will reconcile pubspec to tag, recreate tag, and exit this run early."
+
+            DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+            TAG_REF="refs/tags/${VERSION}"
+
+            git fetch origin "$DEFAULT_BRANCH" --tags --force
+
+            # Delete the already pushed tag and recreate it after pubspec reconciliation.
+            if git ls-remote --exit-code --tags origin "$TAG_REF" >/dev/null 2>&1; then
+              git push origin ":$TAG_REF"
+            fi
+
+            git checkout -B "$DEFAULT_BRANCH" "origin/$DEFAULT_BRANCH"
+
+            DEFAULT_VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
+            if [ -z "$DEFAULT_VERSION_LINE" ]; then
+              echo "Failed to read default-branch version from pubspec.yaml" >&2
+              exit 1
+            fi
+
+            DEFAULT_BUILD_NUMBER="${DEFAULT_VERSION_LINE##*+}"
+            if ! [[ "$DEFAULT_BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+              DEFAULT_BUILD_NUMBER="1"
+            fi
+
+            FIXED_VERSION="${VERSION#v}+${DEFAULT_BUILD_NUMBER}"
+            sed -i "s/^version: .*/version: ${FIXED_VERSION}/" pubspec.yaml
+
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pubspec.yaml
+
+            if ! git diff --cached --quiet; then
+              git commit -m "chore: align pubspec version with tag ${VERSION}"
+              git push origin "HEAD:$DEFAULT_BRANCH"
+            fi
+
+            git tag -f "$VERSION"
+            git push origin "$TAG_REF"
+
+            echo "SHOULD_EXIT=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
           PUBSPEC_BUILD_NUMBER="${VERSION_LINE##*+}"
@@ -121,7 +163,10 @@ jobs:
             exit 1
           fi
 
+          echo "SHOULD_EXIT=false" >> "$GITHUB_OUTPUT"
+
       - name: Prepare release notes
+        if: steps.tag_version.outputs.SHOULD_EXIT != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -133,6 +178,7 @@ jobs:
           fi
 
       - name: Create Release
+        if: steps.tag_version.outputs.SHOULD_EXIT != 'true'
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
@@ -144,16 +190,25 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify release created
+        if: steps.tag_version.outputs.SHOULD_EXIT != 'true'
         run: |
           echo "Successfully created release ${{ steps.tag_version.outputs.VERSION }}"
           echo "Release notes sourced from CHANGELOG.md when available"
           echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag_version.outputs.VERSION }}"
+
+      - name: Notify release rescheduled
+        if: steps.tag_version.outputs.SHOULD_EXIT == 'true'
+        run: |
+          echo "Tag and pubspec mismatch auto-fixed."
+          echo "Recreated tag ${{ steps.tag_version.outputs.VERSION }} to trigger a fresh release workflow."
+          echo "This run exits successfully without creating a release."
 
   build-and-upload:
     needs:
       - bump-build-number
       - create-release
     runs-on: ubuntu-latest
+    if: needs.create-release.outputs.should_exit != 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -264,13 +319,18 @@ jobs:
 
     steps:
       - name: Notify success
-        if: needs.build-and-upload.result == 'success'
+        if: needs.create-release.outputs.should_exit != 'true' && needs.build-and-upload.result == 'success'
         run: |
           echo "Release ${{ needs.create-release.outputs.version }} completed successfully"
           echo "All build artifacts have been uploaded"
 
       - name: Notify failure
-        if: needs.build-and-upload.result == 'failure'
+        if: needs.create-release.outputs.should_exit != 'true' && needs.build-and-upload.result == 'failure'
         run: |
           echo "Failed to complete release ${{ needs.create-release.outputs.version }}"
           echo "Please check the workflow logs for details"
+
+      - name: Notify rescheduled
+        if: needs.create-release.outputs.should_exit == 'true'
+        run: |
+          echo "Release workflow rescheduled by recreated tag after pubspec reconciliation."
