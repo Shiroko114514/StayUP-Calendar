@@ -123,7 +123,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'StayUP课程表'**
+  /// **'StayUP 课程表'**
   String get appName;
 
   /// No description provided for @appVersionLabel.

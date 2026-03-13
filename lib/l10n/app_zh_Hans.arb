@@ -3,7 +3,7 @@
   "appTitle": "WakeUp 课程表",
   "loadingSchedule": "正在加载课表...",
   "aboutTitle": "关于",
-  "appName": "StayUP课程表",
+  "appName": "StayUP 课程表",
   "appVersionLabel": "版本 {version}",
   "@appVersionLabel": {
     "placeholders": {

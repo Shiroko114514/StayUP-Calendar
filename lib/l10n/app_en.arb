@@ -1,9 +1,9 @@
 {
   "@@locale": "en",
-  "appTitle": "WakeUp Timetable",
+  "appTitle": "StayUP Schedule",
   "loadingSchedule": "Loading schedule...",
   "aboutTitle": "About",
-  "appName": "StayUP Timetable",
+  "appName": "StayUP Schedule",
   "appVersionLabel": "Version {version}",
   "@appVersionLabel": {
     "placeholders": {

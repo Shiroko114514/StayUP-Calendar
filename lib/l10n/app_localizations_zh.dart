@@ -18,7 +18,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get aboutTitle => '关于';
 
   @override
-  String get appName => 'StayUP课程表';
+  String get appName => 'StayUP 课程表';
 
   @override
   String appVersionLabel(Object version) {
@@ -285,7 +285,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get aboutTitle => '关于';
 
   @override
-  String get appName => 'StayUP课程表';
+  String get appName => 'StayUP 课程表';
 
   @override
   String appVersionLabel(Object version) {

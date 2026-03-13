@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'WakeUp Timetable';
+  String get appTitle => 'StayUP Schedule';
 
   @override
   String get loadingSchedule => 'Loading schedule...';
@@ -18,7 +18,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutTitle => 'About';
 
   @override
-  String get appName => 'StayUP Timetable';
+  String get appName => 'StayUP Schedule';
 
   @override
   String appVersionLabel(Object version) {
