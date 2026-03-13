@@ -84,12 +84,9 @@ class _SchedulePageState extends State<SchedulePage> {
     final totalWeeks  = cfg.totalWeeks;
 
     return Scaffold(
-      backgroundColor: ac(context).card,
+      backgroundColor: const Color(0xFFF0F4F8),
       body: SafeArea(
-        bottom: false,
-        child: ColoredBox(
-          color: const Color(0xFFF0F4F8),
-          child: Column(
+        child: Column(
           children: [
             _Header(
               weekMonday: _currentWeekMonday,
@@ -181,10 +178,10 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
           ],
         ),
-        ),
       ),
     );
   }
+
   // ── 详情底部弹窗 ──
   void _showDetailSheet(BuildContext context, Course course) {
     showModalBottomSheet(
@@ -511,9 +508,7 @@ class _ScheduleGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double totalHeight = customTimes.length * kSlotHeight;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: bottomPadding),
       child: SizedBox(
         height: totalHeight,
         child: Row(
@@ -723,20 +718,20 @@ class _CourseCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (course.isNonWeek)
-                const Text(
+                Text(
                   '[非本周]',
                   style: TextStyle(
                     fontSize: 7,
-                    color: const Color(0xFF3C3C43),
+                    color: ac(context).hint,
                   ),
                   textAlign: TextAlign.center,
                 ),
               Text(
                 course.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1C1C1E),
+                  color: ac(context).primaryText,
                   height: 1.3,
                 ),
                 textAlign: TextAlign.center,
@@ -747,9 +742,9 @@ class _CourseCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   '@${course.location}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 8,
-                    color: const Color(0xFF3C3C43),
+                    color: ac(context).hint,
                     height: 1.2,
                   ),
                   textAlign: TextAlign.center,
@@ -793,8 +788,8 @@ class _CourseDetailSheet extends StatelessWidget {
         : '';
 
     return Container(
-      decoration: const BoxDecoration(
-        color: const Color(0xFF1C1C1E),
+      decoration: BoxDecoration(
+        color: ac(context).primaryText,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: EdgeInsets.fromLTRB(
@@ -830,8 +825,8 @@ class _CourseDetailSheet extends StatelessWidget {
                       ),
                       child: Text(
                         '周${kWeekDays[course.day - 1]}  ·  第${course.startSection}–${course.startSection + course.span - 1}节',
-                        style: const TextStyle(
-                            fontSize: 12, color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                            fontSize: 12, color: ac(context).primaryText, fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1207,15 +1202,15 @@ class _ToolCell extends StatelessWidget {
             builder: (ctx) => AlertDialog(
               backgroundColor: ac(ctx).card,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              title: const Row(children: [
-                Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
+              title: Row(children: [
+                Icon(Icons.ios_share_outlined, color: ac(context).hint, size: 20),
                 SizedBox(width: 8),
                 Text('导出课表', style: TextStyle(
-                    color: const Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+                    color: ac(context).primaryText, fontSize: 16, fontWeight: FontWeight.w600)),
               ]),
-              content: const Text(
+              content: Text(
                 '「导出课表」功能正在开发中，敬请期待。',
-                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
+                style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
               ),
               actions: [
                 TextButton(
