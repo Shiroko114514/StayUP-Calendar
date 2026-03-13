@@ -14,17 +14,66 @@ on:
     branches:
       - main
 
+concurrency:
+  group: pubspec-build-bump-${{ github.event.repository.default_branch }}
+  cancel-in-progress: false
+
 permissions:
-  contents: read
+  contents: write
   actions: read
   pull-requests: read
 
 jobs:
   ci:
+    if: github.event_name != 'push' || !(startsWith(github.event.head_commit.message, 'chore') && contains(github.event.head_commit.message, 'Bump build number to '))
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bump pubspec build number
+        if: github.event_name != 'pull_request'
+        id: bump_build
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
+          if [ -z "$VERSION_LINE" ]; then
+            echo "Failed to read version from pubspec.yaml" >&2
+            exit 1
+          fi
+
+          BASE_VERSION="${VERSION_LINE%%+*}"
+          if [ "$BASE_VERSION" = "$VERSION_LINE" ]; then
+            echo "pubspec.yaml version must include build number suffix (+N). Got: $VERSION_LINE" >&2
+            exit 1
+          fi
+
+          BUILD_NUMBER="${VERSION_LINE##*+}"
+          if ! [[ "$BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
+            echo "Invalid build number in pubspec.yaml version: $VERSION_LINE" >&2
+            exit 1
+          fi
+
+          NEXT_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          NEXT_VERSION="${BASE_VERSION}+${NEXT_BUILD_NUMBER}"
+          sed -i "s/^version: .*/version: ${NEXT_VERSION}/" pubspec.yaml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          git commit -m "chore: Bump build number to ${NEXT_BUILD_NUMBER}"
+
+          TARGET_BRANCH="${GITHUB_REF_NAME}"
+          if [ -z "$TARGET_BRANCH" ]; then
+            TARGET_BRANCH="${{ github.event.repository.default_branch }}"
+          fi
+          git push origin "HEAD:${TARGET_BRANCH}"
+
+          echo "BUILD_NUMBER=${NEXT_BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
 
       - name: Setup Java
         uses: actions/setup-java@v4
