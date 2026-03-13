@@ -84,5 +84,105 @@
   "schoolSjtu": "上海交通大學",
   "schoolWhu": "武漢大學",
   "schoolCuhksz": "香港中文大學（深圳）",
-  "schoolRuc": "中國人民大學"
+  "schoolRuc": "中國人民大學",
+  "scheduleSettingsTitle": "課表設定",
+  "scheduleDataTitle": "課表資料",
+  "scheduleAppearanceLabel": "課表外觀",
+  "adjustToolTitle": "調課工具",
+  "scheduleAppearanceWipMessage": "「課表外觀」功能正在開發中，敬請期待。",
+  "scheduleNameLabel": "課表名稱",
+  "renameScheduleTitle": "修改課表名稱",
+  "enterScheduleNameHint": "請輸入課表名稱",
+  "classTimeTitle": "上課時間",
+  "scheduleSettingsCurrentWeekDisplay": "第 {week} 週",
+  "@scheduleSettingsCurrentWeekDisplay": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "adjustMoveSuccess": "已將 {from} 的課程移動到 {to}",
+  "@adjustMoveSuccess": {
+    "placeholders": {
+      "from": {},
+      "to": {}
+    }
+  },
+  "adjustDescription": "本功能用於節假日調休等場景，可以將某天的課程移動到另一天，請謹慎操作",
+  "adjustTargetSchedule": "要調整的課表",
+  "adjustFromLabel": "將",
+  "adjustCoursesSuffix": "的課程",
+  "adjustToLabel": "移動到",
+  "adjustWarning": "點擊「確定」後操作不可撤銷，請確認日期選擇無誤後再執行。",
+  "deleteCoursesTitle": "刪除課程",
+  "deleteSelectedCoursesMessage": "確定刪除已選的 {count} 門課程？",
+  "@deleteSelectedCoursesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearScheduleTitle": "清空課表",
+  "clearScheduleMessage": "確定刪除當前課表全部 {count} 門課程？此操作不可恢復。",
+  "@clearScheduleMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearAction": "清空",
+  "moreAction": "更多",
+  "selectCoursesTitle": "選擇課程",
+  "selectedCoursesCount": "已選 {count} 門",
+  "@selectedCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedCoursesTitle": "已添課程",
+  "totalCoursesCount": "共 {count} 門課程",
+  "@totalCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unselectAllAction": "取消全選",
+  "selectAllAction": "全選",
+  "swipeDeleteHint": "  左滑可刪除",
+  "noCoursesYet": "還沒有課程",
+  "courseTimeSummary": "週{weekday} 第{start}-{end}節",
+  "@courseTimeSummary": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCourseMessage": "確定刪除「{name}」？",
+  "@deleteCourseMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "clearCurrentSchedule": "清空當前課表",
+  "deleteSelectedCount": "刪除 ({count})",
+  "@deleteSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addCourseAction": "添加課程"
 }

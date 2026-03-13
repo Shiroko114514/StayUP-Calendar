@@ -84,5 +84,105 @@
   "schoolSjtu": "Shanghai Jiao Tong University",
   "schoolWhu": "Wuhan University",
   "schoolCuhksz": "The Chinese University of Hong Kong, Shenzhen",
-  "schoolRuc": "Renmin University of China"
+  "schoolRuc": "Renmin University of China",
+  "scheduleSettingsTitle": "Schedule Settings",
+  "scheduleDataTitle": "Schedule Data",
+  "scheduleAppearanceLabel": "Schedule Appearance",
+  "adjustToolTitle": "Adjust Tool",
+  "scheduleAppearanceWipMessage": "The schedule appearance feature is under development.",
+  "scheduleNameLabel": "Schedule Name",
+  "renameScheduleTitle": "Rename Schedule",
+  "enterScheduleNameHint": "Enter schedule name",
+  "classTimeTitle": "Class Time",
+  "scheduleSettingsCurrentWeekDisplay": "Week {week}",
+  "@scheduleSettingsCurrentWeekDisplay": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "adjustMoveSuccess": "Moved courses from {from} to {to}",
+  "@adjustMoveSuccess": {
+    "placeholders": {
+      "from": {},
+      "to": {}
+    }
+  },
+  "adjustDescription": "Use this tool for schedule adjustments such as holiday swaps. Please proceed carefully.",
+  "adjustTargetSchedule": "Schedule to adjust",
+  "adjustFromLabel": "From",
+  "adjustCoursesSuffix": "courses",
+  "adjustToLabel": "Move to",
+  "adjustWarning": "This action cannot be undone. Please verify the selected dates before proceeding.",
+  "deleteCoursesTitle": "Delete Courses",
+  "deleteSelectedCoursesMessage": "Delete {count} selected course(s)?",
+  "@deleteSelectedCoursesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearScheduleTitle": "Clear Schedule",
+  "clearScheduleMessage": "Delete all {count} courses in this schedule? This cannot be undone.",
+  "@clearScheduleMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearAction": "Clear",
+  "moreAction": "More",
+  "selectCoursesTitle": "Select Courses",
+  "selectedCoursesCount": "{count} selected",
+  "@selectedCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedCoursesTitle": "Added Courses",
+  "totalCoursesCount": "{count} courses",
+  "@totalCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unselectAllAction": "Unselect All",
+  "selectAllAction": "Select All",
+  "swipeDeleteHint": "  Swipe left to delete",
+  "noCoursesYet": "No courses yet",
+  "courseTimeSummary": "{weekday} {start}-{end}",
+  "@courseTimeSummary": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCourseMessage": "Delete \"{name}\"?",
+  "@deleteCourseMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "clearCurrentSchedule": "Clear Current Schedule",
+  "deleteSelectedCount": "Delete ({count})",
+  "@deleteSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addCourseAction": "Add Course"
 }

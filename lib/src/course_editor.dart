@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'models.dart';
 import 'common_widgets.dart';
+import 'l10n.dart';
 
 class AddCoursePage extends StatefulWidget {
   final ValueChanged<Course>? onAdd;
@@ -1156,10 +1157,11 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 8),
-            Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-            Text('返回', style: TextStyle(color: _kAccent, fontSize: 15)),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+            Text(context.l10n.backAction,
+                style: const TextStyle(color: _kAccent, fontSize: 15)),
           ]),
         ),
         leadingWidth: 64,

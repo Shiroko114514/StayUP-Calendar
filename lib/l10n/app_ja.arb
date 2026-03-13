@@ -84,5 +84,105 @@
   "schoolSjtu": "上海交通大学",
   "schoolWhu": "武漢大学",
   "schoolCuhksz": "香港中文大学（深圳）",
-  "schoolRuc": "中国人民大学"
+  "schoolRuc": "中国人民大学",
+  "scheduleSettingsTitle": "時間割設定",
+  "scheduleDataTitle": "時間割データ",
+  "scheduleAppearanceLabel": "時間割の外観",
+  "adjustToolTitle": "振替ツール",
+  "scheduleAppearanceWipMessage": "「時間割の外観」機能は現在開発中です。",
+  "scheduleNameLabel": "時間割名",
+  "renameScheduleTitle": "時間割名を変更",
+  "enterScheduleNameHint": "時間割名を入力してください",
+  "classTimeTitle": "授業時間",
+  "scheduleSettingsCurrentWeekDisplay": "第{week}週",
+  "@scheduleSettingsCurrentWeekDisplay": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "adjustMoveSuccess": "{from} の授業を {to} に移動しました",
+  "@adjustMoveSuccess": {
+    "placeholders": {
+      "from": {},
+      "to": {}
+    }
+  },
+  "adjustDescription": "振替休日などの調整用に、ある日の授業を別の日に移動できます。慎重に操作してください。",
+  "adjustTargetSchedule": "調整対象の時間割",
+  "adjustFromLabel": "移動元",
+  "adjustCoursesSuffix": "の授業",
+  "adjustToLabel": "移動先",
+  "adjustWarning": "この操作は取り消せません。実行前に日付を確認してください。",
+  "deleteCoursesTitle": "授業を削除",
+  "deleteSelectedCoursesMessage": "選択した{count}件の授業を削除しますか？",
+  "@deleteSelectedCoursesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearScheduleTitle": "時間割をクリア",
+  "clearScheduleMessage": "この時間割の{count}件の授業をすべて削除しますか？この操作は取り消せません。",
+  "@clearScheduleMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearAction": "クリア",
+  "moreAction": "その他",
+  "selectCoursesTitle": "授業を選択",
+  "selectedCoursesCount": "{count}件選択中",
+  "@selectedCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedCoursesTitle": "追加済み授業",
+  "totalCoursesCount": "{count}件の授業",
+  "@totalCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unselectAllAction": "全選択解除",
+  "selectAllAction": "すべて選択",
+  "swipeDeleteHint": "  左スワイプで削除",
+  "noCoursesYet": "授業がありません",
+  "courseTimeSummary": "{weekday} {start}-{end}限",
+  "@courseTimeSummary": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCourseMessage": "「{name}」を削除しますか？",
+  "@deleteCourseMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "clearCurrentSchedule": "現在の時間割をクリア",
+  "deleteSelectedCount": "削除 ({count})",
+  "@deleteSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addCourseAction": "授業を追加"
 }

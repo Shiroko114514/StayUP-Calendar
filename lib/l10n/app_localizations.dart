@@ -521,6 +521,222 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'中国人民大学'**
   String get schoolRuc;
+
+  /// No description provided for @scheduleSettingsTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表设置'**
+  String get scheduleSettingsTitle;
+
+  /// No description provided for @scheduleDataTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表数据'**
+  String get scheduleDataTitle;
+
+  /// No description provided for @scheduleAppearanceLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表外观'**
+  String get scheduleAppearanceLabel;
+
+  /// No description provided for @adjustToolTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'调课工具'**
+  String get adjustToolTitle;
+
+  /// No description provided for @scheduleAppearanceWipMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'「课表外观」功能正在开发中，敬请期待。'**
+  String get scheduleAppearanceWipMessage;
+
+  /// No description provided for @scheduleNameLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表名称'**
+  String get scheduleNameLabel;
+
+  /// No description provided for @renameScheduleTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'修改课表名称'**
+  String get renameScheduleTitle;
+
+  /// No description provided for @enterScheduleNameHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'请输入课表名称'**
+  String get enterScheduleNameHint;
+
+  /// No description provided for @classTimeTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'上课时间'**
+  String get classTimeTitle;
+
+  /// No description provided for @scheduleSettingsCurrentWeekDisplay.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {week} 周'**
+  String scheduleSettingsCurrentWeekDisplay(int week);
+
+  /// No description provided for @adjustMoveSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已将 {from} 的课程移动到 {to}'**
+  String adjustMoveSuccess(Object from, Object to);
+
+  /// No description provided for @adjustDescription.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'本功能用于节假日调休等场景，可以将某天的课程移动到另一天，请谨慎操作'**
+  String get adjustDescription;
+
+  /// No description provided for @adjustTargetSchedule.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'要调整的课表'**
+  String get adjustTargetSchedule;
+
+  /// No description provided for @adjustFromLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'将'**
+  String get adjustFromLabel;
+
+  /// No description provided for @adjustCoursesSuffix.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'的课程'**
+  String get adjustCoursesSuffix;
+
+  /// No description provided for @adjustToLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'移动到'**
+  String get adjustToLabel;
+
+  /// No description provided for @adjustWarning.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'点击「确定」后操作不可撤销，请确认日期选择无误后再执行。'**
+  String get adjustWarning;
+
+  /// No description provided for @deleteCoursesTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'删除课程'**
+  String get deleteCoursesTitle;
+
+  /// No description provided for @deleteSelectedCoursesMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'确定删除已选的 {count} 门课程？'**
+  String deleteSelectedCoursesMessage(int count);
+
+  /// No description provided for @clearScheduleTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'清空课表'**
+  String get clearScheduleTitle;
+
+  /// No description provided for @clearScheduleMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'确定删除当前课表全部 {count} 门课程？此操作不可恢复。'**
+  String clearScheduleMessage(int count);
+
+  /// No description provided for @clearAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'清空'**
+  String get clearAction;
+
+  /// No description provided for @moreAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'更多'**
+  String get moreAction;
+
+  /// No description provided for @selectCoursesTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'选择课程'**
+  String get selectCoursesTitle;
+
+  /// No description provided for @selectedCoursesCount.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已选 {count} 门'**
+  String selectedCoursesCount(int count);
+
+  /// No description provided for @addedCoursesTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已添课程'**
+  String get addedCoursesTitle;
+
+  /// No description provided for @totalCoursesCount.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'共 {count} 门课程'**
+  String totalCoursesCount(int count);
+
+  /// No description provided for @unselectAllAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'取消全选'**
+  String get unselectAllAction;
+
+  /// No description provided for @selectAllAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'全选'**
+  String get selectAllAction;
+
+  /// No description provided for @swipeDeleteHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'  左滑可删除'**
+  String get swipeDeleteHint;
+
+  /// No description provided for @noCoursesYet.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'还没有课程'**
+  String get noCoursesYet;
+
+  /// No description provided for @courseTimeSummary.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'周{weekday} 第{start}-{end}节'**
+  String courseTimeSummary(Object weekday, int start, int end);
+
+  /// No description provided for @deleteCourseMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'确定删除「{name}」？'**
+  String deleteCourseMessage(Object name);
+
+  /// No description provided for @clearCurrentSchedule.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'清空当前课表'**
+  String get clearCurrentSchedule;
+
+  /// No description provided for @deleteSelectedCount.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'删除 ({count})'**
+  String deleteSelectedCount(int count);
+
+  /// No description provided for @addCourseAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'添加课程'**
+  String get addCourseAction;
 }
 
 class _AppLocalizationsDelegate

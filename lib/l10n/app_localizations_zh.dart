@@ -223,6 +223,132 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String get scheduleSettingsTitle => '课表设置';
+
+  @override
+  String get scheduleDataTitle => '课表数据';
+
+  @override
+  String get scheduleAppearanceLabel => '课表外观';
+
+  @override
+  String get adjustToolTitle => '调课工具';
+
+  @override
+  String get scheduleAppearanceWipMessage => '「课表外观」功能正在开发中，敬请期待。';
+
+  @override
+  String get scheduleNameLabel => '课表名称';
+
+  @override
+  String get renameScheduleTitle => '修改课表名称';
+
+  @override
+  String get enterScheduleNameHint => '请输入课表名称';
+
+  @override
+  String get classTimeTitle => '上课时间';
+
+  @override
+  String scheduleSettingsCurrentWeekDisplay(int week) {
+    return '第 $week 周';
+  }
+
+  @override
+  String adjustMoveSuccess(Object from, Object to) {
+    return '已将 $from 的课程移动到 $to';
+  }
+
+  @override
+  String get adjustDescription => '本功能用于节假日调休等场景，可以将某天的课程移动到另一天，请谨慎操作';
+
+  @override
+  String get adjustTargetSchedule => '要调整的课表';
+
+  @override
+  String get adjustFromLabel => '将';
+
+  @override
+  String get adjustCoursesSuffix => '的课程';
+
+  @override
+  String get adjustToLabel => '移动到';
+
+  @override
+  String get adjustWarning => '点击「确定」后操作不可撤销，请确认日期选择无误后再执行。';
+
+  @override
+  String get deleteCoursesTitle => '删除课程';
+
+  @override
+  String deleteSelectedCoursesMessage(int count) {
+    return '确定删除已选的 $count 门课程？';
+  }
+
+  @override
+  String get clearScheduleTitle => '清空课表';
+
+  @override
+  String clearScheduleMessage(int count) {
+    return '确定删除当前课表全部 $count 门课程？此操作不可恢复。';
+  }
+
+  @override
+  String get clearAction => '清空';
+
+  @override
+  String get moreAction => '更多';
+
+  @override
+  String get selectCoursesTitle => '选择课程';
+
+  @override
+  String selectedCoursesCount(int count) {
+    return '已选 $count 门';
+  }
+
+  @override
+  String get addedCoursesTitle => '已添课程';
+
+  @override
+  String totalCoursesCount(int count) {
+    return '共 $count 门课程';
+  }
+
+  @override
+  String get unselectAllAction => '取消全选';
+
+  @override
+  String get selectAllAction => '全选';
+
+  @override
+  String get swipeDeleteHint => '  左滑可删除';
+
+  @override
+  String get noCoursesYet => '还没有课程';
+
+  @override
+  String courseTimeSummary(Object weekday, int start, int end) {
+    return '周$weekday 第$start-$end节';
+  }
+
+  @override
+  String deleteCourseMessage(Object name) {
+    return '确定删除「$name」？';
+  }
+
+  @override
+  String get clearCurrentSchedule => '清空当前课表';
+
+  @override
+  String deleteSelectedCount(int count) {
+    return '删除 ($count)';
+  }
+
+  @override
+  String get addCourseAction => '添加课程';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -444,6 +570,132 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String get scheduleSettingsTitle => '课表设置';
+
+  @override
+  String get scheduleDataTitle => '课表数据';
+
+  @override
+  String get scheduleAppearanceLabel => '课表外观';
+
+  @override
+  String get adjustToolTitle => '调课工具';
+
+  @override
+  String get scheduleAppearanceWipMessage => '「课表外观」功能正在开发中，敬请期待。';
+
+  @override
+  String get scheduleNameLabel => '课表名称';
+
+  @override
+  String get renameScheduleTitle => '修改课表名称';
+
+  @override
+  String get enterScheduleNameHint => '请输入课表名称';
+
+  @override
+  String get classTimeTitle => '上课时间';
+
+  @override
+  String scheduleSettingsCurrentWeekDisplay(int week) {
+    return '第 $week 周';
+  }
+
+  @override
+  String adjustMoveSuccess(Object from, Object to) {
+    return '已将 $from 的课程移动到 $to';
+  }
+
+  @override
+  String get adjustDescription => '本功能用于节假日调休等场景，可以将某天的课程移动到另一天，请谨慎操作';
+
+  @override
+  String get adjustTargetSchedule => '要调整的课表';
+
+  @override
+  String get adjustFromLabel => '将';
+
+  @override
+  String get adjustCoursesSuffix => '的课程';
+
+  @override
+  String get adjustToLabel => '移动到';
+
+  @override
+  String get adjustWarning => '点击「确定」后操作不可撤销，请确认日期选择无误后再执行。';
+
+  @override
+  String get deleteCoursesTitle => '删除课程';
+
+  @override
+  String deleteSelectedCoursesMessage(int count) {
+    return '确定删除已选的 $count 门课程？';
+  }
+
+  @override
+  String get clearScheduleTitle => '清空课表';
+
+  @override
+  String clearScheduleMessage(int count) {
+    return '确定删除当前课表全部 $count 门课程？此操作不可恢复。';
+  }
+
+  @override
+  String get clearAction => '清空';
+
+  @override
+  String get moreAction => '更多';
+
+  @override
+  String get selectCoursesTitle => '选择课程';
+
+  @override
+  String selectedCoursesCount(int count) {
+    return '已选 $count 门';
+  }
+
+  @override
+  String get addedCoursesTitle => '已添课程';
+
+  @override
+  String totalCoursesCount(int count) {
+    return '共 $count 门课程';
+  }
+
+  @override
+  String get unselectAllAction => '取消全选';
+
+  @override
+  String get selectAllAction => '全选';
+
+  @override
+  String get swipeDeleteHint => '  左滑可删除';
+
+  @override
+  String get noCoursesYet => '还没有课程';
+
+  @override
+  String courseTimeSummary(Object weekday, int start, int end) {
+    return '周$weekday 第$start-$end节';
+  }
+
+  @override
+  String deleteCourseMessage(Object name) {
+    return '确定删除「$name」？';
+  }
+
+  @override
+  String get clearCurrentSchedule => '清空当前课表';
+
+  @override
+  String deleteSelectedCount(int count) {
+    return '删除 ($count)';
+  }
+
+  @override
+  String get addCourseAction => '添加课程';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -665,4 +917,130 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get schoolRuc => '中國人民大學';
+
+  @override
+  String get scheduleSettingsTitle => '課表設定';
+
+  @override
+  String get scheduleDataTitle => '課表資料';
+
+  @override
+  String get scheduleAppearanceLabel => '課表外觀';
+
+  @override
+  String get adjustToolTitle => '調課工具';
+
+  @override
+  String get scheduleAppearanceWipMessage => '「課表外觀」功能正在開發中，敬請期待。';
+
+  @override
+  String get scheduleNameLabel => '課表名稱';
+
+  @override
+  String get renameScheduleTitle => '修改課表名稱';
+
+  @override
+  String get enterScheduleNameHint => '請輸入課表名稱';
+
+  @override
+  String get classTimeTitle => '上課時間';
+
+  @override
+  String scheduleSettingsCurrentWeekDisplay(int week) {
+    return '第 $week 週';
+  }
+
+  @override
+  String adjustMoveSuccess(Object from, Object to) {
+    return '已將 $from 的課程移動到 $to';
+  }
+
+  @override
+  String get adjustDescription => '本功能用於節假日調休等場景，可以將某天的課程移動到另一天，請謹慎操作';
+
+  @override
+  String get adjustTargetSchedule => '要調整的課表';
+
+  @override
+  String get adjustFromLabel => '將';
+
+  @override
+  String get adjustCoursesSuffix => '的課程';
+
+  @override
+  String get adjustToLabel => '移動到';
+
+  @override
+  String get adjustWarning => '點擊「確定」後操作不可撤銷，請確認日期選擇無誤後再執行。';
+
+  @override
+  String get deleteCoursesTitle => '刪除課程';
+
+  @override
+  String deleteSelectedCoursesMessage(int count) {
+    return '確定刪除已選的 $count 門課程？';
+  }
+
+  @override
+  String get clearScheduleTitle => '清空課表';
+
+  @override
+  String clearScheduleMessage(int count) {
+    return '確定刪除當前課表全部 $count 門課程？此操作不可恢復。';
+  }
+
+  @override
+  String get clearAction => '清空';
+
+  @override
+  String get moreAction => '更多';
+
+  @override
+  String get selectCoursesTitle => '選擇課程';
+
+  @override
+  String selectedCoursesCount(int count) {
+    return '已選 $count 門';
+  }
+
+  @override
+  String get addedCoursesTitle => '已添課程';
+
+  @override
+  String totalCoursesCount(int count) {
+    return '共 $count 門課程';
+  }
+
+  @override
+  String get unselectAllAction => '取消全選';
+
+  @override
+  String get selectAllAction => '全選';
+
+  @override
+  String get swipeDeleteHint => '  左滑可刪除';
+
+  @override
+  String get noCoursesYet => '還沒有課程';
+
+  @override
+  String courseTimeSummary(Object weekday, int start, int end) {
+    return '週$weekday 第$start-$end節';
+  }
+
+  @override
+  String deleteCourseMessage(Object name) {
+    return '確定刪除「$name」？';
+  }
+
+  @override
+  String get clearCurrentSchedule => '清空當前課表';
+
+  @override
+  String deleteSelectedCount(int count) {
+    return '刪除 ($count)';
+  }
+
+  @override
+  String get addCourseAction => '添加課程';
 }

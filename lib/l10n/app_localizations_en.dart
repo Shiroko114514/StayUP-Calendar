@@ -228,4 +228,133 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schoolRuc => 'Renmin University of China';
+
+  @override
+  String get scheduleSettingsTitle => 'Schedule Settings';
+
+  @override
+  String get scheduleDataTitle => 'Schedule Data';
+
+  @override
+  String get scheduleAppearanceLabel => 'Schedule Appearance';
+
+  @override
+  String get adjustToolTitle => 'Adjust Tool';
+
+  @override
+  String get scheduleAppearanceWipMessage =>
+      'The schedule appearance feature is under development.';
+
+  @override
+  String get scheduleNameLabel => 'Schedule Name';
+
+  @override
+  String get renameScheduleTitle => 'Rename Schedule';
+
+  @override
+  String get enterScheduleNameHint => 'Enter schedule name';
+
+  @override
+  String get classTimeTitle => 'Class Time';
+
+  @override
+  String scheduleSettingsCurrentWeekDisplay(int week) {
+    return 'Week $week';
+  }
+
+  @override
+  String adjustMoveSuccess(Object from, Object to) {
+    return 'Moved courses from $from to $to';
+  }
+
+  @override
+  String get adjustDescription =>
+      'Use this tool for schedule adjustments such as holiday swaps. Please proceed carefully.';
+
+  @override
+  String get adjustTargetSchedule => 'Schedule to adjust';
+
+  @override
+  String get adjustFromLabel => 'From';
+
+  @override
+  String get adjustCoursesSuffix => 'courses';
+
+  @override
+  String get adjustToLabel => 'Move to';
+
+  @override
+  String get adjustWarning =>
+      'This action cannot be undone. Please verify the selected dates before proceeding.';
+
+  @override
+  String get deleteCoursesTitle => 'Delete Courses';
+
+  @override
+  String deleteSelectedCoursesMessage(int count) {
+    return 'Delete $count selected course(s)?';
+  }
+
+  @override
+  String get clearScheduleTitle => 'Clear Schedule';
+
+  @override
+  String clearScheduleMessage(int count) {
+    return 'Delete all $count courses in this schedule? This cannot be undone.';
+  }
+
+  @override
+  String get clearAction => 'Clear';
+
+  @override
+  String get moreAction => 'More';
+
+  @override
+  String get selectCoursesTitle => 'Select Courses';
+
+  @override
+  String selectedCoursesCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get addedCoursesTitle => 'Added Courses';
+
+  @override
+  String totalCoursesCount(int count) {
+    return '$count courses';
+  }
+
+  @override
+  String get unselectAllAction => 'Unselect All';
+
+  @override
+  String get selectAllAction => 'Select All';
+
+  @override
+  String get swipeDeleteHint => '  Swipe left to delete';
+
+  @override
+  String get noCoursesYet => 'No courses yet';
+
+  @override
+  String courseTimeSummary(Object weekday, int start, int end) {
+    return '$weekday $start-$end';
+  }
+
+  @override
+  String deleteCourseMessage(Object name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get clearCurrentSchedule => 'Clear Current Schedule';
+
+  @override
+  String deleteSelectedCount(int count) {
+    return 'Delete ($count)';
+  }
+
+  @override
+  String get addCourseAction => 'Add Course';
 }

@@ -224,4 +224,130 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get schoolRuc => '中国人民大学';
+
+  @override
+  String get scheduleSettingsTitle => '時間割設定';
+
+  @override
+  String get scheduleDataTitle => '時間割データ';
+
+  @override
+  String get scheduleAppearanceLabel => '時間割の外観';
+
+  @override
+  String get adjustToolTitle => '振替ツール';
+
+  @override
+  String get scheduleAppearanceWipMessage => '「時間割の外観」機能は現在開発中です。';
+
+  @override
+  String get scheduleNameLabel => '時間割名';
+
+  @override
+  String get renameScheduleTitle => '時間割名を変更';
+
+  @override
+  String get enterScheduleNameHint => '時間割名を入力してください';
+
+  @override
+  String get classTimeTitle => '授業時間';
+
+  @override
+  String scheduleSettingsCurrentWeekDisplay(int week) {
+    return '第$week週';
+  }
+
+  @override
+  String adjustMoveSuccess(Object from, Object to) {
+    return '$from の授業を $to に移動しました';
+  }
+
+  @override
+  String get adjustDescription => '振替休日などの調整用に、ある日の授業を別の日に移動できます。慎重に操作してください。';
+
+  @override
+  String get adjustTargetSchedule => '調整対象の時間割';
+
+  @override
+  String get adjustFromLabel => '移動元';
+
+  @override
+  String get adjustCoursesSuffix => 'の授業';
+
+  @override
+  String get adjustToLabel => '移動先';
+
+  @override
+  String get adjustWarning => 'この操作は取り消せません。実行前に日付を確認してください。';
+
+  @override
+  String get deleteCoursesTitle => '授業を削除';
+
+  @override
+  String deleteSelectedCoursesMessage(int count) {
+    return '選択した$count件の授業を削除しますか？';
+  }
+
+  @override
+  String get clearScheduleTitle => '時間割をクリア';
+
+  @override
+  String clearScheduleMessage(int count) {
+    return 'この時間割の$count件の授業をすべて削除しますか？この操作は取り消せません。';
+  }
+
+  @override
+  String get clearAction => 'クリア';
+
+  @override
+  String get moreAction => 'その他';
+
+  @override
+  String get selectCoursesTitle => '授業を選択';
+
+  @override
+  String selectedCoursesCount(int count) {
+    return '$count件選択中';
+  }
+
+  @override
+  String get addedCoursesTitle => '追加済み授業';
+
+  @override
+  String totalCoursesCount(int count) {
+    return '$count件の授業';
+  }
+
+  @override
+  String get unselectAllAction => '全選択解除';
+
+  @override
+  String get selectAllAction => 'すべて選択';
+
+  @override
+  String get swipeDeleteHint => '  左スワイプで削除';
+
+  @override
+  String get noCoursesYet => '授業がありません';
+
+  @override
+  String courseTimeSummary(Object weekday, int start, int end) {
+    return '$weekday $start-$end限';
+  }
+
+  @override
+  String deleteCourseMessage(Object name) {
+    return '「$name」を削除しますか？';
+  }
+
+  @override
+  String get clearCurrentSchedule => '現在の時間割をクリア';
+
+  @override
+  String deleteSelectedCount(int count) {
+    return '削除 ($count)';
+  }
+
+  @override
+  String get addCourseAction => '授業を追加';
 }

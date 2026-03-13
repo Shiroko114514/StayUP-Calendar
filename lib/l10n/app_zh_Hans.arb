@@ -84,5 +84,105 @@
   "schoolSjtu": "上海交通大学",
   "schoolWhu": "武汉大学",
   "schoolCuhksz": "香港中文大学（深圳）",
-  "schoolRuc": "中国人民大学"
+  "schoolRuc": "中国人民大学",
+  "scheduleSettingsTitle": "课表设置",
+  "scheduleDataTitle": "课表数据",
+  "scheduleAppearanceLabel": "课表外观",
+  "adjustToolTitle": "调课工具",
+  "scheduleAppearanceWipMessage": "「课表外观」功能正在开发中，敬请期待。",
+  "scheduleNameLabel": "课表名称",
+  "renameScheduleTitle": "修改课表名称",
+  "enterScheduleNameHint": "请输入课表名称",
+  "classTimeTitle": "上课时间",
+  "scheduleSettingsCurrentWeekDisplay": "第 {week} 周",
+  "@scheduleSettingsCurrentWeekDisplay": {
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "adjustMoveSuccess": "已将 {from} 的课程移动到 {to}",
+  "@adjustMoveSuccess": {
+    "placeholders": {
+      "from": {},
+      "to": {}
+    }
+  },
+  "adjustDescription": "本功能用于节假日调休等场景，可以将某天的课程移动到另一天，请谨慎操作",
+  "adjustTargetSchedule": "要调整的课表",
+  "adjustFromLabel": "将",
+  "adjustCoursesSuffix": "的课程",
+  "adjustToLabel": "移动到",
+  "adjustWarning": "点击「确定」后操作不可撤销，请确认日期选择无误后再执行。",
+  "deleteCoursesTitle": "删除课程",
+  "deleteSelectedCoursesMessage": "确定删除已选的 {count} 门课程？",
+  "@deleteSelectedCoursesMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearScheduleTitle": "清空课表",
+  "clearScheduleMessage": "确定删除当前课表全部 {count} 门课程？此操作不可恢复。",
+  "@clearScheduleMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "clearAction": "清空",
+  "moreAction": "更多",
+  "selectCoursesTitle": "选择课程",
+  "selectedCoursesCount": "已选 {count} 门",
+  "@selectedCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addedCoursesTitle": "已添课程",
+  "totalCoursesCount": "共 {count} 门课程",
+  "@totalCoursesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unselectAllAction": "取消全选",
+  "selectAllAction": "全选",
+  "swipeDeleteHint": "  左滑可删除",
+  "noCoursesYet": "还没有课程",
+  "courseTimeSummary": "周{weekday} 第{start}-{end}节",
+  "@courseTimeSummary": {
+    "placeholders": {
+      "weekday": {},
+      "start": {
+        "type": "int"
+      },
+      "end": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCourseMessage": "确定删除「{name}」？",
+  "@deleteCourseMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "clearCurrentSchedule": "清空当前课表",
+  "deleteSelectedCount": "删除 ({count})",
+  "@deleteSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addCourseAction": "添加课程"
 }

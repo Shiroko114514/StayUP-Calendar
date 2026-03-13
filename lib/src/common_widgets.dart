@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'models.dart';
+import 'l10n.dart';
 
 // ─────────────────────────────────────────────
 // 常量定义
@@ -44,14 +45,14 @@ class SubPageScaffold extends StatelessWidget {
 
   leading: GestureDetector(
     onTap: () => Navigator.pop(context),
-    child: const Row(
+    child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(width: 8),
-        Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
+        const SizedBox(width: 8),
+        const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
         Text(
-          '返回',
-          style: TextStyle(color: kAccent, fontSize: 15),
+          context.l10n.backAction,
+          style: const TextStyle(color: kAccent, fontSize: 15),
         ),
       ],
     ),
