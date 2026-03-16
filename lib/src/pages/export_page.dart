@@ -129,7 +129,7 @@ class _ExportPageState extends State<ExportPage> {
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
     return SubPageScaffold(
-      title: context.l10n.exportScheduleTitle,
+      title: context.l10n.dataManagementTitle,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 2, bottom: 10),

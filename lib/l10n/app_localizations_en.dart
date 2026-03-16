@@ -206,7 +206,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalWeeks => 'Total weeks';
 
   @override
-  String get exportScheduleTitle => 'Export Schedule';
+  String get exportScheduleTitle => 'Data Management';
 
   @override
   String get exportFormatLabel => 'Export Format';
@@ -321,7 +321,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hustNoticeText =>
-      '1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. Courses with \"TBD\" time/location will not be imported. Please add them manually later.';
+      '1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. If you want to switch terms after logging in, tap the refresh button in the top-right to choose again.\n\n3. Courses with \"TBD\" time/location will not be imported. Please add them manually later.';
 
   @override
   String get hustNeedLoginError =>
@@ -811,4 +811,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importScheduleFallbackName => 'Imported Schedule';
+
+  @override
+  String get dataManagementTitle => 'Data Management';
 }

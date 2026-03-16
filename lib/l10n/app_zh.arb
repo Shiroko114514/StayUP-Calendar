@@ -72,7 +72,7 @@
   "autoLabel": "自动",
   "sectionsPerDay": "一天课程节数",
   "totalWeeks": "学期周数",
-  "exportScheduleTitle": "导出课表",
+  "exportScheduleTitle": "数据管理",
   "exportFormatLabel": "导出格式",
   "exportIncludeNonWeek": "包含非本周课程",
   "exportIncludeSaturday": "包含周六",
@@ -148,7 +148,7 @@
       "season": {}
     }
   },
-  "hustNoticeText": "1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加",
+  "hustNoticeText": "1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 如果登录后想切换学期，可以点击右上角刷新按钮重新选择\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加",
   "hustNeedLoginError": "请先在页面中完成登录，然后再点击导入按钮",
   "hustApiError": "接口返回异常（code={code}），请重新登录后再试",
   "@hustApiError": {
@@ -487,5 +487,6 @@
   "importJsonInvalid": "JSON 格式无效，导入失败",
   "importJsonFailed": "导入失败，请重试",
   "importJsonNotice": "导入后会自动新建课表并切换到该课表，不会覆盖当前数据。",
-  "importScheduleFallbackName": "导入课表"
+  "importScheduleFallbackName": "导入课表",
+  "dataManagementTitle": "数据管理"
 }

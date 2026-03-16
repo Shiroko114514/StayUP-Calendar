@@ -72,7 +72,7 @@
   "autoLabel": "Auto",
   "sectionsPerDay": "Sections per day",
   "totalWeeks": "Total weeks",
-  "exportScheduleTitle": "Export Schedule",
+  "exportScheduleTitle": "Data Management",
   "exportFormatLabel": "Export Format",
   "exportIncludeNonWeek": "Include non-current-week courses",
   "exportIncludeSaturday": "Include Saturday",
@@ -148,7 +148,7 @@
       "season": {}
     }
   },
-  "hustNoticeText": "1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. Courses with \"TBD\" time/location will not be imported. Please add them manually later.",
+  "hustNoticeText": "1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. If you want to switch terms after logging in, tap the refresh button in the top-right to choose again.\n\n3. Courses with \"TBD\" time/location will not be imported. Please add them manually later.",
   "hustNeedLoginError": "Please finish login in the page first, then tap import.",
   "hustApiError": "API returned an error (code={code}). Please log in again and retry.",
   "@hustApiError": {
@@ -487,5 +487,6 @@
   "importJsonInvalid": "Invalid JSON format, import failed",
   "importJsonFailed": "Import failed, please try again",
   "importJsonNotice": "After import, a new schedule will be created and switched to. Current data will not be overwritten.",
-  "importScheduleFallbackName": "Imported Schedule"
+  "importScheduleFallbackName": "Imported Schedule",
+  "dataManagementTitle": "Data Management"
 }

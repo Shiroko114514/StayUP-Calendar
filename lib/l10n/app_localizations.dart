@@ -477,7 +477,7 @@ abstract class AppLocalizations {
   /// No description provided for @exportScheduleTitle.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'导出课表'**
+  /// **'数据管理'**
   String get exportScheduleTitle;
 
   /// No description provided for @exportFormatLabel.
@@ -675,7 +675,7 @@ abstract class AppLocalizations {
   /// No description provided for @hustNoticeText.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加'**
+  /// **'1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 如果登录后想切换学期，可以点击右上角刷新按钮重新选择\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加'**
   String get hustNoticeText;
 
   /// No description provided for @hustNeedLoginError.
@@ -1523,6 +1523,12 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'导入课表'**
   String get importScheduleFallbackName;
+
+  /// No description provided for @dataManagementTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'数据管理'**
+  String get dataManagementTitle;
 }
 
 class _AppLocalizationsDelegate

@@ -72,7 +72,7 @@
   "autoLabel": "自動",
   "sectionsPerDay": "1日の授業数",
   "totalWeeks": "学期週数",
-  "exportScheduleTitle": "共有",
+  "exportScheduleTitle": "データ管理",
   "exportFormatLabel": "形式",
   "exportIncludeNonWeek": "今週以外の授業を含める",
   "exportIncludeSaturday": "土曜日を含める",
@@ -148,7 +148,7 @@
       "season": {}
     }
   },
-  "hustNoticeText": "1. 未ログインの場合、先にログインページへ移動します。ログイン後、右下のインポートボタンを押してください。\n\n2. 時間・場所が\"未定\"の授業はインポートされません。後で手動追加してください。",
+  "hustNoticeText": "1. 未ログインの場合、先にログインページへ移動します。ログイン後、右下のインポートボタンを押してください。\n\n2. ログイン後に学期を切り替えたい場合は、右上の更新ボタンを押して再選択してください。\n\n3. 時間・場所が\"未定\"の授業はインポートされません。後で手動追加してください。",
   "hustNeedLoginError": "先にページ内でログインしてから、インポートを押してください。",
   "hustApiError": "API が異常を返しました（code={code}）。再ログインして再試行してください。",
   "@hustApiError": {
@@ -487,5 +487,6 @@
   "importJsonInvalid": "JSON形式が不正のため、インポートに失敗しました",
   "importJsonFailed": "インポートに失敗しました。再試行してください",
   "importJsonNotice": "インポート後は新しい時間割が自動作成され、その時間割に切り替わります。現在のデータは上書きされません。",
-  "importScheduleFallbackName": "インポートした時間割"
+  "importScheduleFallbackName": "インポートした時間割",
+  "dataManagementTitle": "データ管理"
 }

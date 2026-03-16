@@ -1033,7 +1033,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
       _MenuTool(icon: Icons.tune_outlined,         label: l.schedulePageToolScheduleSettings, route: 'schedule_settings'),
       _MenuTool(icon: Icons.inbox_outlined,        label: l.schedulePageToolAddedCourses,     route: 'added_courses'),
       _MenuTool(icon: Icons.settings_outlined,     label: l.globalSettingsTitle,              route: 'global_settings'),
-      _MenuTool(icon: Icons.ios_share_outlined,    label: l.exportScheduleTitle,              route: 'export'),
+      _MenuTool(icon: Icons.storage_outlined,         label: l.dataManagementTitle,              route: 'export'),
       _MenuTool(icon: Icons.info_outline,          label: l.aboutTitle,                       route: 'about'),
     ];
     final colors = ac(context);

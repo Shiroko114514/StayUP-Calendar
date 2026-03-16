@@ -200,7 +200,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get totalWeeks => '学期周数';
 
   @override
-  String get exportScheduleTitle => '导出课表';
+  String get exportScheduleTitle => '数据管理';
 
   @override
   String get exportFormatLabel => '导出格式';
@@ -313,7 +313,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
+      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 如果登录后想切换学期，可以点击右上角刷新按钮重新选择\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
   @override
   String get hustNeedLoginError => '请先在页面中完成登录，然后再点击导入按钮';
@@ -796,6 +796,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get importScheduleFallbackName => '导入课表';
+
+  @override
+  String get dataManagementTitle => '数据管理';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -994,7 +997,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get totalWeeks => '学期周数';
 
   @override
-  String get exportScheduleTitle => '导出课表';
+  String get exportScheduleTitle => '数据管理';
 
   @override
   String get exportFormatLabel => '导出格式';
@@ -1107,7 +1110,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
+      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 如果登录后想切换学期，可以点击右上角刷新按钮重新选择\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
   @override
   String get hustNeedLoginError => '请先在页面中完成登录，然后再点击导入按钮';
@@ -1590,6 +1593,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get importScheduleFallbackName => '导入课表';
+
+  @override
+  String get dataManagementTitle => '数据管理';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1788,7 +1794,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get totalWeeks => '學期週數';
 
   @override
-  String get exportScheduleTitle => '導出課表';
+  String get exportScheduleTitle => '數據管理';
 
   @override
   String get exportFormatLabel => '導出格式';
@@ -1901,7 +1907,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 時間地點為\"待定\"的課程不會導入，請後續手動添加';
+      '1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 如果登入後想切換學期，可以點擊右上角重新整理按鈕重新選擇\n\n3. 時間地點為\"待定\"的課程不會導入，請後續手動添加';
 
   @override
   String get hustNeedLoginError => '請先在頁面中完成登入，然後再點擊導入按鈕';
@@ -2384,4 +2390,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get importScheduleFallbackName => '匯入課表';
+
+  @override
+  String get dataManagementTitle => '資料管理';
 }

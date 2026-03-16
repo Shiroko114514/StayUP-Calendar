@@ -72,7 +72,7 @@
   "autoLabel": "自動",
   "sectionsPerDay": "一天課程節數",
   "totalWeeks": "學期週數",
-  "exportScheduleTitle": "導出課表",
+  "exportScheduleTitle": "數據管理",
   "exportFormatLabel": "導出格式",
   "exportIncludeNonWeek": "包含非本週課程",
   "exportIncludeSaturday": "包含週六",
@@ -148,7 +148,7 @@
       "season": {}
     }
   },
-  "hustNoticeText": "1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 時間地點為\"待定\"的課程不會導入，請後續手動添加",
+  "hustNoticeText": "1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 如果登入後想切換學期，可以點擊右上角重新整理按鈕重新選擇\n\n3. 時間地點為\"待定\"的課程不會導入，請後續手動添加",
   "hustNeedLoginError": "請先在頁面中完成登入，然後再點擊導入按鈕",
   "hustApiError": "介面返回異常（code={code}），請重新登入後再試",
   "@hustApiError": {
@@ -487,5 +487,6 @@
   "importJsonInvalid": "JSON 格式無效，匯入失敗",
   "importJsonFailed": "匯入失敗，請重試",
   "importJsonNotice": "匯入後會自動新建課表並切換到該課表，不會覆蓋當前資料。",
-  "importScheduleFallbackName": "匯入課表"
+  "importScheduleFallbackName": "匯入課表",
+  "dataManagementTitle": "資料管理"
 }
