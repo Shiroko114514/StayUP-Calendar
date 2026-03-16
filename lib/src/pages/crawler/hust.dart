@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../common_widgets.dart';
@@ -9,6 +9,9 @@ import '../../models.dart';
 import '../widgets/school_importers.dart';
 
 class HustImporter extends SchoolImporter {
+  int _selectedAcademicYear = _defaultAcademicYear(DateTime.now());
+  int _selectedSemester = _defaultSemester(DateTime.now());
+
   @override
   String get schoolId => 'hust';
 
@@ -18,10 +21,18 @@ class HustImporter extends SchoolImporter {
   @override
   String get pinyin => 'H';
 
-  // 直接打开 JSON 接口，登录后 Cookie 会自动携带
+  static const String _baseUrl =
+      'http://mhub.hust.edu.cn/LsController/findNameCourse';
+
+  static int _defaultAcademicYear(DateTime now) => now.month >= 8 ? now.year : now.year - 1;
+
+  static int _defaultSemester(DateTime now) => now.month >= 8 ? 1 : 2;
+
+  String _buildUrl(int academicYear, int semester) =>
+      '$_baseUrl?kcbxqh=${academicYear}$semester';
+
   @override
-  String get webUrl =>
-      'http://mhub.hust.edu.cn/LsController/findNameCourse?kcbxqh=20252';
+  String get webUrl => _buildUrl(_selectedAcademicYear, _selectedSemester);
 
   @override
   String noticeText(BuildContext context) => context.l10n.hustNoticeText;
@@ -40,6 +51,18 @@ class HustImporter extends SchoolImporter {
     void Function(String error) onError,
   ) async {
     try {
+      final selection = await _showTermDialog(context);
+      if (selection == null) {
+        return null;
+      }
+      _selectedAcademicYear = selection.academicYear;
+      _selectedSemester = selection.semester;
+
+      await controller.loadRequest(
+        Uri.parse(_buildUrl(_selectedAcademicYear, _selectedSemester)),
+      );
+      await _waitForPageReady(controller);
+
       final result = await controller.runJavaScriptReturningResult(
         'document.body.innerText',
       );
@@ -68,6 +91,129 @@ class HustImporter extends SchoolImporter {
     } catch (e) {
       onError(context.l10n.hustReadFailed(e));
       return null;
+    }
+  }
+
+  Future<_HustTermSelection?> _showTermDialog(BuildContext context) async {
+    final nowYear = DateTime.now().year;
+    final yearOptions = List<int>.generate(5, (index) => nowYear - 2 + index);
+
+    int draftYear = _selectedAcademicYear;
+    if (!yearOptions.contains(draftYear)) {
+      draftYear = _defaultAcademicYear(DateTime.now());
+    }
+    int draftSemester = _selectedSemester;
+
+    return showDialog<_HustTermSelection>(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setState) {
+            return AlertDialog(
+              backgroundColor: ac(context).card,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              title: Text(
+                context.l10n.hustTermDialogTitle,
+                style: TextStyle(
+                  color: ac(context).primaryText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    context.l10n.hustTermDialogMessage,
+                    style: TextStyle(
+                      color: ac(context).hint,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<int>(
+                    initialValue: draftYear,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.hustAcademicYearLabel,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: yearOptions
+                        .map((year) => DropdownMenuItem<int>(
+                              value: year,
+                              child: Text(context.l10n.hustAcademicYearOption(year)),
+                            ))
+                        .toList(),
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => draftYear = value);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<int>(
+                    initialValue: draftSemester,
+                    decoration: InputDecoration(
+                      labelText: context.l10n.hustSemesterLabel,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: [
+                      DropdownMenuItem<int>(
+                        value: 1,
+                        child: Text(context.l10n.hustSemesterFall),
+                      ),
+                      DropdownMenuItem<int>(
+                        value: 2,
+                        child: Text(context.l10n.hustSemesterSpring),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => draftSemester = value);
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(
+                    context.l10n.cancelAction,
+                    style: TextStyle(color: ac(context).hint),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(
+                    _HustTermSelection(
+                      academicYear: draftYear,
+                      semester: draftSemester,
+                    ),
+                  ),
+                  child: Text(
+                    context.l10n.confirmAction,
+                    style: TextStyle(
+                      color: Color(0xFFFF3B5C),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _waitForPageReady(WebViewController controller) async {
+    for (int i = 0; i < 20; i++) {
+      final readyState = await controller.runJavaScriptReturningResult(
+        'document.readyState',
+      );
+      final state = readyState.toString().replaceAll('"', '').trim().toLowerCase();
+      if (state == 'complete') {
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 200));
     }
   }
 
@@ -145,4 +291,14 @@ class HustImporter extends SchoolImporter {
 
     return courses;
   }
+}
+
+class _HustTermSelection {
+  final int academicYear;
+  final int semester;
+
+  const _HustTermSelection({
+    required this.academicYear,
+    required this.semester,
+  });
 }

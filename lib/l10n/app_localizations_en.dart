@@ -262,6 +262,29 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get hustTermDialogTitle => 'Select term';
+
+  @override
+  String get hustTermDialogMessage => 'Please select the academic year and semester to import';
+
+  @override
+  String get hustAcademicYearLabel => 'Academic year';
+
+  @override
+  String hustAcademicYearOption(int year) {
+    return '$year academic year';
+  }
+
+  @override
+  String get hustSemesterLabel => 'Semester';
+
+  @override
+  String get hustSemesterFall => 'Fall semester';
+
+  @override
+  String get hustSemesterSpring => 'Spring semester';
+
+  @override
   String get schoolImportWipMessage => 'Course import for this school is under development.';
 
   @override

@@ -262,6 +262,29 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get hustTermDialogTitle => '学期を選択';
+
+  @override
+  String get hustTermDialogMessage => 'インポートする学年と学期を選択してください';
+
+  @override
+  String get hustAcademicYearLabel => '学年';
+
+  @override
+  String hustAcademicYearOption(int year) {
+    return '$year学年';
+  }
+
+  @override
+  String get hustSemesterLabel => '学期';
+
+  @override
+  String get hustSemesterFall => '秋学期';
+
+  @override
+  String get hustSemesterSpring => '春学期';
+
+  @override
   String get schoolImportWipMessage => 'この学校の授業インポート機能は現在開発中です。';
 
   @override

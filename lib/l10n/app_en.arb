@@ -129,6 +129,20 @@
       "error": {}
     }
   },
+  "hustTermDialogTitle": "Select term",
+  "hustTermDialogMessage": "Please select the academic year and semester to import",
+  "hustAcademicYearLabel": "Academic year",
+  "hustAcademicYearOption": "{year} academic year",
+  "@hustAcademicYearOption": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "hustSemesterLabel": "Semester",
+  "hustSemesterFall": "Fall semester",
+  "hustSemesterSpring": "Spring semester",
   "schoolImportWipMessage": "Course import for this school is under development.",
   "schoolHust": "Huazhong University of Science and Technology",
   "schoolJxnu": "Jiangxi Normal University",

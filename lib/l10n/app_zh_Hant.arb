@@ -129,6 +129,20 @@
       "error": {}
     }
   },
+  "hustTermDialogTitle": "選擇學期",
+  "hustTermDialogMessage": "請選擇要導入的學年與學期",
+  "hustAcademicYearLabel": "學年",
+  "hustAcademicYearOption": "{year}學年",
+  "@hustAcademicYearOption": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "hustSemesterLabel": "學期",
+  "hustSemesterFall": "秋季學期",
+  "hustSemesterSpring": "春季學期",
   "schoolImportWipMessage": "該學校的課程導入功能正在開發中，敬請期待。",
   "schoolHust": "華中科技大學",
   "schoolJxnu": "江西師範大學",

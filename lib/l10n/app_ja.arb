@@ -129,6 +129,20 @@
       "error": {}
     }
   },
+  "hustTermDialogTitle": "学期を選択",
+  "hustTermDialogMessage": "インポートする学年と学期を選択してください",
+  "hustAcademicYearLabel": "学年",
+  "hustAcademicYearOption": "{year}学年",
+  "@hustAcademicYearOption": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "hustSemesterLabel": "学期",
+  "hustSemesterFall": "秋学期",
+  "hustSemesterSpring": "春学期",
   "schoolImportWipMessage": "この学校の授業インポート機能は現在開発中です。",
   "schoolHust": "華中科技大学",
   "schoolJxnu": "江西師範大学",

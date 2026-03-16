@@ -129,6 +129,20 @@
       "error": {}
     }
   },
+  "hustTermDialogTitle": "选择学期",
+  "hustTermDialogMessage": "请选择要导入的学年与学期",
+  "hustAcademicYearLabel": "学年",
+  "hustAcademicYearOption": "{year}学年",
+  "@hustAcademicYearOption": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "hustSemesterLabel": "学期",
+  "hustSemesterFall": "秋季学期",
+  "hustSemesterSpring": "春季学期",
   "schoolImportWipMessage": "该学校的课程导入功能正在开发中，敬请期待。",
   "schoolHust": "华中科技大学",
   "schoolJxnu": "江西师范大学",

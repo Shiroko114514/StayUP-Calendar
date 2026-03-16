@@ -573,6 +573,48 @@ abstract class AppLocalizations {
   /// **'读取失败：{error}'**
   String hustReadFailed(Object error);
 
+  /// No description provided for @hustTermDialogTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'选择学期'**
+  String get hustTermDialogTitle;
+
+  /// No description provided for @hustTermDialogMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'请选择要导入的学年与学期'**
+  String get hustTermDialogMessage;
+
+  /// No description provided for @hustAcademicYearLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'学年'**
+  String get hustAcademicYearLabel;
+
+  /// No description provided for @hustAcademicYearOption.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'{year}学年'**
+  String hustAcademicYearOption(int year);
+
+  /// No description provided for @hustSemesterLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'学期'**
+  String get hustSemesterLabel;
+
+  /// No description provided for @hustSemesterFall.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'秋季学期'**
+  String get hustSemesterFall;
+
+  /// No description provided for @hustSemesterSpring.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'春季学期'**
+  String get hustSemesterSpring;
+
   /// No description provided for @schoolImportWipMessage.
   ///
   /// In zh_Hans, this message translates to:

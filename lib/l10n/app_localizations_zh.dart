@@ -262,6 +262,29 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get hustTermDialogTitle => '选择学期';
+
+  @override
+  String get hustTermDialogMessage => '请选择要导入的学年与学期';
+
+  @override
+  String get hustAcademicYearLabel => '学年';
+
+  @override
+  String hustAcademicYearOption(int year) {
+    return '$year学年';
+  }
+
+  @override
+  String get hustSemesterLabel => '学期';
+
+  @override
+  String get hustSemesterFall => '秋季学期';
+
+  @override
+  String get hustSemesterSpring => '春季学期';
+
+  @override
   String get schoolImportWipMessage => '该学校的课程导入功能正在开发中，敬请期待。';
 
   @override
@@ -581,6 +604,29 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get hustTermDialogTitle => '选择学期';
+
+  @override
+  String get hustTermDialogMessage => '请选择要导入的学年与学期';
+
+  @override
+  String get hustAcademicYearLabel => '学年';
+
+  @override
+  String hustAcademicYearOption(int year) {
+    return '$year学年';
+  }
+
+  @override
+  String get hustSemesterLabel => '学期';
+
+  @override
+  String get hustSemesterFall => '秋季学期';
+
+  @override
+  String get hustSemesterSpring => '春季学期';
+
+  @override
   String get schoolImportWipMessage => '该学校的课程导入功能正在开发中，敬请期待。';
 
   @override
@@ -898,6 +944,29 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String hustReadFailed(Object error) {
     return '讀取失敗：$error';
   }
+
+  @override
+  String get hustTermDialogTitle => '選擇學期';
+
+  @override
+  String get hustTermDialogMessage => '請選擇要導入的學年與學期';
+
+  @override
+  String get hustAcademicYearLabel => '學年';
+
+  @override
+  String hustAcademicYearOption(int year) {
+    return '$year學年';
+  }
+
+  @override
+  String get hustSemesterLabel => '學期';
+
+  @override
+  String get hustSemesterFall => '秋季學期';
+
+  @override
+  String get hustSemesterSpring => '春季學期';
 
   @override
   String get schoolImportWipMessage => '該學校的課程導入功能正在開發中，敬請期待。';
