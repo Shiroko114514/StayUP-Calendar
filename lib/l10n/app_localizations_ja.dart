@@ -117,11 +117,11 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dateFormatCustomDialogTitle => '日付形式をカスタム';
 
   @override
-  String get dateFormatCustomDialogHint => 'intl の日付パターンを入力（例: MMM. d yyyy）';
+  String get dateFormatCustomDialogHint => 'intl の日付パターンを入力（例: MMM d, yyyy）';
 
   @override
   String get dateFormatCustomDialogHelper =>
-      'DateFormat のパターン構文を使用します。例: yyyy/MM/dd, d MMM. yyyy, MMM. d yyyy';
+      'DateFormat のパターン構文を使用します。例: yyyy/MM/dd, d MMM. yyyy, MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogEmpty => '日付形式を入力してください';
@@ -315,7 +315,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get hustNoticeText =>
-      '1. 未ログインの場合、先にログインページへ移動します。\n\n2. ログイン後に学期を切り替えたい場合は、右上の更新ボタンを押してください。\n\n3. 時間・場所が\"未定\"の授業はインポートされません。後で手動追加してください。';
+      '1. 未ログインの場合、先にログインページへ移動します。ログイン後、右下のインポートボタンを押してください。\n\n2. 時間・場所が\"未定\"の授業はインポートされません。後で手動追加してください。';
 
   @override
   String get hustNeedLoginError => '先にページ内でログインしてから、インポートを押してください。';
@@ -766,4 +766,37 @@ class AppLocalizationsJa extends AppLocalizations {
   String newScheduleCreateSuccess(Object name) {
     return '時間割「$name」を作成しました';
   }
+
+  @override
+  String get exportCurrentScheduleJsonAction => '現在の時間割をJSONでエクスポート';
+
+  @override
+  String get importScheduleFromJsonAction => 'JSONから新しい時間割にインポート';
+
+  @override
+  String exportCurrentScheduleLabel(Object name) {
+    return '現在の時間割: $name';
+  }
+
+  @override
+  String get exportJsonSuccess => '時間割をJSONでエクスポートしました';
+
+  @override
+  String get exportJsonFailed => 'エクスポートに失敗しました。再試行してください';
+
+  @override
+  String get importJsonSuccess => '新しい時間割にインポートしました';
+
+  @override
+  String get importJsonInvalid => 'JSON形式が不正のため、インポートに失敗しました';
+
+  @override
+  String get importJsonFailed => 'インポートに失敗しました。再試行してください';
+
+  @override
+  String get importJsonNotice =>
+      'インポート後は新しい時間割が自動作成され、その時間割に切り替わります。現在のデータは上書きされません。';
+
+  @override
+  String get importScheduleFallbackName => 'インポートした時間割';
 }

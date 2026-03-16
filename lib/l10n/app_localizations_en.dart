@@ -119,11 +119,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateFormatCustomDialogHint =>
-      'Enter an intl date pattern, e.g. MMM. d yyyy';
+      'Enter an intl date pattern, e.g. MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogHelper =>
-      'Use DateFormat pattern syntax. Examples: yyyy/MM/dd, d MMM. yyyy, MMM. d yyyy';
+      'Use DateFormat pattern syntax. Examples: yyyy/MM/dd, d MMM. yyyy, MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogEmpty => 'Please enter a date format';
@@ -321,7 +321,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hustNoticeText =>
-      '1. If you are not logged in, you will be redirected to the login page.\n\n2. After login, if you want to switch terms, tap the refresh button in the top-right.\n\n3. Courses with \"TBD\" time/location will not be imported. Please add them manually later.';
+      '1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. Courses with \"TBD\" time/location will not be imported. Please add them manually later.';
 
   @override
   String get hustNeedLoginError =>
@@ -777,4 +777,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String newScheduleCreateSuccess(Object name) {
     return 'Created schedule \"$name\"';
   }
+
+  @override
+  String get exportCurrentScheduleJsonAction =>
+      'Export current schedule as JSON';
+
+  @override
+  String get importScheduleFromJsonAction => 'Import from JSON to new schedule';
+
+  @override
+  String exportCurrentScheduleLabel(Object name) {
+    return 'Current schedule: $name';
+  }
+
+  @override
+  String get exportJsonSuccess => 'Schedule exported as JSON';
+
+  @override
+  String get exportJsonFailed => 'Export failed, please try again';
+
+  @override
+  String get importJsonSuccess => 'Imported into a new schedule';
+
+  @override
+  String get importJsonInvalid => 'Invalid JSON format, import failed';
+
+  @override
+  String get importJsonFailed => 'Import failed, please try again';
+
+  @override
+  String get importJsonNotice =>
+      'After import, a new schedule will be created and switched to. Current data will not be overwritten.';
+
+  @override
+  String get importScheduleFallbackName => 'Imported Schedule';
 }

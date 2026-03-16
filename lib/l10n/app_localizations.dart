@@ -315,13 +315,13 @@ abstract class AppLocalizations {
   /// No description provided for @dateFormatCustomDialogHint.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'请输入 intl 日期格式，例如：MMM. d yyyy'**
+  /// **'请输入 intl 日期格式，例如：MMM d, yyyy'**
   String get dateFormatCustomDialogHint;
 
   /// No description provided for @dateFormatCustomDialogHelper.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy'**
+  /// **'使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy'**
   String get dateFormatCustomDialogHelper;
 
   /// No description provided for @dateFormatCustomDialogEmpty.
@@ -675,7 +675,7 @@ abstract class AppLocalizations {
   /// No description provided for @hustNoticeText.
   ///
   /// In zh_Hans, this message translates to:
-  /// **'1. 若未登录会先跳转到登录页\n\n2. 登录后若想切换学期，请点击右上角刷新按钮\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加'**
+  /// **'1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加'**
   String get hustNoticeText;
 
   /// No description provided for @hustNeedLoginError.
@@ -1463,6 +1463,66 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'已创建新课表：{name}'**
   String newScheduleCreateSuccess(Object name);
+
+  /// No description provided for @exportCurrentScheduleJsonAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'导出当前课表为 JSON'**
+  String get exportCurrentScheduleJsonAction;
+
+  /// No description provided for @importScheduleFromJsonAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'从 JSON 导入到新课表'**
+  String get importScheduleFromJsonAction;
+
+  /// No description provided for @exportCurrentScheduleLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'当前课表：{name}'**
+  String exportCurrentScheduleLabel(Object name);
+
+  /// No description provided for @exportJsonSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'课表已导出为 JSON'**
+  String get exportJsonSuccess;
+
+  /// No description provided for @exportJsonFailed.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'导出失败，请重试'**
+  String get exportJsonFailed;
+
+  /// No description provided for @importJsonSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已导入到新建课表'**
+  String get importJsonSuccess;
+
+  /// No description provided for @importJsonInvalid.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'JSON 格式无效，导入失败'**
+  String get importJsonInvalid;
+
+  /// No description provided for @importJsonFailed.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'导入失败，请重试'**
+  String get importJsonFailed;
+
+  /// No description provided for @importJsonNotice.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'导入后会自动新建课表并切换到该课表，不会覆盖当前数据。'**
+  String get importJsonNotice;
+
+  /// No description provided for @importScheduleFallbackName.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'导入课表'**
+  String get importScheduleFallbackName;
 }
 
 class _AppLocalizationsDelegate

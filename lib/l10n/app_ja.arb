@@ -40,8 +40,8 @@
   "dateFormatSettingLabel": "日付形式",
   "dateFormatCustomOptionLabel": "カスタム",
   "dateFormatCustomDialogTitle": "日付形式をカスタム",
-  "dateFormatCustomDialogHint": "intl の日付パターンを入力（例: MMM. d yyyy）",
-  "dateFormatCustomDialogHelper": "DateFormat のパターン構文を使用します。例: yyyy/MM/dd, d MMM. yyyy, MMM. d yyyy",
+  "dateFormatCustomDialogHint": "intl の日付パターンを入力（例: MMM d, yyyy）",
+  "dateFormatCustomDialogHelper": "DateFormat のパターン構文を使用します。例: yyyy/MM/dd, d MMM. yyyy, MMM d, yyyy",
   "dateFormatCustomDialogEmpty": "日付形式を入力してください",
   "dateFormatCustomDialogInvalid": "日付形式が無効です。パターンを確認してください",
   "languageFollowSystem": "システム設定に従う",
@@ -472,5 +472,20 @@
     "placeholders": {
       "name": {}
     }
-  }
+  },
+  "exportCurrentScheduleJsonAction": "現在の時間割をJSONでエクスポート",
+  "importScheduleFromJsonAction": "JSONから新しい時間割にインポート",
+  "exportCurrentScheduleLabel": "現在の時間割: {name}",
+  "@exportCurrentScheduleLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "exportJsonSuccess": "時間割をJSONでエクスポートしました",
+  "exportJsonFailed": "エクスポートに失敗しました。再試行してください",
+  "importJsonSuccess": "新しい時間割にインポートしました",
+  "importJsonInvalid": "JSON形式が不正のため、インポートに失敗しました",
+  "importJsonFailed": "インポートに失敗しました。再試行してください",
+  "importJsonNotice": "インポート後は新しい時間割が自動作成され、その時間割に切り替わります。現在のデータは上書きされません。",
+  "importScheduleFallbackName": "インポートした時間割"
 }

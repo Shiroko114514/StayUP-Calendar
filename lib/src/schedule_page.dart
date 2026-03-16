@@ -1282,34 +1282,8 @@ class _ToolCell extends StatelessWidget {
         page = const GlobalSettingsPage();
         break;
       case 'export':
-        Navigator.pop(context); // 关闭菜单
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: ac(ctx).card,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              title: Row(children: [
-                const Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
-                const SizedBox(width: 8),
-                Text(ctx.l10n.exportScheduleTitle, style: const TextStyle(
-                    color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
-              ]),
-              content: Text(
-                ctx.l10n.featureInDevelopmentMessage,
-                style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(ctx.l10n.okAction,
-                      style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
-                ),
-              ],
-            ),
-          );
-        });
-        return;
+        page = const ExportPage();
+        break;
       case 'about':
       default:
         page = const AboutPage();

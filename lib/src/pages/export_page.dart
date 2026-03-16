@@ -1,9 +1,12 @@
+import 'dart:convert';
+
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../common_widgets.dart';
 import '../l10n.dart';
-
-enum _ExportFormat { png, jpg, pdf, ics, csv }
+import '../models.dart';
 
 class ExportPage extends StatefulWidget {
   const ExportPage({super.key});
@@ -12,170 +15,155 @@ class ExportPage extends StatefulWidget {
 }
 
 class _ExportPageState extends State<ExportPage> {
-  _ExportFormat _format = _ExportFormat.png;
-  bool _includeNonWeek = false;
-  bool _includeSaturday = true;
-  bool _includeSunday = false;
+  static const XTypeGroup _jsonTypeGroup = XTypeGroup(
+    label: 'JSON',
+    extensions: <String>['json'],
+    mimeTypes: <String>['application/json', 'text/json'],
+  );
 
-  List<_ExportFormat> get _formats => _ExportFormat.values;
+  Future<void> _exportCurrentSchedule() async {
+    final appState = AppStateScope.of(context);
+    final scheduleName = appState.config.name.trim();
+    final suggested = scheduleName.isEmpty
+        ? 'stayup_schedule.json'
+        : '${scheduleName.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')}.json';
 
-  String _formatLabel(BuildContext context, _ExportFormat format) {
-    final l10n = context.l10n;
-    switch (format) {
-      case _ExportFormat.png:
-        return l10n.exportFormatPng;
-      case _ExportFormat.jpg:
-        return l10n.exportFormatJpg;
-      case _ExportFormat.pdf:
-        return l10n.exportFormatPdf;
-      case _ExportFormat.ics:
-        return l10n.exportFormatIcs;
-      case _ExportFormat.csv:
-        return l10n.exportFormatCsv;
+    try {
+      final location = await getSaveLocation(
+        suggestedName: suggested,
+        acceptedTypeGroups: const <XTypeGroup>[_jsonTypeGroup],
+      );
+      if (location == null || !mounted) return;
+
+      final payload = appState.exportActiveScheduleJson();
+      final pretty = const JsonEncoder.withIndent('  ').convert(payload);
+      final file = XFile.fromData(
+        utf8.encode(pretty),
+        mimeType: 'application/json',
+        name: suggested,
+      );
+      await file.saveTo(location.path);
+      if (!mounted) return;
+      showAppToast(context, context.l10n.exportJsonSuccess);
+    } catch (_) {
+      if (!mounted) return;
+      showAppToast(context, context.l10n.exportJsonFailed);
+    }
+  }
+
+  String _resolveImportedScheduleName(
+    AppLocalizations l10n,
+    Map<String, dynamic> decoded,
+  ) {
+    String? rawName;
+    final topLevelName = decoded['scheduleName'];
+    if (topLevelName is String && topLevelName.trim().isNotEmpty) {
+      rawName = topLevelName.trim();
+    }
+
+    final scheduleRaw = decoded['schedule'];
+    if (rawName == null && scheduleRaw is Map) {
+      final configRaw = scheduleRaw['config'];
+      if (configRaw is Map) {
+        final name = configRaw['name'];
+        if (name is String && name.trim().isNotEmpty) {
+          rawName = name.trim();
+        }
+      }
+    }
+
+    if (rawName == null || rawName.isEmpty) {
+      return l10n.importScheduleFallbackName;
+    }
+
+    final match = RegExp(
+      r'^(\\d{4})\\s+(Spring|Fall|Autumn|春|秋)$',
+      caseSensitive: false,
+    ).firstMatch(rawName);
+    if (match == null) return rawName;
+
+    final year = int.tryParse(match.group(1) ?? '');
+    final seasonToken = (match.group(2) ?? '').toLowerCase();
+    if (year == null) return rawName;
+
+    final season =
+        (seasonToken == 'spring' || seasonToken == '春')
+            ? l10n.schoolImportSeasonSpringShort
+            : l10n.schoolImportSeasonFallShort;
+    return l10n.schoolImportScheduleNameByTerm(year, season);
+  }
+
+  Future<void> _importFromJson() async {
+    try {
+      final l10n = context.l10n;
+      final appState = AppStateScope.of(context);
+      final file = await openFile(
+        acceptedTypeGroups: const <XTypeGroup>[_jsonTypeGroup],
+      );
+      if (file == null || !mounted) return;
+
+      final text = await file.readAsString();
+      final decoded = jsonDecode(text);
+      if (decoded is! Map) {
+        throw const FormatException('Top-level JSON must be an object.');
+      }
+
+      final decodedMap = Map<String, dynamic>.from(decoded);
+      final resolvedName = _resolveImportedScheduleName(l10n, decodedMap);
+      appState.importScheduleFromJsonMap(
+        decodedMap,
+        importedNameOverride: resolvedName,
+      );
+      if (!mounted) return;
+      showAppToast(context, context.l10n.importJsonSuccess);
+    } on FormatException {
+      if (!mounted) return;
+      showAppToast(context, context.l10n.importJsonInvalid);
+    } catch (_) {
+      if (!mounted) return;
+      showAppToast(context, context.l10n.importJsonFailed);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appState = AppStateScope.of(context);
     return SubPageScaffold(
       title: context.l10n.exportScheduleTitle,
       children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 2, bottom: 10),
+          child: Text(
+            context.l10n.exportCurrentScheduleLabel(appState.config.name),
+            style: TextStyle(color: ac(context).hint, fontSize: 13),
+          ),
+        ),
         settingCard(context, [
           SettingRow(
-            label: context.l10n.exportFormatLabel,
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _formatLabel(context, _format),
-                  style: const TextStyle(color: kHint, fontSize: 13),
-                ),
-                const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: kHint, size: 18),
-              ],
-            ),
-            onTap: _pickFormat,
+            label: context.l10n.exportCurrentScheduleJsonAction,
+            onTap: _exportCurrentSchedule,
+            trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
           ),
           SettingRow(
-            label: context.l10n.exportIncludeNonWeek,
-            trailing: Switch(
-              value: _includeNonWeek,
-              onChanged: (v) => setState(() => _includeNonWeek = v),
-              activeThumbColor: const Color(0xFF4ECDC4),
-            ),
-          ),
-          SettingRow(
-            label: context.l10n.exportIncludeSaturday,
-            trailing: Switch(
-              value: _includeSaturday,
-              onChanged: (v) => setState(() => _includeSaturday = v),
-              activeThumbColor: const Color(0xFF4ECDC4),
-            ),
-          ),
-          SettingRow(
-            label: context.l10n.exportIncludeSunday,
+            label: context.l10n.importScheduleFromJsonAction,
             showDivider: false,
-            trailing: Switch(
-              value: _includeSunday,
-              onChanged: (v) => setState(() => _includeSunday = v),
-              activeThumbColor: const Color(0xFF4ECDC4),
-            ),
+            onTap: _importFromJson,
+            trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
           ),
         ]),
         Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(top: 8),
-          child: ElevatedButton(
-            onPressed: () {
-              showAppToast(
-                context,
-                context.l10n.exportSuccess(_formatLabel(context, _format)),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4ECDC4),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 0,
-            ),
-            child: Text(
-              context.l10n.exportNow,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-            ),
+          margin: const EdgeInsets.only(top: 12),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: ac(context).card,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            context.l10n.importJsonNotice,
+            style: TextStyle(color: ac(context).hint, fontSize: 13, height: 1.5),
           ),
         ),
       ],
-    );
-  }
-
-  void _pickFormat() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: ac(context).card,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.exportSelectFormat,
-              style: TextStyle(
-                color: ac(context).primaryText,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ..._formats.map(
-              (f) => GestureDetector(
-                onTap: () {
-                  setState(() => _format = f);
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 4,
-                  ),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(color: kDivider, width: 0.5),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        _formatLabel(context, f),
-                        style: TextStyle(
-                          color: f == _format
-                              ? const Color(0xFF4ECDC4)
-                              : Colors.white,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const Spacer(),
-                      if (f == _format)
-                        const Icon(
-                          Icons.check,
-                          color: Color(0xFF4ECDC4),
-                          size: 18,
-                        ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

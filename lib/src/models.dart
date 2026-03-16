@@ -169,7 +169,7 @@ const String kDateFormatYmdDash = 'yyyy-MM-dd';
 const String kDateFormatMdySlash = 'MM/dd/yyyy';
 const String kDateFormatDmySlash = 'dd/MM/yyyy';
 const String kDateFormatDMonY = 'd MMM. yyyy';
-const String kDateFormatMonDY = 'MMM. d yyyy';
+const String kDateFormatMonDY = 'MMM d, yyyy';
 const int kScheduleNameMaxLength = 20;
 const int kScheduleNameChineseMaxLength = 5;
 
@@ -368,6 +368,54 @@ class AppState extends ChangeNotifier {
     if (normalizedName.isEmpty) return;
     allConfigs = List.from(allConfigs)
       ..[index] = allConfigs[index].copyWith(name: normalizedName);
+    notifyListeners();
+  }
+
+  // ── 课表 JSON 导出/导入 ──
+  Map<String, dynamic> exportActiveScheduleJson() => {
+    'format': 'stayup.schedule',
+    'version': 1,
+    'exportedAt': DateTime.now().toIso8601String(),
+    'scheduleName': config.name,
+    'schedule': {
+      'config': config.toJson(),
+      'courses': courses.map((c) => c.toJson()).toList(),
+    },
+  };
+
+  void importScheduleFromJsonMap(
+    Map<String, dynamic> jsonMap, {
+    String? importedNameOverride,
+  }) {
+    final scheduleRaw = jsonMap['schedule'] ?? jsonMap;
+    if (scheduleRaw is! Map) {
+      throw const FormatException('Missing schedule object in JSON.');
+    }
+
+    final schedule = Map<String, dynamic>.from(scheduleRaw);
+    final configRaw = schedule['config'];
+    final coursesRaw = schedule['courses'];
+    if (configRaw is! Map || coursesRaw is! List) {
+      throw const FormatException('Invalid schedule JSON: config/courses not found.');
+    }
+
+    final importedConfig = ScheduleConfig.fromJson(
+      Map<String, dynamic>.from(configRaw),
+    );
+    final importedCourses = coursesRaw
+        .map((e) => Course.fromJson(Map<String, dynamic>.from(e as Map)))
+        .toList();
+
+    final fallbackName = '导入课表';
+    final candidateName = importedNameOverride ?? importedConfig.name;
+    final normalizedName = normalizeScheduleName(candidateName);
+    final finalName = normalizedName.isEmpty
+        ? fallbackName
+        : normalizedName;
+
+    allConfigs = [...allConfigs, importedConfig.copyWith(name: finalName)];
+    allCourses = [...allCourses, importedCourses];
+    activeScheduleIndex = allConfigs.length - 1;
     notifyListeners();
   }
 

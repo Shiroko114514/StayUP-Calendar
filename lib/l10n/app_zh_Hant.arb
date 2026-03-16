@@ -40,8 +40,8 @@
   "dateFormatSettingLabel": "日期格式",
   "dateFormatCustomOptionLabel": "自訂",
   "dateFormatCustomDialogTitle": "自訂日期格式",
-  "dateFormatCustomDialogHint": "請輸入 intl 日期格式，例如：MMM. d yyyy",
-  "dateFormatCustomDialogHelper": "使用 DateFormat 格式語法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy",
+  "dateFormatCustomDialogHint": "請輸入 intl 日期格式，例如：MMM d, yyyy",
+  "dateFormatCustomDialogHelper": "使用 DateFormat 格式語法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy",
   "dateFormatCustomDialogEmpty": "請輸入日期格式",
   "dateFormatCustomDialogInvalid": "日期格式無效，請檢查後重試",
   "languageFollowSystem": "跟隨系統",
@@ -472,5 +472,20 @@
     "placeholders": {
       "name": {}
     }
-  }
+  },
+  "exportCurrentScheduleJsonAction": "匯出當前課表為 JSON",
+  "importScheduleFromJsonAction": "從 JSON 匯入到新課表",
+  "exportCurrentScheduleLabel": "當前課表：{name}",
+  "@exportCurrentScheduleLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "exportJsonSuccess": "課表已匯出為 JSON",
+  "exportJsonFailed": "匯出失敗，請重試",
+  "importJsonSuccess": "已匯入到新建課表",
+  "importJsonInvalid": "JSON 格式無效，匯入失敗",
+  "importJsonFailed": "匯入失敗，請重試",
+  "importJsonNotice": "匯入後會自動新建課表並切換到該課表，不會覆蓋當前資料。",
+  "importScheduleFallbackName": "匯入課表"
 }

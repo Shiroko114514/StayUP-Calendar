@@ -40,8 +40,8 @@
   "dateFormatSettingLabel": "Date Format",
   "dateFormatCustomOptionLabel": "Custom",
   "dateFormatCustomDialogTitle": "Custom Date Format",
-  "dateFormatCustomDialogHint": "Enter an intl date pattern, e.g. MMM. d yyyy",
-  "dateFormatCustomDialogHelper": "Use DateFormat pattern syntax. Examples: yyyy/MM/dd, d MMM. yyyy, MMM. d yyyy",
+  "dateFormatCustomDialogHint": "Enter an intl date pattern, e.g. MMM d, yyyy",
+  "dateFormatCustomDialogHelper": "Use DateFormat pattern syntax. Examples: yyyy/MM/dd, d MMM. yyyy, MMM d, yyyy",
   "dateFormatCustomDialogEmpty": "Please enter a date format",
   "dateFormatCustomDialogInvalid": "Invalid date format pattern",
   "languageFollowSystem": "Follow System",
@@ -472,5 +472,20 @@
     "placeholders": {
       "name": {}
     }
-  }
+  },
+  "exportCurrentScheduleJsonAction": "Export current schedule as JSON",
+  "importScheduleFromJsonAction": "Import from JSON to new schedule",
+  "exportCurrentScheduleLabel": "Current schedule: {name}",
+  "@exportCurrentScheduleLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "exportJsonSuccess": "Schedule exported as JSON",
+  "exportJsonFailed": "Export failed, please try again",
+  "importJsonSuccess": "Imported into a new schedule",
+  "importJsonInvalid": "Invalid JSON format, import failed",
+  "importJsonFailed": "Import failed, please try again",
+  "importJsonNotice": "After import, a new schedule will be created and switched to. Current data will not be overwritten.",
+  "importScheduleFallbackName": "Imported Schedule"
 }

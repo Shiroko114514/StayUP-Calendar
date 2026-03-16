@@ -116,11 +116,11 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dateFormatCustomDialogTitle => '自定义日期格式';
 
   @override
-  String get dateFormatCustomDialogHint => '请输入 intl 日期格式，例如：MMM. d yyyy';
+  String get dateFormatCustomDialogHint => '请输入 intl 日期格式，例如：MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogHelper =>
-      '使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy';
+      '使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogEmpty => '请输入日期格式';
@@ -313,7 +313,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登录会先跳转到登录页\n\n2. 登录后若想切换学期，请点击右上角刷新按钮\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
+      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
   @override
   String get hustNeedLoginError => '请先在页面中完成登录，然后再点击导入按钮';
@@ -764,6 +764,38 @@ class AppLocalizationsZh extends AppLocalizations {
   String newScheduleCreateSuccess(Object name) {
     return '已创建新课表：$name';
   }
+
+  @override
+  String get exportCurrentScheduleJsonAction => '导出当前课表为 JSON';
+
+  @override
+  String get importScheduleFromJsonAction => '从 JSON 导入到新课表';
+
+  @override
+  String exportCurrentScheduleLabel(Object name) {
+    return '当前课表：$name';
+  }
+
+  @override
+  String get exportJsonSuccess => '课表已导出为 JSON';
+
+  @override
+  String get exportJsonFailed => '导出失败，请重试';
+
+  @override
+  String get importJsonSuccess => '已导入到新建课表';
+
+  @override
+  String get importJsonInvalid => 'JSON 格式无效，导入失败';
+
+  @override
+  String get importJsonFailed => '导入失败，请重试';
+
+  @override
+  String get importJsonNotice => '导入后会自动新建课表并切换到该课表，不会覆盖当前数据。';
+
+  @override
+  String get importScheduleFallbackName => '导入课表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -878,11 +910,11 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get dateFormatCustomDialogTitle => '自定义日期格式';
 
   @override
-  String get dateFormatCustomDialogHint => '请输入 intl 日期格式，例如：MMM. d yyyy';
+  String get dateFormatCustomDialogHint => '请输入 intl 日期格式，例如：MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogHelper =>
-      '使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy';
+      '使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogEmpty => '请输入日期格式';
@@ -1075,7 +1107,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登录会先跳转到登录页\n\n2. 登录后若想切换学期，请点击右上角刷新按钮\n\n3. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
+      '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
   @override
   String get hustNeedLoginError => '请先在页面中完成登录，然后再点击导入按钮';
@@ -1526,6 +1558,38 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String newScheduleCreateSuccess(Object name) {
     return '已创建新课表：$name';
   }
+
+  @override
+  String get exportCurrentScheduleJsonAction => '导出当前课表为 JSON';
+
+  @override
+  String get importScheduleFromJsonAction => '从 JSON 导入到新课表';
+
+  @override
+  String exportCurrentScheduleLabel(Object name) {
+    return '当前课表：$name';
+  }
+
+  @override
+  String get exportJsonSuccess => '课表已导出为 JSON';
+
+  @override
+  String get exportJsonFailed => '导出失败，请重试';
+
+  @override
+  String get importJsonSuccess => '已导入到新建课表';
+
+  @override
+  String get importJsonInvalid => 'JSON 格式无效，导入失败';
+
+  @override
+  String get importJsonFailed => '导入失败，请重试';
+
+  @override
+  String get importJsonNotice => '导入后会自动新建课表并切换到该课表，不会覆盖当前数据。';
+
+  @override
+  String get importScheduleFallbackName => '导入课表';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1640,11 +1704,11 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get dateFormatCustomDialogTitle => '自訂日期格式';
 
   @override
-  String get dateFormatCustomDialogHint => '請輸入 intl 日期格式，例如：MMM. d yyyy';
+  String get dateFormatCustomDialogHint => '請輸入 intl 日期格式，例如：MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogHelper =>
-      '使用 DateFormat 格式語法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy';
+      '使用 DateFormat 格式語法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy';
 
   @override
   String get dateFormatCustomDialogEmpty => '請輸入日期格式';
@@ -1837,7 +1901,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get hustNoticeText =>
-      '1. 若未登入會先跳轉到登入頁\n\n2. 登入後若想切換學期，請點擊右上角刷新按鈕\n\n3. 時間地點為\"待定\"的課程不會導入，請後續手動添加';
+      '1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 時間地點為\"待定\"的課程不會導入，請後續手動添加';
 
   @override
   String get hustNeedLoginError => '請先在頁面中完成登入，然後再點擊導入按鈕';
@@ -2288,4 +2352,36 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String newScheduleCreateSuccess(Object name) {
     return '已建立新課表：$name';
   }
+
+  @override
+  String get exportCurrentScheduleJsonAction => '匯出當前課表為 JSON';
+
+  @override
+  String get importScheduleFromJsonAction => '從 JSON 匯入到新課表';
+
+  @override
+  String exportCurrentScheduleLabel(Object name) {
+    return '當前課表：$name';
+  }
+
+  @override
+  String get exportJsonSuccess => '課表已匯出為 JSON';
+
+  @override
+  String get exportJsonFailed => '匯出失敗，請重試';
+
+  @override
+  String get importJsonSuccess => '已匯入到新建課表';
+
+  @override
+  String get importJsonInvalid => 'JSON 格式無效，匯入失敗';
+
+  @override
+  String get importJsonFailed => '匯入失敗，請重試';
+
+  @override
+  String get importJsonNotice => '匯入後會自動新建課表並切換到該課表，不會覆蓋當前資料。';
+
+  @override
+  String get importScheduleFallbackName => '匯入課表';
 }

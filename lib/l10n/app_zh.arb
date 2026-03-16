@@ -40,8 +40,8 @@
   "dateFormatSettingLabel": "日期格式",
   "dateFormatCustomOptionLabel": "自定义",
   "dateFormatCustomDialogTitle": "自定义日期格式",
-  "dateFormatCustomDialogHint": "请输入 intl 日期格式，例如：MMM. d yyyy",
-  "dateFormatCustomDialogHelper": "使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM. d yyyy",
+  "dateFormatCustomDialogHint": "请输入 intl 日期格式，例如：MMM d, yyyy",
+  "dateFormatCustomDialogHelper": "使用 DateFormat 格式语法。示例：yyyy/MM/dd、d MMM. yyyy、MMM d, yyyy",
   "dateFormatCustomDialogEmpty": "请输入日期格式",
   "dateFormatCustomDialogInvalid": "日期格式无效，请检查后重试",
   "languageFollowSystem": "跟随系统",
@@ -472,5 +472,20 @@
     "placeholders": {
       "name": {}
     }
-  }
+  },
+  "exportCurrentScheduleJsonAction": "导出当前课表为 JSON",
+  "importScheduleFromJsonAction": "从 JSON 导入到新课表",
+  "exportCurrentScheduleLabel": "当前课表：{name}",
+  "@exportCurrentScheduleLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "exportJsonSuccess": "课表已导出为 JSON",
+  "exportJsonFailed": "导出失败，请重试",
+  "importJsonSuccess": "已导入到新建课表",
+  "importJsonInvalid": "JSON 格式无效，导入失败",
+  "importJsonFailed": "导入失败，请重试",
+  "importJsonNotice": "导入后会自动新建课表并切换到该课表，不会覆盖当前数据。",
+  "importScheduleFallbackName": "导入课表"
 }
