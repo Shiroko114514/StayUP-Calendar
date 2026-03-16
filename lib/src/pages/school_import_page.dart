@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../common_widgets.dart';
@@ -151,12 +152,10 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
       }
       await _cookieManager.clearCookies();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.schoolImportResetLoginSuccess),
-          backgroundColor: ac(context).card,
-          behavior: SnackBarBehavior.floating,
-        ),
+      await Fluttertoast.showToast(
+        msg: context.l10n.schoolImportResetLoginSuccess,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
       );
     } catch (error) {
       if (!mounted) return;
