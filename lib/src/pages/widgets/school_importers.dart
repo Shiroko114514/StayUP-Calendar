@@ -12,6 +12,8 @@ abstract class SchoolImporter {
   String get pinyin;
   String noticeText(BuildContext context);
 
+  void resetSession() {}
+
   String newScheduleName(BuildContext context) {
     final now = DateTime.now();
     return '${displayName(context)} ${now.month}/${now.day}';

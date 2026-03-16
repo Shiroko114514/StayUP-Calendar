@@ -165,7 +165,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get totalWeeks => '学期週数';
 
   @override
-  String get exportScheduleTitle => '時間割をエクスポート';
+  String get exportScheduleTitle => '共有';
 
   @override
   String get exportFormatLabel => '形式';
@@ -241,6 +241,24 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get schoolImportScheduleAction => '時間割をインポート';
+
+  @override
+  String get schoolImportResetLoginAction => '再ログイン';
+
+  @override
+  String get schoolImportResetLoginTitle => 'ログイン状態をクリア';
+
+  @override
+  String get schoolImportResetLoginMessage =>
+      '内蔵ブラウザ内のログイン Cookie をすべて削除し、ログイン入口を再度開きます。続行しますか？';
+
+  @override
+  String get schoolImportResetLoginSuccess => 'ログイン状態をクリアしました。もう一度ログインしてください。';
+
+  @override
+  String schoolImportResetLoginFailed(Object error) {
+    return 'ログイン状態のクリアに失敗しました: $error';
+  }
 
   @override
   String schoolImportScheduleName(Object school, int month, int day) {

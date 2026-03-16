@@ -241,6 +241,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get schoolImportScheduleAction => '导入课表';
 
   @override
+  String get schoolImportResetLoginAction => '重新登录';
+
+  @override
+  String get schoolImportResetLoginTitle => '清除登录状态';
+
+  @override
+  String get schoolImportResetLoginMessage =>
+      '这会清除当前内置浏览器中的所有登录 Cookie，并重新打开登录入口。确定继续吗？';
+
+  @override
+  String get schoolImportResetLoginSuccess => '已清除登录状态，请重新登录';
+
+  @override
+  String schoolImportResetLoginFailed(Object error) {
+    return '清除登录状态失败：$error';
+  }
+
+  @override
   String schoolImportScheduleName(Object school, int month, int day) {
     return '$school导入 $month/$day';
   }
@@ -695,6 +713,24 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get schoolImportScheduleAction => '导入课表';
 
   @override
+  String get schoolImportResetLoginAction => '重新登录';
+
+  @override
+  String get schoolImportResetLoginTitle => '清除登录状态';
+
+  @override
+  String get schoolImportResetLoginMessage =>
+      '这会清除当前内置浏览器中的所有登录 Cookie，并重新打开登录入口。确定继续吗？';
+
+  @override
+  String get schoolImportResetLoginSuccess => '已清除登录状态，请重新登录';
+
+  @override
+  String schoolImportResetLoginFailed(Object error) {
+    return '清除登录状态失败：$error';
+  }
+
+  @override
   String schoolImportScheduleName(Object school, int month, int day) {
     return '$school导入 $month/$day';
   }
@@ -1147,6 +1183,24 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get schoolImportScheduleAction => '導入課表';
+
+  @override
+  String get schoolImportResetLoginAction => '重新登入';
+
+  @override
+  String get schoolImportResetLoginTitle => '清除登入狀態';
+
+  @override
+  String get schoolImportResetLoginMessage =>
+      '這會清除目前內建瀏覽器中的所有登入 Cookie，並重新開啟登入入口。確定要繼續嗎？';
+
+  @override
+  String get schoolImportResetLoginSuccess => '已清除登入狀態，請重新登入';
+
+  @override
+  String schoolImportResetLoginFailed(Object error) {
+    return '清除登入狀態失敗：$error';
+  }
 
   @override
   String schoolImportScheduleName(Object school, int month, int day) {

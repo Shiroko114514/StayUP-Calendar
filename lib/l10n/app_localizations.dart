@@ -546,6 +546,36 @@ abstract class AppLocalizations {
   /// **'导入课表'**
   String get schoolImportScheduleAction;
 
+  /// No description provided for @schoolImportResetLoginAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'重新登录'**
+  String get schoolImportResetLoginAction;
+
+  /// No description provided for @schoolImportResetLoginTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'清除登录状态'**
+  String get schoolImportResetLoginTitle;
+
+  /// No description provided for @schoolImportResetLoginMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'这会清除当前内置浏览器中的所有登录 Cookie，并重新打开登录入口。确定继续吗？'**
+  String get schoolImportResetLoginMessage;
+
+  /// No description provided for @schoolImportResetLoginSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已清除登录状态，请重新登录'**
+  String get schoolImportResetLoginSuccess;
+
+  /// No description provided for @schoolImportResetLoginFailed.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'清除登录状态失败：{error}'**
+  String schoolImportResetLoginFailed(Object error);
+
   /// No description provided for @schoolImportScheduleName.
   ///
   /// In zh_Hans, this message translates to:

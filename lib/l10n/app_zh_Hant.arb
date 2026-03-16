@@ -103,6 +103,16 @@
   "schoolImportErrorTitle": "錯誤",
   "schoolImportParsing": "解析中...",
   "schoolImportScheduleAction": "導入課表",
+  "schoolImportResetLoginAction": "重新登入",
+  "schoolImportResetLoginTitle": "清除登入狀態",
+  "schoolImportResetLoginMessage": "這會清除目前內建瀏覽器中的所有登入 Cookie，並重新開啟登入入口。確定要繼續嗎？",
+  "schoolImportResetLoginSuccess": "已清除登入狀態，請重新登入",
+  "schoolImportResetLoginFailed": "清除登入狀態失敗：{error}",
+  "@schoolImportResetLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "schoolImportScheduleName": "{school}導入 {month}/{day}",
   "@schoolImportScheduleName": {
     "placeholders": {

@@ -60,7 +60,7 @@
   "autoLabel": "自動",
   "sectionsPerDay": "1日の授業数",
   "totalWeeks": "学期週数",
-  "exportScheduleTitle": "時間割をエクスポート",
+  "exportScheduleTitle": "共有",
   "exportFormatLabel": "形式",
   "exportIncludeNonWeek": "今週以外の授業を含める",
   "exportIncludeSaturday": "土曜日を含める",
@@ -103,6 +103,16 @@
   "schoolImportErrorTitle": "エラー",
   "schoolImportParsing": "解析中...",
   "schoolImportScheduleAction": "時間割をインポート",
+  "schoolImportResetLoginAction": "再ログイン",
+  "schoolImportResetLoginTitle": "ログイン状態をクリア",
+  "schoolImportResetLoginMessage": "内蔵ブラウザ内のログイン Cookie をすべて削除し、ログイン入口を再度開きます。続行しますか？",
+  "schoolImportResetLoginSuccess": "ログイン状態をクリアしました。もう一度ログインしてください。",
+  "schoolImportResetLoginFailed": "ログイン状態のクリアに失敗しました: {error}",
+  "@schoolImportResetLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "schoolImportScheduleName": "{school} インポート {month}/{day}",
   "@schoolImportScheduleName": {
     "placeholders": {

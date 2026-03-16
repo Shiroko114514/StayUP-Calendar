@@ -103,6 +103,16 @@
   "schoolImportErrorTitle": "Error",
   "schoolImportParsing": "Parsing...",
   "schoolImportScheduleAction": "Import Schedule",
+  "schoolImportResetLoginAction": "Log in again",
+  "schoolImportResetLoginTitle": "Clear login state",
+  "schoolImportResetLoginMessage": "This will clear all login cookies in the built-in browser and reopen the login entry page. Continue?",
+  "schoolImportResetLoginSuccess": "Login state cleared. Please sign in again.",
+  "schoolImportResetLoginFailed": "Failed to clear login state: {error}",
+  "@schoolImportResetLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "schoolImportScheduleName": "{school} import {month}/{day}",
   "@schoolImportScheduleName": {
     "placeholders": {

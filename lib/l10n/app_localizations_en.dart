@@ -246,6 +246,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get schoolImportScheduleAction => 'Import Schedule';
 
   @override
+  String get schoolImportResetLoginAction => 'Log in again';
+
+  @override
+  String get schoolImportResetLoginTitle => 'Clear login state';
+
+  @override
+  String get schoolImportResetLoginMessage =>
+      'This will clear all login cookies in the built-in browser and reopen the login entry page. Continue?';
+
+  @override
+  String get schoolImportResetLoginSuccess =>
+      'Login state cleared. Please sign in again.';
+
+  @override
+  String schoolImportResetLoginFailed(Object error) {
+    return 'Failed to clear login state: $error';
+  }
+
+  @override
   String schoolImportScheduleName(Object school, int month, int day) {
     return '$school import $month/$day';
   }

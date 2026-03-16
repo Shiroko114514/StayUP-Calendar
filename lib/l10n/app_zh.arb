@@ -103,6 +103,16 @@
   "schoolImportErrorTitle": "错误",
   "schoolImportParsing": "解析中...",
   "schoolImportScheduleAction": "导入课表",
+  "schoolImportResetLoginAction": "重新登录",
+  "schoolImportResetLoginTitle": "清除登录状态",
+  "schoolImportResetLoginMessage": "这会清除当前内置浏览器中的所有登录 Cookie，并重新打开登录入口。确定继续吗？",
+  "schoolImportResetLoginSuccess": "已清除登录状态，请重新登录",
+  "schoolImportResetLoginFailed": "清除登录状态失败：{error}",
+  "@schoolImportResetLoginFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
   "schoolImportScheduleName": "{school}导入 {month}/{day}",
   "@schoolImportScheduleName": {
     "placeholders": {

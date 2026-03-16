@@ -215,6 +215,7 @@ class _SchoolWebViewPage extends StatefulWidget {
 
 class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
   late final WebViewController _controller;
+  final WebViewCookieManager _cookieManager = WebViewCookieManager();
   bool _loading = true;
   bool _crawling = false;
   String _currentUrl = '';
@@ -309,6 +310,81 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
     setState(() => _crawling = false);
     if (courses != null && courses.isNotEmpty) {
       _showConfirmDialog(courses);
+    }
+  }
+
+  Future<void> _confirmResetLogin() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          context.l10n.schoolImportResetLoginTitle,
+          style: TextStyle(
+            color: ac(context).primaryText,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          context.l10n.schoolImportResetLoginMessage,
+          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              context.l10n.cancelAction,
+              style: TextStyle(color: ac(context).hint, fontSize: 15),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              context.l10n.schoolImportResetLoginAction,
+              style: const TextStyle(
+                color: Color(0xFFFF3B5C),
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      await _resetLoginSession();
+    }
+  }
+
+  Future<void> _resetLoginSession() async {
+    if (!mounted) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _loading = true;
+      _crawling = false;
+      _currentUrl = widget.importer.webUrl;
+    });
+
+    try {
+      widget.importer.resetSession();
+      await _cookieManager.clearCookies();
+      await _controller.loadRequest(Uri.parse(widget.importer.webUrl));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.schoolImportResetLoginSuccess),
+          backgroundColor: ac(context).card,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      _showError(context.l10n.schoolImportResetLoginFailed(error));
     }
   }
 
@@ -448,6 +524,15 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
                 fontSize: 17,
                 fontWeight: FontWeight.w600)),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _loading ? null : _confirmResetLogin,
+            tooltip: context.l10n.schoolImportResetLoginAction,
+            icon: const Icon(Icons.refresh_rounded),
+            color: _loading ? ac(context).hint : const Color(0xFFFF3B5C),
+          ),
+          const SizedBox(width: 4),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(32),
           child: Column(mainAxisSize: MainAxisSize.min, children: [

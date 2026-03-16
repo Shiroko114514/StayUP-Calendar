@@ -40,6 +40,11 @@ class HustImporter extends SchoolImporter {
   String noticeText(BuildContext context) => context.l10n.hustNoticeText;
 
   @override
+  void resetSession() {
+    _termPrepared = false;
+  }
+
+  @override
   String newScheduleName(BuildContext context) {
     final now = DateTime.now();
     return context.l10n.schoolImportScheduleName(displayName(context), now.month, now.day);
