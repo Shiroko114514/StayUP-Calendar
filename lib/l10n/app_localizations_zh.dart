@@ -95,6 +95,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languageSettingLabel => '语言';
 
   @override
+  String get dateFormatSettingLabel => '日期格式';
+
+  @override
   String get languageFollowSystem => '跟随系统';
 
   @override
@@ -567,6 +570,9 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get languageSettingLabel => '语言';
 
   @override
+  String get dateFormatSettingLabel => '日期格式';
+
+  @override
   String get languageFollowSystem => '跟随系统';
 
   @override
@@ -1037,6 +1043,9 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get languageSettingLabel => '語言';
+
+  @override
+  String get dateFormatSettingLabel => '日期格式';
 
   @override
   String get languageFollowSystem => '跟隨系統';

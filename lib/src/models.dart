@@ -160,6 +160,11 @@ const String kLocaleModeChineseTraditional = 'zh-Hant';
 const String kLocaleModeEnglish = 'en';
 const String kLocaleModeJapanese = 'ja';
 
+const String kDateFormatYmdSlash = 'yyyy/MM/dd';
+const String kDateFormatYmdDash = 'yyyy-MM-dd';
+const String kDateFormatMdySlash = 'MM/dd/yyyy';
+const String kDateFormatDmySlash = 'dd/MM/yyyy';
+
 class AppState extends ChangeNotifier {
   List<TimeTableConfig> allTimeTables;
   int activeTimeTableIndex;
@@ -173,6 +178,7 @@ class AppState extends ChangeNotifier {
   bool showSection;
   bool isDarkMode;
   String localeMode;
+  String dateFormatPattern;
 
   // 全局主题色（null = 使用 kCourseColors[0] 默认值）
   int? themeColorValue;
@@ -214,6 +220,7 @@ class AppState extends ChangeNotifier {
     this.showSection = true,
     this.isDarkMode = false,
     this.localeMode = kLocaleModeSystem,
+    this.dateFormatPattern = kDateFormatYmdSlash,
     this.themeColorValue,
     this.activeScheduleIndex = 0,
     List<ScheduleConfig>? allConfigs,
@@ -388,6 +395,11 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateDateFormatPattern(String value) {
+    dateFormatPattern = value;
+    notifyListeners();
+  }
+
   void updateThemeColor(Color color) {
     themeColorValue = color.toARGB32();
     notifyListeners();
@@ -426,6 +438,7 @@ class AppState extends ChangeNotifier {
         'showSection': showSection,
         'isDarkMode': isDarkMode,
         'localeMode': localeMode,
+        'dateFormatPattern': dateFormatPattern,
         'themeColorValue': themeColorValue,
         'allTimeTables': allTimeTables.map((t) => t.toJson()).toList(),
         'allConfigs': allConfigs.map((c) => c.toJson()).toList(),
@@ -490,6 +503,8 @@ class AppState extends ChangeNotifier {
           showSection: j['showSection'] as bool? ?? true,
           isDarkMode: j['isDarkMode'] as bool? ?? false,
           localeMode: j['localeMode'] as String? ?? kLocaleModeSystem,
+            dateFormatPattern:
+              j['dateFormatPattern'] as String? ?? kDateFormatYmdSlash,
           themeColorValue: j['themeColorValue'] as int?,
         ).._loadedCourses(allCourses);
       }

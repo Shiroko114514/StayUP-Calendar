@@ -33,6 +33,7 @@
   "featureInDevelopmentTitle": "In Development",
   "featureInDevelopmentMessage": "This feature is currently under development.",
   "languageSettingLabel": "Language",
+  "dateFormatSettingLabel": "Date Format",
   "languageFollowSystem": "Follow System",
   "languageChangedRestartTitle": "Language changed",
   "languageChangedRestartMessage": "The app will close to apply the new language. Please reopen it.",

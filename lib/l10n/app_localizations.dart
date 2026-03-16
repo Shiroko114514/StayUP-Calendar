@@ -270,6 +270,12 @@ abstract class AppLocalizations {
   /// **'语言'**
   String get languageSettingLabel;
 
+  /// No description provided for @dateFormatSettingLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'日期格式'**
+  String get dateFormatSettingLabel;
+
   /// No description provided for @languageFollowSystem.
   ///
   /// In zh_Hans, this message translates to:

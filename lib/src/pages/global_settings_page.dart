@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../common_widgets.dart';
@@ -92,6 +93,87 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
       default:
         return l10n.languageFollowSystem;
     }
+  }
+
+  String _datePatternLabel(BuildContext context, String pattern) {
+    final sample = DateFormat(pattern).format(DateTime.now());
+    return '$pattern  ($sample)';
+  }
+
+  void _showDateFormatPicker(BuildContext context, AppState appState) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        final options = [
+          kDateFormatYmdSlash,
+          kDateFormatYmdDash,
+          kDateFormatMdySlash,
+          kDateFormatDmySlash,
+        ];
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.l10n.dateFormatSettingLabel,
+                style: TextStyle(
+                  color: ac(context).primaryText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...options.map(
+                (pattern) => GestureDetector(
+                  onTap: () {
+                    appState.updateDateFormatPattern(pattern);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 4,
+                    ),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: kDivider, width: 0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          _datePatternLabel(context, pattern),
+                          style: TextStyle(
+                            color: pattern == appState.dateFormatPattern
+                                ? const Color(0xFF4ECDC4)
+                                : ac(context).primaryText,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (pattern == appState.dateFormatPattern)
+                          const Icon(
+                            Icons.check,
+                            color: Color(0xFF4ECDC4),
+                            size: 18,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showLanguagePicker(BuildContext context, AppState appState) {
@@ -205,6 +287,21 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               ],
             ),
             onTap: () => _showLanguagePicker(context, appState),
+          ),
+          _WideSettingRow(
+            label: context.l10n.dateFormatSettingLabel,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _datePatternLabel(context, appState.dateFormatPattern),
+                  style: const TextStyle(color: kHint, fontSize: 13),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right, color: kHint, size: 18),
+              ],
+            ),
+            onTap: () => _showDateFormatPicker(context, appState),
           ),
           _WideSettingRow(
             label: context.l10n.courseReminder,

@@ -96,6 +96,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languageSettingLabel => '言語';
 
   @override
+  String get dateFormatSettingLabel => '日付形式';
+
+  @override
   String get languageFollowSystem => 'システム設定に従う';
 
   @override

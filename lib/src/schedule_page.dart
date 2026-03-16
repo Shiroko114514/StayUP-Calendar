@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'l10n.dart';
 import 'models.dart';
 import 'common_widgets.dart';
@@ -273,6 +274,7 @@ class _Header extends StatelessWidget {
     final weekDayStr = kWeekDays[todayCol - 1];
     final appState = AppStateScope.of(context);
     final scheduleName = appState.scheduleNames[appState.activeScheduleIndex];
+    final dateText = DateFormat(appState.dateFormatPattern).format(today);
 
     return Container(
       decoration: BoxDecoration(
@@ -286,7 +288,7 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '${today.year}/${today.month}/${today.day}',
+                dateText,
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
