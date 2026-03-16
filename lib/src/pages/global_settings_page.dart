@@ -400,7 +400,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
           ),
         ]),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 28),
 
         settingCard(context, [
           _WideSettingRow(
