@@ -573,7 +573,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Container(
                 height: 0.5,
                 color: colors.divider,
-                margin: const EdgeInsets.only(left: 16),
+                margin: const EdgeInsets.symmetric(horizontal: 16),
               ),
           ],
         ],
@@ -654,7 +654,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
         children: [
           // 卡片标题行：时间段 N + 删除按钮
           Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 Text(
@@ -802,7 +802,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     const Spacer(),
                     if (_customColor == null)
                       Padding(
-                        padding: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(context.l10n.autoLabel,
                             style: TextStyle(
                                 color: colors.hint, fontSize: 13)),
@@ -831,7 +831,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
             // ── 时间段标题行 ──
             Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
                     Text(context.l10n.courseEditorTimeSlotsLabel,
@@ -1122,7 +1122,7 @@ class _SettingRow extends StatelessWidget {
           Container(
               height: 0.5,
               color: colors.divider,
-              margin: const EdgeInsets.only(left: 16)),
+              margin: const EdgeInsets.symmetric(horizontal: 16)),
       ],
     );
   }
@@ -1164,7 +1164,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           label: l.backAction,
           color: _kAccent,
         ),
-        leadingWidth: 64,
+        leadingWidth: 110,
           title: Text(l.schedulePageToolClassTime,
             style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
@@ -1193,12 +1193,12 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
             ),
           ]),
              Padding(
-            padding: EdgeInsets.only(left: 6, bottom: 16, top: 4),
+            padding: EdgeInsets.symmetric(horizontal: 16),
              child: Text(l.classTimeSelectHint,
                style: TextStyle(color: _kHint, fontSize: 12)),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 6, bottom: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(children: [
                Text(l.classTimeTableListHeader,
                    style: const TextStyle(color: _kHint, fontSize: 12)),
@@ -1218,7 +1218,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                       : DismissDirection.none,
                   background: Container(
                     alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: const BoxDecoration(
                       color: Color(0xFFFF3B5C),
                       borderRadius:
@@ -1618,7 +1618,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
             ),
           ]),
              Padding(
-            padding: EdgeInsets.only(left: 6, bottom: 12),
+            padding: EdgeInsets.symmetric(horizontal: 16),
              child: Text(l.classTimeEditNameHint,
                style: TextStyle(color: _kHint, fontSize: 12)),
           ),
@@ -1657,7 +1657,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           ]),
           if (!_sameLength)
             Padding(
-              padding: const EdgeInsets.only(left: 6, bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                  l.classTimeSectionListHint,
                 style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),

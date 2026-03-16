@@ -660,7 +660,7 @@ class _WideSettingRow extends StatelessWidget {
           Container(
             height: 0.5,
             color: colors.divider,
-            margin: const EdgeInsets.only(left: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
           ),
       ],
     );

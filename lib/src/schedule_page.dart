@@ -1226,7 +1226,7 @@ class _ScheduleThumb extends StatelessWidget {
     final colors = ac(context);
     return Container(
       width: 72,
-      margin: const EdgeInsets.only(right: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         children: [
           Container(
