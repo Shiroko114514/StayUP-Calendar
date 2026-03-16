@@ -117,7 +117,7 @@ class TimeTableConfig {
 class ScheduleConfig {
   final String name;
   final DateTime firstWeekDay;
-  final int sectionsPerDay; // 1–20
+  final int sectionsPerDay; // 1–12
   final int totalWeeks; // 1–20
 
   const ScheduleConfig({
@@ -272,7 +272,7 @@ class AppState extends ChangeNotifier {
              ScheduleConfig(
                name: '新建课表',
                firstWeekDay: _defaultFirstWeekDay,
-               sectionsPerDay: 20,
+               sectionsPerDay: 12,
                totalWeeks: 20,
              ),
            ],
@@ -573,7 +573,7 @@ class AppState extends ChangeNotifier {
         ScheduleConfig(
           name: '新建课表',
           firstWeekDay: DateTime(DateTime.now().year, 9, 1),
-          sectionsPerDay: 20,
+          sectionsPerDay: 12,
           totalWeeks: 20,
         ),
       ],

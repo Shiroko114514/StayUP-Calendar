@@ -189,8 +189,8 @@ class _SchedulePageState extends State<SchedulePage> {
       backgroundColor: Colors.transparent,
       builder: (_) => _CourseDetailSheet(
         course: course,
-        onDelete: () {
-          showDialog<bool>(
+        onDelete: () async {
+          final confirmed = await showDialog<bool>(
             context: context,
             builder: (_) => AlertDialog(
               backgroundColor: ac(context).card,
@@ -214,12 +214,11 @@ class _SchedulePageState extends State<SchedulePage> {
                 ),
               ],
             ),
-          ).then((confirmed) {
-            if (confirmed != true || !mounted) return;
-            _deleteCourse(course.id);
-            showAppToast(context, context.l10n.scheduleSettingsDeleteSuccess);
-            Navigator.pop(context);
-          });
+          );
+          if (!context.mounted || confirmed != true) return;
+          _deleteCourse(course.id);
+          showAppToast(context, context.l10n.scheduleSettingsDeleteSuccess);
+          Navigator.pop(context);
         },
         onEdit: () {
           final appState = AppStateScope.of(context);

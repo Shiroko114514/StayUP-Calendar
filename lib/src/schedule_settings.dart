@@ -243,7 +243,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
-                                  content: const Text(
+                                  content: Text(
                                     context.l10n.scheduleNameTruncatedMessage,
                                     style: TextStyle(fontSize: 14, height: 1.5),
                                   ),
@@ -257,9 +257,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                                         );
                                         Navigator.pop(warnCtx);
                                       },
-                                      child: const Text(
-                                        '确定',
-                                        style: TextStyle(color: kAccent),
+                                      child: Text(
+                                        context.l10n.confirmAction,
+                                        style: const TextStyle(color: kAccent),
                                       ),
                                     ),
                                   ],
@@ -330,7 +330,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           settingCard(context, [
             SettingRow(
                 label: context.l10n.sectionsPerDay,
-                onTap: () => _pickNumber(context.l10n.sectionsPerDay, cfg.sectionsPerDay, 1, 20,
+                onTap: () => _pickNumber(context.l10n.sectionsPerDay, cfg.sectionsPerDay, 1, 12,
                   (v) => s.updateActiveConfig(sectionsPerDay: v)),
               trailing: Text('${cfg.sectionsPerDay}',
                   style: TextStyle(color: kHint, fontSize: 15)),

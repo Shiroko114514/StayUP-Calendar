@@ -15,7 +15,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
   final _nameCtrl = TextEditingController();
   bool _initializedName = false;
   DateTime _firstDay = DateTime(DateTime.now().year, 9, 1);
-  int _sectionsPerDay = 20;
+  int _sectionsPerDay = 12;
   int _totalWeeks = 20;
 
   @override
@@ -168,7 +168,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
-          content: const Text(
+          content: Text(
             context.l10n.scheduleNameTruncatedMessage,
             style: TextStyle(fontSize: 14, height: 1.5),
           ),
@@ -178,9 +178,9 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 Navigator.pop(ctx);
                 _saveWithName(name);
               },
-              child: const Text(
-                '确定',
-                style: TextStyle(color: kAccent),
+              child: Text(
+                context.l10n.confirmAction,
+                style: const TextStyle(color: kAccent),
               ),
             ),
           ],
@@ -327,7 +327,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 context.l10n.sectionsPerDay,
                 _sectionsPerDay,
                 1,
-                20,
+                12,
                 (v) => setState(() => _sectionsPerDay = v),
               ),
               trailing: Text(
