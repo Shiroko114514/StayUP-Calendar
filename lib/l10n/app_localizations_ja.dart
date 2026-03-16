@@ -281,6 +281,17 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get schoolImportSeasonSpringShort => '春';
+
+  @override
+  String get schoolImportSeasonFallShort => '秋';
+
+  @override
+  String schoolImportScheduleNameByTerm(int year, Object season) {
+    return '$year $season';
+  }
+
+  @override
   String get hustNoticeText =>
       '1. 未ログインの場合、先にログインページへ移動します。ログイン後、右下のインポートボタンを押してください。\n\n2. 時間・場所が\"未定\"の授業はインポートされません。後で手動追加してください。';
 

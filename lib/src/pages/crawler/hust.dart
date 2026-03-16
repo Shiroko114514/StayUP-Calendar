@@ -46,7 +46,13 @@ class HustImporter extends SchoolImporter {
 
   @override
   String newScheduleName(BuildContext context) {
-    return context.l10n.newScheduleTitle;
+    final season = _selectedSemester == 1
+        ? context.l10n.schoolImportSeasonFallShort
+        : context.l10n.schoolImportSeasonSpringShort;
+    return context.l10n.schoolImportScheduleNameByTerm(
+      _selectedAcademicYear,
+      season,
+    );
   }
 
   Future<bool> prepareTermAndLoad(

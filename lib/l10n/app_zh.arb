@@ -130,6 +130,17 @@
       }
     }
   },
+  "schoolImportSeasonSpringShort": "春",
+  "schoolImportSeasonFallShort": "秋",
+  "schoolImportScheduleNameByTerm": "{year} {season}",
+  "@schoolImportScheduleNameByTerm": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "season": {}
+    }
+  },
   "hustNoticeText": "1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加",
   "hustNeedLoginError": "请先在页面中完成登录，然后再点击导入按钮",
   "hustApiError": "接口返回异常（code={code}），请重新登录后再试",

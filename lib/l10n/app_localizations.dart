@@ -612,6 +612,24 @@ abstract class AppLocalizations {
   /// **'{school}导入 {month}/{day}'**
   String schoolImportScheduleName(Object school, int month, int day);
 
+  /// No description provided for @schoolImportSeasonSpringShort.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'春'**
+  String get schoolImportSeasonSpringShort;
+
+  /// No description provided for @schoolImportSeasonFallShort.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'秋'**
+  String get schoolImportSeasonFallShort;
+
+  /// No description provided for @schoolImportScheduleNameByTerm.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'{year} {season}'**
+  String schoolImportScheduleNameByTerm(int year, Object season);
+
   /// No description provided for @hustNoticeText.
   ///
   /// In zh_Hans, this message translates to:

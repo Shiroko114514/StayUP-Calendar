@@ -285,6 +285,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get schoolImportSeasonSpringShort => 'Spring';
+
+  @override
+  String get schoolImportSeasonFallShort => 'Fall';
+
+  @override
+  String schoolImportScheduleNameByTerm(int year, Object season) {
+    return '$year $season';
+  }
+
+  @override
   String get hustNoticeText =>
       '1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. Courses with \"TBD\" time/location will not be imported. Please add them manually later.';
 

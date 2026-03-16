@@ -130,6 +130,17 @@
       }
     }
   },
+  "schoolImportSeasonSpringShort": "Spring",
+  "schoolImportSeasonFallShort": "Fall",
+  "schoolImportScheduleNameByTerm": "{year} {season}",
+  "@schoolImportScheduleNameByTerm": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "season": {}
+    }
+  },
   "hustNoticeText": "1. If you are not logged in, you will be redirected to the login page. After login, tap the import button in the bottom-right.\n\n2. Courses with \"TBD\" time/location will not be imported. Please add them manually later.",
   "hustNeedLoginError": "Please finish login in the page first, then tap import.",
   "hustApiError": "API returned an error (code={code}). Please log in again and retry.",

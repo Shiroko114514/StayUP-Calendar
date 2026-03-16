@@ -279,6 +279,17 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get schoolImportSeasonSpringShort => '春';
+
+  @override
+  String get schoolImportSeasonFallShort => '秋';
+
+  @override
+  String schoolImportScheduleNameByTerm(int year, Object season) {
+    return '$year $season';
+  }
+
+  @override
   String get hustNoticeText =>
       '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
@@ -1008,6 +1019,17 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   }
 
   @override
+  String get schoolImportSeasonSpringShort => '春';
+
+  @override
+  String get schoolImportSeasonFallShort => '秋';
+
+  @override
+  String schoolImportScheduleNameByTerm(int year, Object season) {
+    return '$year $season';
+  }
+
+  @override
   String get hustNoticeText =>
       '1. 若未登录会先跳转到登录页，登录后点击右下角导入按钮\n\n2. 时间地点为\"待定\"的课程不会导入，请后续手动添加';
 
@@ -1734,6 +1756,17 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String schoolImportScheduleName(Object school, int month, int day) {
     return '$school導入 $month/$day';
+  }
+
+  @override
+  String get schoolImportSeasonSpringShort => '春';
+
+  @override
+  String get schoolImportSeasonFallShort => '秋';
+
+  @override
+  String schoolImportScheduleNameByTerm(int year, Object season) {
+    return '$year $season';
   }
 
   @override

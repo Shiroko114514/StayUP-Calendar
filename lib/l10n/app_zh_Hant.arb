@@ -130,6 +130,17 @@
       }
     }
   },
+  "schoolImportSeasonSpringShort": "春",
+  "schoolImportSeasonFallShort": "秋",
+  "schoolImportScheduleNameByTerm": "{year} {season}",
+  "@schoolImportScheduleNameByTerm": {
+    "placeholders": {
+      "year": {
+        "type": "int"
+      },
+      "season": {}
+    }
+  },
   "hustNoticeText": "1. 若未登入會先跳轉到登入頁，登入後點擊右下角導入按鈕\n\n2. 時間地點為\"待定\"的課程不會導入，請後續手動添加",
   "hustNeedLoginError": "請先在頁面中完成登入，然後再點擊導入按鈕",
   "hustApiError": "介面返回異常（code={code}），請重新登入後再試",
