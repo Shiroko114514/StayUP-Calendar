@@ -51,6 +51,7 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
 
   final TextEditingController _searchCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
+  final WebViewCookieManager _cookieManager = WebViewCookieManager();
   String _query = '';
 
   @override
@@ -97,6 +98,95 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
     );
   }
 
+  Future<void> _confirmResetLogin() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text(
+          context.l10n.schoolImportResetLoginTitle,
+          style: TextStyle(
+            color: ac(context).primaryText,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        content: Text(
+          context.l10n.schoolImportResetLoginMessage,
+          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              context.l10n.cancelAction,
+              style: TextStyle(color: ac(context).hint, fontSize: 15),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              context.l10n.schoolImportResetLoginAction,
+              style: const TextStyle(
+                color: Color(0xFFFF3B5C),
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+    await _clearCookiesAndResetSessions();
+  }
+
+  Future<void> _clearCookiesAndResetSessions() async {
+    FocusScope.of(context).unfocus();
+    try {
+      for (final importer in kSchoolImporters.values) {
+        importer.resetSession();
+      }
+      await _cookieManager.clearCookies();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(context.l10n.schoolImportResetLoginSuccess),
+          backgroundColor: ac(context).card,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: ac(context).card,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          title: Text(
+            context.l10n.schoolImportErrorTitle,
+            style: TextStyle(color: ac(context).primaryText, fontSize: 16),
+          ),
+          content: Text(
+            context.l10n.schoolImportResetLoginFailed(error),
+            style: TextStyle(color: ac(context).hint, fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text(
+                context.l10n.confirmAction,
+                style: const TextStyle(color: Color(0xFFFF3B5C)),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final grouped = _filteredGrouped;
@@ -137,6 +227,13 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
                     ),
                   ),
                 ),
+              ),
+              const SizedBox(width: 6),
+              IconButton(
+                onPressed: _confirmResetLogin,
+                tooltip: context.l10n.schoolImportResetLoginAction,
+                icon: const Icon(Icons.delete_outline_rounded),
+                color: const Color(0xFFFF3B5C),
               ),
             ]),
           ),
@@ -215,7 +312,6 @@ class _SchoolWebViewPage extends StatefulWidget {
 
 class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
   late final WebViewController _controller;
-  final WebViewCookieManager _cookieManager = WebViewCookieManager();
   bool _loading = true;
   bool _crawling = false;
   String _currentUrl = '';
@@ -313,79 +409,10 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
     }
   }
 
-  Future<void> _confirmResetLogin() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: ac(context).card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: Text(
-          context.l10n.schoolImportResetLoginTitle,
-          style: TextStyle(
-            color: ac(context).primaryText,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        content: Text(
-          context.l10n.schoolImportResetLoginMessage,
-          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(
-              context.l10n.cancelAction,
-              style: TextStyle(color: ac(context).hint, fontSize: 15),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(
-              context.l10n.schoolImportResetLoginAction,
-              style: const TextStyle(
-                color: Color(0xFFFF3B5C),
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await _resetLoginSession();
-    }
-  }
-
-  Future<void> _resetLoginSession() async {
+  Future<void> _refreshCurrentPage() async {
     if (!mounted) return;
-    FocusScope.of(context).unfocus();
-    setState(() {
-      _loading = true;
-      _crawling = false;
-      _currentUrl = widget.importer.webUrl;
-    });
-
-    try {
-      widget.importer.resetSession();
-      await _cookieManager.clearCookies();
-      await _controller.loadRequest(Uri.parse(widget.importer.webUrl));
-
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.schoolImportResetLoginSuccess),
-          backgroundColor: ac(context).card,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    } catch (error) {
-      if (!mounted) return;
-      setState(() => _loading = false);
-      _showError(context.l10n.schoolImportResetLoginFailed(error));
-    }
+    setState(() => _loading = true);
+    await _controller.reload();
   }
 
   void _showConfirmDialog(List<Course> courses) {
@@ -526,10 +553,10 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: _loading ? null : _confirmResetLogin,
-            tooltip: context.l10n.schoolImportResetLoginAction,
+            onPressed: _refreshCurrentPage,
+            tooltip: MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
             icon: const Icon(Icons.refresh_rounded),
-            color: _loading ? ac(context).hint : const Color(0xFFFF3B5C),
+            color: const Color(0xFFFF3B5C),
           ),
           const SizedBox(width: 4),
         ],
