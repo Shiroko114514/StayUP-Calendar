@@ -398,12 +398,19 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             ),
             onTap: () => _showDateFormatPicker(context, appState),
           ),
+        ]),
+
+        const SizedBox(height: 12),
+
+        settingCard(context, [
           _WideSettingRow(
             label: context.l10n.courseReminder,
             trailing: Switch(
               value: _notification,
               onChanged: (v) => _showWip(context),
               activeThumbColor: const Color(0xFF4ECDC4),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
             ),
           ),
           _WideSettingRow(
@@ -413,6 +420,8 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               value: _widgetSync,
               onChanged: (v) => _showWip(context),
               activeThumbColor: const Color(0xFF4ECDC4),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
             ),
           ),
         ]),
@@ -452,38 +461,43 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   }
 }
 
-/// 行高更大的 SettingRow，vertical padding 从 14 加大到 20
+/// 固定高度的 SettingRow，保证各项视觉高度一致
 class _WideSettingRow extends StatelessWidget {
   final String label;
   final Widget? trailing;
   final VoidCallback? onTap;
   final bool showDivider;
+  final double height;
 
   const _WideSettingRow({
     required this.label,
     this.trailing,
     this.onTap,
     this.showDivider = true,
+    this.height = 60,
   });
 
   @override
   Widget build(BuildContext context) {
     final colors = ac(context);
-    final content = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Row(
-        children: [
-          Text(label,
-              style: TextStyle(color: colors.primaryText, fontSize: 15)),
-          const Spacer(),
-          onTap != null
-              ? IgnorePointer(
-                  child: trailing ??
-                      Icon(Icons.chevron_right, color: colors.hint, size: 18),
-                )
-              : (trailing ??
-                  Icon(Icons.chevron_right, color: colors.hint, size: 18)),
-        ],
+    final content = SizedBox(
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+            children: [
+              Text(label,
+                  style: TextStyle(color: colors.primaryText, fontSize: 15)),
+              const Spacer(),
+              onTap != null
+                  ? IgnorePointer(
+                      child: trailing ??
+                          Icon(Icons.chevron_right, color: colors.hint, size: 18),
+                    )
+                  : (trailing ??
+                      Icon(Icons.chevron_right, color: colors.hint, size: 18)),
+            ],
+        ),
       ),
     );
 
