@@ -31,7 +31,7 @@ class _SchoolRow extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFFFFF),
+          color: ac(context).card,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -51,7 +51,7 @@ class _SchoolRow extends StatelessWidget {
               ),
             ),
             if (showDivider)
-              const Divider(height: 1, indent: 16, endIndent: 0, color: Color(0xFFE5E5EA)),
+              Divider(height: 1, indent: 16, endIndent: 0, color: ac(context).divider),
           ],
         ),
       ),

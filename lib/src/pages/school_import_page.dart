@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../common_widgets.dart';
 import '../l10n.dart';
+import '../models.dart';
+import 'widgets/school_importers.dart';
 
 part 'widgets/school_import_widgets.dart';
 
@@ -11,6 +16,9 @@ class _SchoolEntry {
   const _SchoolEntry({required this.id, required this.pinyin});
 }
 
+// ══════════════════════════════════════════════════════════
+// 学校列表页
+// ══════════════════════════════════════════════════════════
 class SchoolImportPage extends StatefulWidget {
   const SchoolImportPage({super.key});
   @override
@@ -18,69 +26,33 @@ class SchoolImportPage extends StatefulWidget {
 }
 
 class _SchoolImportPageState extends State<SchoolImportPage> {
-  // 支持的学校列表（分组字母由拼音首字母固定）
-  static const List<_SchoolEntry> _allSchools = [
-    _SchoolEntry(id: 'hust', pinyin: 'H'),
-    _SchoolEntry(id: 'jxnu', pinyin: 'J'),
-    _SchoolEntry(id: 'sjtu', pinyin: 'S'),
-    _SchoolEntry(id: 'whu', pinyin: 'W'),
-    _SchoolEntry(id: 'cuhksz', pinyin: 'X'),
-    _SchoolEntry(id: 'ruc', pinyin: 'Z'),
-  ];
+  static List<_SchoolEntry> get _allSchools => kSchoolImporters.entries
+      .map((e) => _SchoolEntry(id: e.key, pinyin: e.value.pinyin))
+      .toList();
 
   String _schoolName(BuildContext context, String id) {
-    final l10n = context.l10n;
     switch (id) {
-      case 'hust':
-        return l10n.schoolHust;
-      case 'jxnu':
-        return l10n.schoolJxnu;
-      case 'sjtu':
-        return l10n.schoolSjtu;
-      case 'whu':
-        return l10n.schoolWhu;
-      case 'cuhksz':
-        return l10n.schoolCuhksz;
-      case 'ruc':
-        return l10n.schoolRuc;
-      default:
-        return id;
+      case 'hust': return context.l10n.schoolHust;
+      default: return id.toUpperCase();
     }
   }
 
-  // 按首字母分组
-  static Map<String, List<String>> get _grouped {
-    final map = <String, List<String>>{};
-    for (final s in _allSchools) {
-      final letter = s.pinyin;
-      map.putIfAbsent(letter, () => []).add(s.id);
-    }
+  static Map<String, List<_SchoolEntry>> get _grouped {
+    final map = <String, List<_SchoolEntry>>{};
+    for (final s in _allSchools) map.putIfAbsent(s.pinyin, () => []).add(s);
     return map;
   }
 
-  // 字母索引列表（已排序）
-  static List<String> get _letters {
-    final keys = _grouped.keys.toList()..sort();
-    return keys;
-  }
+  static List<String> get _letters => _grouped.keys.toList()..sort();
 
   final TextEditingController _searchCtrl = TextEditingController();
   final ScrollController _scrollCtrl = ScrollController();
   String _query = '';
 
-  // 每个字母 section 的 ScrollController key → offset 映射（按索引跳转）
-  // 用 GlobalKey 计算各 section 高度
-  final Map<String, GlobalKey> _sectionKeys = {};
-
   @override
   void initState() {
     super.initState();
-    for (final l in _letters) {
-      _sectionKeys[l] = GlobalKey();
-    }
-    _searchCtrl.addListener(
-      () => setState(() => _query = _searchCtrl.text.trim()),
-    );
+    _searchCtrl.addListener(() => setState(() => _query = _searchCtrl.text.trim()));
   }
 
   @override
@@ -90,41 +62,27 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
     super.dispose();
   }
 
-  // 过滤结果
   List<_SchoolEntry> get _filtered {
     if (_query.isEmpty) return _allSchools;
-    return _allSchools
-        .where((s) => _schoolName(context, s.id).contains(_query))
-        .toList();
+    return _allSchools.where((s) => _schoolName(context, s.id).contains(_query)).toList();
   }
 
-  // 按字母分组（过滤后）
-  Map<String, List<String>> get _filteredGrouped {
-    final map = <String, List<String>>{};
-    for (final s in _filtered) {
-      final letter = s.pinyin;
-      map.putIfAbsent(letter, () => []).add(s.id);
-    }
+  Map<String, List<_SchoolEntry>> get _filteredGrouped {
+    final map = <String, List<_SchoolEntry>>{};
+    for (final s in _filtered) map.putIfAbsent(s.pinyin, () => []).add(s);
     return map;
   }
 
-  List<String> get _filteredLetters {
-    final keys = _filteredGrouped.keys.toList()..sort();
-    return keys;
-  }
+  List<String> get _filteredLetters => _filteredGrouped.keys.toList()..sort();
 
-  // 跳转到某字母 section
   void _jumpToLetter(String letter) {
     final grouped = _filteredGrouped;
     final letters = _filteredLetters;
     if (!letters.contains(letter)) return;
-    // 计算该字母前所有 section 的高度偏移量
-    // 每个 section = header(36) + items*56
     double offset = 0;
     for (final l in letters) {
       if (l == letter) break;
-      final count = grouped[l]!.length;
-      offset += 36 + count * 56.0;
+      offset += 36 + grouped[l]!.length * 56.0;
     }
     _scrollCtrl.animateTo(
       offset.clamp(0, _scrollCtrl.position.maxScrollExtent),
@@ -133,47 +91,307 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
     );
   }
 
-  void _onSchoolTap(String name) {
+  @override
+  Widget build(BuildContext context) {
+    final grouped = _filteredGrouped;
+    final letters = _filteredLetters;
+    final allLetters = _letters;
+
+    return Scaffold(
+      backgroundColor: ac(context).bg,
+      body: SafeArea(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Text(context.l10n.backAction,
+                      style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: ac(context).card,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: TextField(
+                    controller: _searchCtrl,
+                    style: TextStyle(color: ac(context).primaryText, fontSize: 15),
+                    decoration: InputDecoration(
+                      hintText: context.l10n.searchSchoolHint,
+                      hintStyle: TextStyle(color: ac(context).hint, fontSize: 15),
+                      prefixIcon: Icon(Icons.search, color: ac(context).hint, size: 20),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+            child: Text(context.l10n.schoolImportTip,
+                style: TextStyle(color: ac(context).hint, fontSize: 13)),
+          ),
+          Expanded(
+            child: Stack(children: [
+              ListView.builder(
+                controller: _scrollCtrl,
+                padding: const EdgeInsets.only(right: 28, bottom: 20),
+                itemCount: letters.fold<int>(0, (s, l) => s + 1 + grouped[l]!.length) + 1,
+                itemBuilder: (context, index) {
+                  final total = letters.fold<int>(0, (s, l) => s + 1 + grouped[l]!.length);
+                  if (index == total) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
+                      child: Text('更多高校正在适配中',
+                          style: TextStyle(color: ac(context).hint, fontSize: 13),
+                          textAlign: TextAlign.center),
+                    );
+                  }
+                  int cursor = 0;
+                  for (final letter in letters) {
+                    if (index == cursor) return _SectionHeader(letter: letter);
+                    cursor++;
+                    final items = grouped[letter]!;
+                    if (index < cursor + items.length) {
+                      final itemIdx = index - cursor;
+                      final entry = items[itemIdx];
+                      final name = _schoolName(context, entry.id);
+                      return _SchoolRow(
+                        name: name,
+                        showDivider: itemIdx != items.length - 1,
+                        onTap: () {
+                          final importer = kSchoolImporters[entry.id]!;
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (_) => _SchoolWebViewPage(
+                              title: name,
+                              importer: importer,
+                            ),
+                          ));
+                        },
+                      );
+                    }
+                    cursor += items.length;
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+              Positioned(
+                right: 0, top: 0, bottom: 0,
+                child: _AlphaIndexBar(letters: allLetters, onLetterTap: _jumpToLetter),
+              ),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// 内建浏览器页面
+// ══════════════════════════════════════════════════════════
+class _SchoolWebViewPage extends StatefulWidget {
+  final String title;
+  final SchoolImporter importer;
+  const _SchoolWebViewPage({required this.title, required this.importer});
+
+  @override
+  State<_SchoolWebViewPage> createState() => _SchoolWebViewPageState();
+}
+
+class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
+  late final WebViewController _controller;
+  bool _loading = true;
+  bool _crawling = false;
+  String _currentUrl = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUrl = widget.importer.webUrl;
+
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+        'AppleWebKit/537.36 (KHTML, like Gecko) '
+        'Chrome/120.0.0.0 Safari/537.36',
+      )
+      ..setNavigationDelegate(NavigationDelegate(
+        onPageStarted: (url) => setState(() {
+          _loading = true;
+          _currentUrl = url;
+        }),
+        onPageFinished: (url) => setState(() {
+          _loading = false;
+          _currentUrl = url;
+        }),
+      ))
+      ..loadRequest(Uri.parse(widget.importer.webUrl));
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showNotice());
+  }
+
+  void _showNotice() {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
         backgroundColor: ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: Row(
-          children: [
-            Icon(
-              Icons.school_outlined,
-              color: ac(context).hint,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                name,
+        title: Text('注意事项',
+            style: TextStyle(
+                color: ac(context).primaryText,
+                fontSize: 16,
+                fontWeight: FontWeight.w600)),
+        content: Text(widget.importer.noticeText,
+            style: TextStyle(
+                color: ac(context).hint, fontSize: 14, height: 1.6)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('好',
                 style: TextStyle(
-                  color: ac(context).primaryText,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                    color: Color(0xFFFF3B5C),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _startCrawl() async {
+    setState(() => _crawling = true);
+    final appState = AppStateScope.of(context);
+    final courses = await widget.importer.onPageLoaded(
+      _controller,
+      appState,
+      (e) {
+        setState(() => _crawling = false);
+        _showError(e);
+      },
+    );
+    setState(() => _crawling = false);
+    if (courses != null && courses.isNotEmpty) {
+      _showConfirmDialog(courses);
+    }
+  }
+
+  void _showConfirmDialog(List<Course> courses) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text('解析完成',
+            style: TextStyle(
+                color: ac(context).primaryText,
+                fontSize: 16,
+                fontWeight: FontWeight.w600)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('共解析到 ${courses.length} 门课程，是否新建课表并导入？',
+                style: TextStyle(
+                    color: ac(context).hint, fontSize: 14, height: 1.5)),
+            const SizedBox(height: 12),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 240),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: courses.length,
+                separatorBuilder: (_, __) =>
+                    Divider(height: 1, color: ac(context).divider),
+                itemBuilder: (_, i) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(children: [
+                    Container(
+                      width: 10, height: 10,
+                      decoration: BoxDecoration(
+                          color: courses[i].effectiveColor,
+                          shape: BoxShape.circle),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(courses[i].name,
+                          style: TextStyle(
+                              color: ac(context).primaryText, fontSize: 14),
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ]),
                 ),
               ),
             ),
-          ],
-        ),
-        content: Text(
-          context.l10n.schoolImportWipMessage,
-          style: TextStyle(
-            color: ac(context).hint,
-            fontSize: 14,
-            height: 1.5,
-          ),
+          ]),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              context.l10n.okAction,
-              style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15),
-            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('取消',
+                style: TextStyle(color: ac(context).hint, fontSize: 15)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              _importCourses(courses);
+            },
+            child: const Text('导入',
+                style: TextStyle(
+                    color: Color(0xFFFF3B5C),
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _importCourses(List<Course> courses) {
+    final appState = AppStateScope.of(context);
+    final cfg = ScheduleConfig(
+      name: widget.importer.newScheduleName,
+      firstWeekDay: appState.config.firstWeekDay,
+      sectionsPerDay: appState.config.sectionsPerDay,
+      totalWeeks: appState.config.totalWeeks,
+    );
+    appState.addSchedule(cfg);
+    appState.switchSchedule(appState.allConfigs.length - 1);
+    appState.replaceCourses(courses);
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('已新建课表并导入 ${courses.length} 门课程'),
+      backgroundColor: ac(context).card,
+      behavior: SnackBarBehavior.floating,
+    ));
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
+  void _showError(String msg) {
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ac(context).card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        title: Text('错误',
+            style: TextStyle(color: ac(context).primaryText, fontSize: 16)),
+        content: Text(msg,
+            style: TextStyle(color: ac(context).hint, fontSize: 14)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('确定',
+                style: TextStyle(color: Color(0xFFFF3B5C))),
           ),
         ],
       ),
@@ -182,130 +400,71 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
 
   @override
   Widget build(BuildContext context) {
-    final grouped = _filteredGrouped;
-    final letters = _filteredLetters;
-    final allLetters = _letters; // 全部字母，用于右侧索引条
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F7),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── 顶部搜索栏 ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: Text(
-                        context.l10n.backAction,
-                        style: const TextStyle(
-                          color: Color(0xFFFF3B5C),
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFFFFF),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: TextField(
-                        controller: _searchCtrl,
-                        style: TextStyle(
-                          color: ac(context).primaryText,
-                          fontSize: 15,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: context.l10n.searchSchoolHint,
-                          hintStyle: TextStyle(
-                            color: ac(context).hint,
-                            fontSize: 15,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: ac(context).hint,
-                            size: 20,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+      backgroundColor: ac(context).bg,
+      appBar: AppBar(
+        backgroundColor: ac(context).card,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: const Row(mainAxisSize: MainAxisSize.min, children: [
+            SizedBox(width: 8),
+            Icon(Icons.arrow_back_ios, color: Color(0xFFFF3B5C), size: 17),
+            Text('返回', style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
+          ]),
+        ),
+        leadingWidth: 64,
+        title: Text(widget.title,
+            style: TextStyle(
+                color: ac(context).primaryText,
+                fontSize: 17,
+                fontWeight: FontWeight.w600)),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(32),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              width: double.infinity,
+              color: ac(context).bg,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: ac(context).card,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _currentUrl,
+                  style: TextStyle(color: ac(context).hint, fontSize: 11),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-
-            // ── 提示文字 ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
-              child: Text(
-                context.l10n.schoolImportTip,
-                style: TextStyle(color: ac(context).hint, fontSize: 13),
-              ),
-            ),
-
-            // ── 列表 + 右侧字母索引条 ──
-            Expanded(
-              child: Stack(
-                children: [
-                  // 主列表
-                  ListView.builder(
-                    controller: _scrollCtrl,
-                    padding: const EdgeInsets.only(right: 28, bottom: 20),
-                    itemCount: letters.fold<int>(
-                      0,
-                      (sum, l) => sum + 1 + grouped[l]!.length,
-                    ),
-                    itemBuilder: (context, index) {
-                      // 映射 index → section header 或 item
-                      int cursor = 0;
-                      for (final letter in letters) {
-                        if (index == cursor) {
-                          // section header
-                          return _SectionHeader(letter: letter);
-                        }
-                        cursor++;
-                        final items = grouped[letter]!;
-                        if (index < cursor + items.length) {
-                          final itemIdx = index - cursor;
-                          final name = _schoolName(context, items[itemIdx]);
-                          final isLast = itemIdx == items.length - 1;
-                          return _SchoolRow(
-                            name: name,
-                            showDivider: !isLast,
-                            onTap: () => _onSchoolTap(name),
-                          );
-                        }
-                        cursor += items.length;
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-
-                  // 右侧字母索引条
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: _AlphaIndexBar(
-                      letters: allLetters,
-                      onLetterTap: _jumpToLetter,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+            Container(height: 0.5, color: ac(context).divider),
+          ]),
+        ),
+      ),
+      body: Stack(children: [
+        WebViewWidget(controller: _controller),
+        if (_loading)
+          const Center(child: CircularProgressIndicator(
+              color: Color(0xFFFF3B5C), strokeWidth: 2)),
+      ]),
+      floatingActionButton: _loading ? null : FloatingActionButton.extended(
+        onPressed: _crawling ? null : _startCrawl,
+        backgroundColor: const Color(0xFFFF3B5C),
+        icon: _crawling
+            ? const SizedBox(
+                width: 18, height: 18,
+                child: CircularProgressIndicator(
+                    color: Colors.white, strokeWidth: 2))
+            : const Icon(Icons.download_rounded, color: Colors.white),
+        label: Text(
+          _crawling ? '解析中...' : '导入课表',
+          style: const TextStyle(
+              color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
     );
