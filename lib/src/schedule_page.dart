@@ -191,6 +191,7 @@ class _SchedulePageState extends State<SchedulePage> {
         course: course,
         onDelete: () {
           _deleteCourse(course.id);
+          showAppToast(context, context.l10n.scheduleSettingsDeleteSuccess);
           Navigator.pop(context);
         },
         onEdit: () {

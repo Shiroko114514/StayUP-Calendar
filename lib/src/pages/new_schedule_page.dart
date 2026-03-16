@@ -203,6 +203,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
       ),
     );
     s.switchSchedule(s.allConfigs.length - 1);
+    showAppToast(context, context.l10n.newScheduleCreateSuccess(name));
     Navigator.pop(context);
   }
 

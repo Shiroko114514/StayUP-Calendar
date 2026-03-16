@@ -436,5 +436,23 @@
         "type": "int"
       }
     }
+  },
+  "courseEditorAddSuccess": "Course added",
+  "courseEditorEditSuccess": "Course updated",
+  "scheduleSettingsDeleteSuccess": "Course deleted",
+  "scheduleSettingsDeleteSelectedSuccess": "Deleted {count} courses",
+  "@scheduleSettingsDeleteSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduleSettingsClearAllSuccess": "All courses cleared",
+  "newScheduleCreateSuccess": "Created schedule \"{name}\"",
+  "@newScheduleCreateSuccess": {
+    "placeholders": {
+      "name": {}
+    }
   }
 }

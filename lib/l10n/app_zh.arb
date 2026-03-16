@@ -436,5 +436,23 @@
         "type": "int"
       }
     }
+  },
+  "courseEditorAddSuccess": "已添加课程",
+  "courseEditorEditSuccess": "已修改课程",
+  "scheduleSettingsDeleteSuccess": "已删除课程",
+  "scheduleSettingsDeleteSelectedSuccess": "已删除 {count} 门课程",
+  "@scheduleSettingsDeleteSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduleSettingsClearAllSuccess": "已清空全部课程",
+  "newScheduleCreateSuccess": "已创建新课表：{name}",
+  "@newScheduleCreateSuccess": {
+    "placeholders": {
+      "name": {}
+    }
   }
 }

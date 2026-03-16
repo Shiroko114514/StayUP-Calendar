@@ -711,4 +711,26 @@ class AppLocalizationsJa extends AppLocalizations {
   String scheduleSettingsDeleteSelectedAction(int count) {
     return '削除 ($count)';
   }
+
+  @override
+  String get courseEditorAddSuccess => '授業を追加しました';
+
+  @override
+  String get courseEditorEditSuccess => '授業を更新しました';
+
+  @override
+  String get scheduleSettingsDeleteSuccess => '授業を削除しました';
+
+  @override
+  String scheduleSettingsDeleteSelectedSuccess(int count) {
+    return '$count件の授業を削除しました';
+  }
+
+  @override
+  String get scheduleSettingsClearAllSuccess => 'すべての授業をクリアしました';
+
+  @override
+  String newScheduleCreateSuccess(Object name) {
+    return '時間割「$name」を作成しました';
+  }
 }

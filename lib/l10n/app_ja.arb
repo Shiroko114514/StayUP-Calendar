@@ -436,5 +436,23 @@
         "type": "int"
       }
     }
+  },
+  "courseEditorAddSuccess": "授業を追加しました",
+  "courseEditorEditSuccess": "授業を更新しました",
+  "scheduleSettingsDeleteSuccess": "授業を削除しました",
+  "scheduleSettingsDeleteSelectedSuccess": "{count}件の授業を削除しました",
+  "@scheduleSettingsDeleteSelectedSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduleSettingsClearAllSuccess": "すべての授業をクリアしました",
+  "newScheduleCreateSuccess": "時間割「{name}」を作成しました",
+  "@newScheduleCreateSuccess": {
+    "placeholders": {
+      "name": {}
+    }
   }
 }

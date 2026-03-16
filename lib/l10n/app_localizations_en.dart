@@ -720,4 +720,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String scheduleSettingsDeleteSelectedAction(int count) {
     return 'Delete ($count)';
   }
+
+  @override
+  String get courseEditorAddSuccess => 'Course added';
+
+  @override
+  String get courseEditorEditSuccess => 'Course updated';
+
+  @override
+  String get scheduleSettingsDeleteSuccess => 'Course deleted';
+
+  @override
+  String scheduleSettingsDeleteSelectedSuccess(int count) {
+    return 'Deleted $count courses';
+  }
+
+  @override
+  String get scheduleSettingsClearAllSuccess => 'All courses cleared';
+
+  @override
+  String newScheduleCreateSuccess(Object name) {
+    return 'Created schedule \"$name\"';
+  }
 }

@@ -1367,6 +1367,42 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'删除 ({count})'**
   String scheduleSettingsDeleteSelectedAction(int count);
+
+  /// No description provided for @courseEditorAddSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已添加课程'**
+  String get courseEditorAddSuccess;
+
+  /// No description provided for @courseEditorEditSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已修改课程'**
+  String get courseEditorEditSuccess;
+
+  /// No description provided for @scheduleSettingsDeleteSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已删除课程'**
+  String get scheduleSettingsDeleteSuccess;
+
+  /// No description provided for @scheduleSettingsDeleteSelectedSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已删除 {count} 门课程'**
+  String scheduleSettingsDeleteSelectedSuccess(int count);
+
+  /// No description provided for @scheduleSettingsClearAllSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已清空全部课程'**
+  String get scheduleSettingsClearAllSuccess;
+
+  /// No description provided for @newScheduleCreateSuccess.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'已创建新课表：{name}'**
+  String newScheduleCreateSuccess(Object name);
 }
 
 class _AppLocalizationsDelegate

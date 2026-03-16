@@ -620,6 +620,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                 for (final id in _selected) {
                   s.deleteCourse(id);
                 }
+                showAppToast(context, context.l10n.scheduleSettingsDeleteSelectedSuccess(_selected.length));
                 setState(() { _selected.clear(); _editing = false; });
               },
               child: Text(context.l10n.deleteAction, style: const TextStyle(color: Color(0xFFFF3B5C)))),
@@ -646,6 +647,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
               onPressed: () {
                 Navigator.pop(context);
                 s.replaceCourses([]);
+                showAppToast(context, context.l10n.scheduleSettingsClearAllSuccess);
                 setState(() { _selected.clear(); _editing = false; });
               },
               child: Text(context.l10n.scheduleSettingsClearScheduleTitle, style: const TextStyle(color: Color(0xFFFF3B5C)))),
@@ -869,7 +871,10 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                   ],
                                 ),
                               ) ?? false,
-                          onDismissed: (_) => s.deleteCourse(c.id),
+                          onDismissed: (_) {
+                            s.deleteCourse(c.id);
+                            showAppToast(context, context.l10n.scheduleSettingsDeleteSuccess);
+                          },
                           child: row,
                         ),
                         if (!isLast)

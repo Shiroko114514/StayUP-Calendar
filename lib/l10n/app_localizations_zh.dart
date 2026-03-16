@@ -709,6 +709,28 @@ class AppLocalizationsZh extends AppLocalizations {
   String scheduleSettingsDeleteSelectedAction(int count) {
     return '删除 ($count)';
   }
+
+  @override
+  String get courseEditorAddSuccess => '已添加课程';
+
+  @override
+  String get courseEditorEditSuccess => '已修改课程';
+
+  @override
+  String get scheduleSettingsDeleteSuccess => '已删除课程';
+
+  @override
+  String scheduleSettingsDeleteSelectedSuccess(int count) {
+    return '已删除 $count 门课程';
+  }
+
+  @override
+  String get scheduleSettingsClearAllSuccess => '已清空全部课程';
+
+  @override
+  String newScheduleCreateSuccess(Object name) {
+    return '已创建新课表：$name';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1416,6 +1438,28 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String scheduleSettingsDeleteSelectedAction(int count) {
     return '删除 ($count)';
   }
+
+  @override
+  String get courseEditorAddSuccess => '已添加课程';
+
+  @override
+  String get courseEditorEditSuccess => '已修改课程';
+
+  @override
+  String get scheduleSettingsDeleteSuccess => '已删除课程';
+
+  @override
+  String scheduleSettingsDeleteSelectedSuccess(int count) {
+    return '已删除 $count 门课程';
+  }
+
+  @override
+  String get scheduleSettingsClearAllSuccess => '已清空全部课程';
+
+  @override
+  String newScheduleCreateSuccess(Object name) {
+    return '已创建新课表：$name';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -2122,5 +2166,27 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   @override
   String scheduleSettingsDeleteSelectedAction(int count) {
     return '刪除 ($count)';
+  }
+
+  @override
+  String get courseEditorAddSuccess => '已添加課程';
+
+  @override
+  String get courseEditorEditSuccess => '已修改課程';
+
+  @override
+  String get scheduleSettingsDeleteSuccess => '已刪除課程';
+
+  @override
+  String scheduleSettingsDeleteSelectedSuccess(int count) {
+    return '已刪除 $count 門課程';
+  }
+
+  @override
+  String get scheduleSettingsClearAllSuccess => '已清空全部課程';
+
+  @override
+  String newScheduleCreateSuccess(Object name) {
+    return '已建立新課表：$name';
   }
 }

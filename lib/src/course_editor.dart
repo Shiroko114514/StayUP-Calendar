@@ -203,8 +203,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
     if (widget.editCourse != null) {
       appState.editCourse(course);
+      showAppToast(context, context.l10n.courseEditorEditSuccess);
     } else {
       appState.addCourse(course);
+      showAppToast(context, context.l10n.courseEditorAddSuccess);
     }
     Navigator.pop(context);
   }
@@ -593,7 +595,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(
-            width: 60,
+            width: 86,
             child: Text(label,
                 style: TextStyle(color: colors.primaryText, fontSize: 16)),
           ),
@@ -602,6 +604,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               controller: ctrl,
               maxLines: null,
               maxLength: maxLength,
+              textAlign: TextAlign.right,
               style: TextStyle(color: colors.primaryText, fontSize: 15),
               decoration: InputDecoration(
                 hintText: hint,
