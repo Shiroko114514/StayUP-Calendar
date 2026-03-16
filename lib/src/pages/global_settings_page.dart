@@ -448,7 +448,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             trailing: const Icon(Icons.open_in_new, color: kHint, size: 16),
             onTap: () async {
               final uri = Uri.parse(
-                'https://blog.lucas04.top/docs/stayup-schedule',
+                'https://blog.lucas04.top/docs/stayup-schedule/usage-guide/',
               );
               if (await canLaunchUrl(uri)) {
                 await launchUrl(uri, mode: LaunchMode.externalApplication);
