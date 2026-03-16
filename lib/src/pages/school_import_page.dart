@@ -525,15 +525,7 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
         backgroundColor: ac(context).card,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_back_ios, color: Color(0xFFFF3B5C), size: 17),
-            Text(context.l10n.backAction,
-                style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
-          ]),
-        ),
+        leading: buildBackLeading(context, label: context.l10n.backAction),
         leadingWidth: 64,
         title: Text(widget.title,
             style: TextStyle(

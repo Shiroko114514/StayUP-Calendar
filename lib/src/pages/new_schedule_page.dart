@@ -260,12 +260,10 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
         backgroundColor: ac(context).card,
         elevation: 0,
         automaticallyImplyLeading: false,
-        leading: TextButton(
+        leading: buildLeadingTextAction(
+          context,
+          label: context.l10n.cancelAction,
           onPressed: () => Navigator.pop(context),
-          child: Text(
-            context.l10n.cancelAction,
-            style: const TextStyle(color: kAccent, fontSize: 15),
-          ),
         ),
         leadingWidth: 64,
         title: Text(

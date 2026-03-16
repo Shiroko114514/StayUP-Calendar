@@ -3,6 +3,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'l10n.dart';
 import 'models.dart';
 
+const double _kAppBarLeadingStartPadding = 12;
+const double _kAppBarTextActionStartPadding = 16;
+
 // ─────────────────────────────────────────────
 // 常量定义
 // ─────────────────────────────────────────────
@@ -28,6 +31,55 @@ Future<void> showAppToast(
     msg: message,
     toastLength: toastLength,
     gravity: gravity,
+  );
+}
+
+Widget buildBackLeading(
+  BuildContext context, {
+  required String label,
+  VoidCallback? onTap,
+  Color color = kAccent,
+}) {
+  return GestureDetector(
+    behavior: HitTestBehavior.opaque,
+    onTap: onTap ?? () => Navigator.pop(context),
+    child: Padding(
+      padding: const EdgeInsetsDirectional.only(start: _kAppBarLeadingStartPadding),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.arrow_back_ios, color: color, size: 17),
+          Text(
+            label,
+            style: TextStyle(color: color, fontSize: 15),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget buildLeadingTextAction(
+  BuildContext context, {
+  required String label,
+  required VoidCallback onPressed,
+  Color color = kAccent,
+}) {
+  return Align(
+    alignment: Alignment.centerLeft,
+    child: TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        padding: const EdgeInsetsDirectional.only(
+          start: _kAppBarTextActionStartPadding,
+          end: 12,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontSize: 15),
+      ),
+    ),
   );
 }
 
@@ -57,20 +109,7 @@ class SubPageScaffold extends StatelessWidget {
   elevation: 0,
   scrolledUnderElevation: 0,
 
-  leading: GestureDetector(
-    onTap: () => Navigator.pop(context),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(width: 8),
-        const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-        Text(
-          context.l10n.backAction,
-          style: const TextStyle(color: kAccent, fontSize: 15),
-        ),
-      ],
-    ),
-  ),
+  leading: buildBackLeading(context, label: context.l10n.backAction),
   leadingWidth: 80,
 
   title: Text(

@@ -181,13 +181,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
       appBar: AppBar(
         backgroundColor: ac(context).card,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-            Text(context.l10n.scheduleSettingsTitle, style: const TextStyle(color: kAccent, fontSize: 15)),
-          ]),
+        leading: buildBackLeading(
+          context,
+          label: context.l10n.scheduleSettingsTitle,
         ),
         leadingWidth: 100,
         title: Text(context.l10n.scheduleSettingsDataTitle,
@@ -484,13 +480,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
       appBar: AppBar(
         backgroundColor: ac(context).card,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-            Text(context.l10n.globalSettingsTitle, style: const TextStyle(color: kAccent, fontSize: 15)),
-          ]),
+        leading: buildBackLeading(
+          context,
+          label: context.l10n.globalSettingsTitle,
         ),
         leadingWidth: 100,
         title: Text(context.l10n.scheduleSettingsAdjustToolTitle,
@@ -715,13 +707,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
       appBar: AppBar(
         backgroundColor: ac(context).card,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_back_ios, color: kAccent, size: 17),
-            Text(context.l10n.scheduleSettingsMoreTitle, style: const TextStyle(color: kAccent, fontSize: 15)),
-          ]),
+        leading: buildBackLeading(
+          context,
+          label: context.l10n.scheduleSettingsMoreTitle,
         ),
         leadingWidth: 72,
         title: Text(

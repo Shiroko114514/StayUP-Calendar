@@ -753,10 +753,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
         titleSpacing: 0,
         title: Row(
           children: [
-            TextButton(
+            buildLeadingTextAction(
+              context,
+              label: context.l10n.cancelAction,
               onPressed: () => Navigator.pop(context),
-              child: Text(context.l10n.cancelAction,
-                style: const TextStyle(color: _accent, fontSize: 15)),
+              color: _accent,
             ),
             const Spacer(),
             Text(
@@ -1158,13 +1159,10 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
       appBar: AppBar(
         backgroundColor: ac(context).card,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              const SizedBox(width: 8),
-              const Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-              Text(l.backAction, style: const TextStyle(color: _kAccent, fontSize: 15)),
-          ]),
+        leading: buildBackLeading(
+          context,
+          label: l.backAction,
+          color: _kAccent,
         ),
         leadingWidth: 64,
           title: Text(l.schedulePageToolClassTime,
@@ -1570,16 +1568,10 @@ class _ClassTimePageState extends State<ClassTimePage> {
       appBar: AppBar(
         backgroundColor: ac(context).card,
         elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-               const SizedBox(width: 8),
-               const Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-               Text(l.schedulePageToolClassTime, style: const TextStyle(color: _kAccent, fontSize: 15)),
-            ],
-          ),
+        leading: buildBackLeading(
+          context,
+          label: l.schedulePageToolClassTime,
+          color: _kAccent,
         ),
         leadingWidth: 88,
         title: Text(
