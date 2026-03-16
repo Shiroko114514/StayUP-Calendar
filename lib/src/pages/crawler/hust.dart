@@ -119,8 +119,8 @@ class HustImporter extends SchoolImporter {
   Future<_HustTermSelection?> _showTermDialog(BuildContext context) async {
     final now = DateTime.now();
     final nowYear = now.year;
-    // 9 years: current year −4 … current year +4  (18 semesters total)
-    final yearOptions = List<int>.generate(9, (index) => nowYear - 4 + index);
+    // 6 years: current year −4 … current year +1  (12 semesters total)
+    final yearOptions = List<int>.generate(6, (index) => nowYear - 4 + index);
 
     // Default pre-selection: date-derived, not the last user choice
     int draftYear     = _defaultAcademicYear(now);
