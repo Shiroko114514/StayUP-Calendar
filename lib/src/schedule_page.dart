@@ -271,7 +271,8 @@ class _Header extends StatelessWidget {
         weekMonday.month == thisWeekMonday.month &&
         weekMonday.day == thisWeekMonday.day;
 
-    final weekDayStr = kWeekDays[todayCol - 1];
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final weekDayStr = DateFormat.E(locale).format(today);
     final appState = AppStateScope.of(context);
     final scheduleName = appState.scheduleNames[appState.activeScheduleIndex];
     final dateText = DateFormat(appState.dateFormatPattern).format(today);
@@ -319,7 +320,7 @@ class _Header extends StatelessWidget {
                   const SizedBox(width: 6),
                   if (isThisWeek)
                     Text(
-                      '周$weekDayStr',
+                      weekDayStr,
                       style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
                     )
                   else
@@ -329,8 +330,8 @@ class _Header extends StatelessWidget {
                         color: const Color(0xFFF07B8A).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text(
-                        '非本周',
+                      child: Text(
+                        context.l10n.schedulePageNotCurrentWeek,
                         style: TextStyle(
                           fontSize: 11,
                           color: Color(0xFFF07B8A),
@@ -401,6 +402,7 @@ class _DayHeader extends StatelessWidget {
     final isCurrentWeek = weekMonday.year == thisWeekMonday.year &&
         weekMonday.month == thisWeekMonday.month &&
         weekMonday.day == thisWeekMonday.day;
+    final locale = Localizations.localeOf(context).toLanguageTag();
 
     return Container(
       decoration: BoxDecoration(
@@ -417,12 +419,8 @@ class _DayHeader extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '${weekMonday.month}',
+                    DateFormat.MMM(locale).format(weekMonday),
                     style: const TextStyle(fontSize: 10, color: Color(0xFF999999)),
-                  ),
-                  const Text(
-                    '月',
-                    style: TextStyle(fontSize: 10, color: Color(0xFF999999)),
                   ),
                 ],
               ),
@@ -442,7 +440,7 @@ class _DayHeader extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      kWeekDays[i],
+                      DateFormat.E(locale).format(date),
                       style: TextStyle(
                         fontSize: 11,
                         color: isToday ? const Color(0xFF4ECDC4) : const Color(0xFF999999),
@@ -718,8 +716,8 @@ class _CourseCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (course.isNonWeek)
-                const Text(
-                  '[非本周]',
+                Text(
+                  context.l10n.schedulePageCourseNotCurrentWeekTag,
                   style: TextStyle(
                     fontSize: 7,
                     color: Color(0xFF3C3C43),
@@ -775,6 +773,12 @@ class _CourseDetailSheet extends StatelessWidget {
     required this.onEdit,
   });
 
+  String _weekdayLabel(BuildContext context, int day) {
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final base = DateTime(2020, 1, 6).add(Duration(days: day - 1));
+    return DateFormat.E(locale).format(base);
+  }
+
   @override
   Widget build(BuildContext context) {
     final color = course.effectiveColor;
@@ -824,7 +828,11 @@ class _CourseDetailSheet extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        '周${kWeekDays[course.day - 1]}  ·  第${course.startSection}–${course.startSection + course.span - 1}节',
+                        context.l10n.schedulePageCourseTime(
+                          _weekdayLabel(context, course.day),
+                          course.startSection,
+                          course.startSection + course.span - 1,
+                        ),
                         style: const TextStyle(
                             fontSize: 12, color: Color(0xFF1C1C1E), fontWeight: FontWeight.w500),
                       ),
@@ -847,10 +855,10 @@ class _CourseDetailSheet extends StatelessWidget {
                     color: const Color(0xFFF0F0F0),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.edit_outlined, size: 15, color: Color(0xFF555555)),
-                    SizedBox(width: 4),
-                    Text('编辑', style: TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    const Icon(Icons.edit_outlined, size: 15, color: Color(0xFF555555)),
+                    const SizedBox(width: 4),
+                    Text(context.l10n.editAction, style: const TextStyle(fontSize: 14, color: Color(0xFF555555), fontWeight: FontWeight.w500)),
                   ]),
                 ),
               ),
@@ -889,8 +897,8 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('删除课程',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                child: Text(context.l10n.schedulePageDeleteCourse,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(width: 10),
@@ -903,7 +911,7 @@ class _CourseDetailSheet extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text('关闭', style: TextStyle(fontSize: 15)),
+                child: Text(context.l10n.schedulePageClose, style: const TextStyle(fontSize: 15)),
               ),
             ),
           ]),

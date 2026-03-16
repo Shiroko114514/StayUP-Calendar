@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../common_widgets.dart';
@@ -13,9 +14,19 @@ class NewSchedulePage extends StatefulWidget {
 
 class _NewSchedulePageState extends State<NewSchedulePage> {
   final _nameCtrl = TextEditingController();
+  bool _initializedName = false;
   DateTime _firstDay = DateTime(DateTime.now().year, 9, 1);
   int _sectionsPerDay = 20;
   int _totalWeeks = 20;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initializedName) return;
+    _nameCtrl.text = context.l10n.newScheduleTitle;
+    _nameCtrl.selection = TextSelection.collapsed(offset: _nameCtrl.text.length);
+    _initializedName = true;
+  }
 
   String _fmtDate(BuildContext context, DateTime d) =>
       DateFormat.yMd(context.l10n.localeName).format(d);
@@ -212,6 +223,9 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 controller: _nameCtrl,
                 onChanged: (_) => setState(() {}),
                 autofocus: true,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(kScheduleNameMaxLength),
+                ],
                 style: TextStyle(color: ac(context).primaryText, fontSize: 15),
                 decoration: InputDecoration(
                   hintText: context.l10n.scheduleNameRequiredHint,

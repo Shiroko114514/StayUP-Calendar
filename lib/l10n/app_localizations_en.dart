@@ -72,7 +72,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get globalSettingsTitle => 'Global Settings';
 
   @override
-  String get darkMode => 'Dark Mode';
+  String get darkMode => 'Appearance';
 
   @override
   String get themeModeFollowSystem => 'Follow System';

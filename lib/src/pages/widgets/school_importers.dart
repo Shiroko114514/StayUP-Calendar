@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../l10n.dart';
 import '../../models.dart';
 
 // ══════════════════════════════════════════════════════════
@@ -15,8 +16,7 @@ abstract class SchoolImporter {
   void resetSession() {}
 
   String newScheduleName(BuildContext context) {
-    final now = DateTime.now();
-    return '${displayName(context)} ${now.month}/${now.day}';
+    return context.l10n.newScheduleTitle;
   }
 
   String displayName(BuildContext context);

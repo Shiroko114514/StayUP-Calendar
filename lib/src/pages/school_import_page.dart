@@ -1,6 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../common_widgets.dart';
@@ -152,11 +151,7 @@ class _SchoolImportPageState extends State<SchoolImportPage> {
       }
       await _cookieManager.clearCookies();
       if (!mounted) return;
-      await Fluttertoast.showToast(
-        msg: context.l10n.schoolImportResetLoginSuccess,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-      );
+      await showAppToast(context, context.l10n.schoolImportResetLoginSuccess);
     } catch (error) {
       if (!mounted) return;
       showDialog(
@@ -495,11 +490,7 @@ class _SchoolWebViewPageState extends State<_SchoolWebViewPage> {
     appState.switchSchedule(appState.allConfigs.length - 1);
     appState.replaceCourses(courses);
 
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(context.l10n.schoolImportSuccess(courses.length)),
-      backgroundColor: ac(context).card,
-      behavior: SnackBarBehavior.floating,
-    ));
+    showAppToast(context, context.l10n.schoolImportSuccess(courses.length));
 
     Navigator.of(context).popUntil((route) => route.isFirst);
   }

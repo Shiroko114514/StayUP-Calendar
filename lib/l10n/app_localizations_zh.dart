@@ -71,7 +71,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get globalSettingsTitle => '全局设置';
 
   @override
-  String get darkMode => '深色模式';
+  String get darkMode => '外观';
 
   @override
   String get themeModeFollowSystem => '跟随系统';
@@ -555,7 +555,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get globalSettingsTitle => '全局设置';
 
   @override
-  String get darkMode => '深色模式';
+  String get darkMode => '外观';
 
   @override
   String get themeModeFollowSystem => '跟随系统';
@@ -1039,7 +1039,7 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
   String get globalSettingsTitle => '全域設定';
 
   @override
-  String get darkMode => '深色模式';
+  String get darkMode => '外觀';
 
   @override
   String get themeModeFollowSystem => '跟隨系統';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'l10n.dart';
 import 'models.dart';
 
@@ -16,6 +17,19 @@ const kDivider = Color(0xFFE5E5EA);
 
 AppColors ac(BuildContext context) =>
     Theme.of(context).extension<AppColors>() ?? AppColors.light;
+
+Future<void> showAppToast(
+  BuildContext context,
+  String message, {
+  Toast toastLength = Toast.LENGTH_SHORT,
+  ToastGravity gravity = ToastGravity.BOTTOM,
+}) async {
+  await Fluttertoast.showToast(
+    msg: message,
+    toastLength: toastLength,
+    gravity: gravity,
+  );
+}
 
 // ─────────────────────────────────────────────
 // 通用 Widget 组件

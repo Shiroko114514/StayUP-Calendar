@@ -25,7 +25,7 @@
   "deleteAction": "Delete",
   "okAction": "OK",
   "globalSettingsTitle": "Global Settings",
-  "darkMode": "Dark Mode",
+  "darkMode": "Appearance",
   "themeModeFollowSystem": "Follow System",
   "themeModeLight": "Light",
   "themeModeDark": "Dark",

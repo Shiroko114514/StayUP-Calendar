@@ -33,6 +33,32 @@ class _AddCoursePageState extends State<AddCoursePage> {
 
   static const Color _accent   = Color(0xFFFF3B5C);
 
+  String _tx(BuildContext context, String zh, String en, {String? ja}) {
+    final code = Localizations.localeOf(context).languageCode;
+    if (code == 'zh') return zh;
+    if (code == 'ja') return ja ?? en;
+    return en;
+  }
+
+  String _weekdayLabel(BuildContext context, int day) {
+    const en = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const ja = ['月', '火', '水', '木', '金', '土', '日'];
+    return _tx(
+      context,
+      '周${kWeekDays[day - 1]}',
+      en[day - 1],
+      ja: '${ja[day - 1]}曜',
+    );
+  }
+
+  String _weekNthLabel(BuildContext context, int week) {
+    return _tx(context, '第$week周', 'Week $week', ja: '第$week週');
+  }
+
+  String _sectionNthLabel(BuildContext context, int section) {
+    return _tx(context, '第$section节', 'Sec $section', ja: '$section限');
+  }
+
   // 自动选一个与已有课程不冲突的颜色
   Color _pickAutoColor(List<Course> existing) {
     final usedColors = existing
@@ -135,8 +161,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
   void _save() {
     if (_nameCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('请填写课程名称'),
+        SnackBar(
+          content: Text(_tx(context, '请填写课程名称', 'Please enter course name', ja: '授業名を入力してください')),
           backgroundColor: Color(0xFFE5E5EA),
         ),
       );
@@ -217,8 +243,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('取消',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.cancelAction,
+                          style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
                     Text(title,
                         style: TextStyle(
@@ -230,8 +256,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         onChanged(current);
                         Navigator.pop(ctx);
                       },
-                      child: const Text('确定',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.confirmAction,
+                          style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
                   ],
                 ),
@@ -303,10 +329,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('取消',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.cancelAction,
+                        style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
-                    Text('周数',
+                    Text(_tx(context, '周数', 'Week Range', ja: '週範囲'),
                         style: TextStyle(
                             color: ac(context).primaryText,
                             fontSize: 16,
@@ -318,8 +344,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                 startWeek: tmpStart, endWeek: tmpEnd));
                         Navigator.pop(ctx);
                       },
-                      child: const Text('确定',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.confirmAction,
+                          style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
                   ],
                 ),
@@ -327,7 +353,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    Text('开始',
+                    Text(_tx(context, '开始', 'Start', ja: '開始'),
                         style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
@@ -341,7 +367,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childDelegate: ListWheelChildBuilderDelegate(
                           childCount: 20,
                           builder: (_, i) => Center(
-                            child: Text('第${i + 1}周',
+                            child: Text(_weekNthLabel(context, i + 1),
                               style: TextStyle(
                                 color: i + 1 == tmpStart
                                     ? ac(ctx).primaryText
@@ -357,7 +383,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     ),
                   ])),
                   Expanded(child: Column(children: [
-                    Text('结束',
+                    Text(_tx(context, '结束', 'End', ja: '終了'),
                         style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
@@ -370,7 +396,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childDelegate: ListWheelChildBuilderDelegate(
                           childCount: 20,
                           builder: (_, i) => Center(
-                            child: Text('第${i + 1}周',
+                            child: Text(_weekNthLabel(context, i + 1),
                               style: TextStyle(
                                 color: i + 1 == tmpEnd
                                     ? ac(ctx).primaryText
@@ -427,10 +453,10 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('取消',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.cancelAction,
+                        style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
-                    Text('选择节次',
+                    Text(_tx(context, '选择节次', 'Select Sections', ja: 'コマを選択'),
                         style: TextStyle(
                             color: ac(context).primaryText,
                             fontSize: 16,
@@ -443,8 +469,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                                 startSection: tmpStart, endSection: end));
                         Navigator.pop(ctx);
                       },
-                      child: const Text('确定',
-                          style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
+                      child: Text(context.l10n.confirmAction,
+                          style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 16)),
                     ),
                   ],
                 ),
@@ -452,7 +478,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               Row(
                 children: [
                   Expanded(child: Column(children: [
-                    Text('开始节',
+                    Text(_tx(context, '开始节', 'Start Section', ja: '開始コマ'),
                         style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
@@ -470,7 +496,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childDelegate: ListWheelChildBuilderDelegate(
                           childCount: maxSec,
                           builder: (_, i) => Center(
-                            child: Text('第${i + 1}节',
+                            child: Text(_sectionNthLabel(context, i + 1),
                               style: TextStyle(
                                 color: i + 1 == tmpStart
                                     ? ac(ctx).primaryText
@@ -486,7 +512,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     ),
                   ])),
                   Expanded(child: Column(children: [
-                    Text('结束节',
+                    Text(_tx(context, '结束节', 'End Section', ja: '終了コマ'),
                         style: TextStyle(color: ac(context).hint, fontSize: 12)),
                     SizedBox(
                       height: 200,
@@ -504,7 +530,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         childDelegate: ListWheelChildBuilderDelegate(
                           childCount: maxSec,
                           builder: (_, i) => Center(
-                            child: Text('第${i + 1}节',
+                            child: Text(_sectionNthLabel(context, i + 1),
                               style: TextStyle(
                                 color: i + 1 == tmpEnd
                                     ? ac(ctx).primaryText
@@ -628,7 +654,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
             child: Row(
               children: [
                 Text(
-                  '时间段 ${i + 1}',
+                  _tx(context, '时间段 ${i + 1}', 'Time Slot ${i + 1}', ja: '時間枠 ${i + 1}'),
                   style: TextStyle(color: colors.hint, fontSize: 13),
                 ),
                 const Spacer(),
@@ -642,13 +668,13 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         color: const Color(0xFFFF3B5C).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.remove,
+                          const Icon(Icons.remove,
                               color: Color(0xFFFF3B5C), size: 13),
-                          SizedBox(width: 2),
-                          Text('删除',
+                          const SizedBox(width: 2),
+                          Text(context.l10n.deleteAction,
                               style: TextStyle(
                                   color: Color(0xFFFF3B5C), fontSize: 12)),
                         ],
@@ -662,19 +688,19 @@ class _AddCoursePageState extends State<AddCoursePage> {
           _buildCard(context, [
             _buildTapRow(
               context,
-              '周数',
-              '第${slot.startWeek} – ${slot.endWeek}周',
+              _tx(context, '周数', 'Weeks', ja: '週数'),
+              '${_weekNthLabel(context, slot.startWeek)} - ${_weekNthLabel(context, slot.endWeek)}',
               () => _showWeekRangePicker(i),
             ),
             _buildTapRow(
               context,
-              '时间',
-              '周${kWeekDays[slot.day - 1]}',
+              _tx(context, '时间', 'Day', ja: '曜日'),
+              _weekdayLabel(context, slot.day),
               () => _showPicker<int>(
-                title: '星期',
+                title: _tx(context, '星期', 'Weekday', ja: '曜日'),
                 values: List.generate(7, (d) => d + 1),
                 selected: slot.day,
-                label: (v) => '周${kWeekDays[v - 1]}',
+                label: (v) => _weekdayLabel(context, v),
                 onChanged: (v) => _updateSlot(i, slot.copyWith(day: v)),
               ),
             ),
@@ -685,11 +711,11 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 14),
                 child: Row(children: [
-                  Text('节次',
+                  Text(_tx(context, '节次', 'Sections', ja: 'コマ'),
                       style: TextStyle(
                           color: colors.primaryText, fontSize: 16)),
                   const Spacer(),
-                  Text('第${slot.startSection} – ${slot.endSection}节',
+                  Text('${_sectionNthLabel(context, slot.startSection)} - ${_sectionNthLabel(context, slot.endSection)}',
                       style:
                           TextStyle(color: colors.hint, fontSize: 15)),
                   const SizedBox(width: 4),
@@ -698,9 +724,9 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 ]),
               ),
             ),
-            _buildTextRow(context, '老师', _teacherCtrls[i], '选填',
+            _buildTextRow(context, _tx(context, '老师', 'Teacher', ja: '教員'), _teacherCtrls[i], _tx(context, '选填', 'Optional', ja: '任意'),
                 maxLength: 50),
-            _buildTextRow(context, '地点', _locCtrls[i], '选填',
+            _buildTextRow(context, _tx(context, '地点', 'Location', ja: '場所'), _locCtrls[i], _tx(context, '选填', 'Optional', ja: '任意'),
                 maxLength: 50),
           ]),
         ],
@@ -725,12 +751,14 @@ class _AddCoursePageState extends State<AddCoursePage> {
           children: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('取消',
-                  style: TextStyle(color: _accent, fontSize: 15)),
+              child: Text(context.l10n.cancelAction,
+                style: const TextStyle(color: _accent, fontSize: 15)),
             ),
             const Spacer(),
             Text(
-              widget.editCourse != null ? '编辑课程' : '添加课程',
+              widget.editCourse != null
+                ? _tx(context, '编辑课程', 'Edit Course', ja: '授業を編集')
+                : _tx(context, '添加课程', 'Add Course', ja: '授業を追加'),
               style: TextStyle(
                   color: ac(context).primaryText,
                   fontSize: 17,
@@ -739,8 +767,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
             const Spacer(),
             TextButton(
               onPressed: _save,
-              child: const Text('保存',
-                  style: TextStyle(
+              child: Text(context.l10n.saveAction,
+                style: const TextStyle(
                       color: _accent,
                       fontSize: 15,
                       fontWeight: FontWeight.w600)),
@@ -755,7 +783,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
           children: [
             // ── 基本信息卡 ──
             _buildCard(context, [
-              _buildTextRow(context, '课程', _nameCtrl, '必填',
+              _buildTextRow(context, _tx(context, '课程', 'Course', ja: '授業'), _nameCtrl, _tx(context, '必填', 'Required', ja: '必須'),
                   maxLength: 50),
               // 颜色行
               Padding(
@@ -763,14 +791,14 @@ class _AddCoursePageState extends State<AddCoursePage> {
                     horizontal: 16, vertical: 12),
                 child: Row(
                   children: [
-                    Text('颜色',
+                    Text(_tx(context, '颜色', 'Color', ja: '色'),
                         style: TextStyle(
                             color: colors.primaryText, fontSize: 16)),
                     const Spacer(),
                     if (_customColor == null)
                       Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: Text('自动',
+                        child: Text(_tx(context, '自动', 'Auto', ja: '自動'),
                             style: TextStyle(
                                 color: colors.hint, fontSize: 13)),
                       ),
@@ -790,8 +818,8 @@ class _AddCoursePageState extends State<AddCoursePage> {
                   ],
                 ),
               ),
-              _buildTextRow(context, '学分', _creditCtrl, '选填'),
-              _buildTextRow(context, '备注', _noteCtrl, ''),
+              _buildTextRow(context, _tx(context, '学分', 'Credits', ja: '単位'), _creditCtrl, _tx(context, '选填', 'Optional', ja: '任意')),
+              _buildTextRow(context, _tx(context, '备注', 'Notes', ja: 'メモ'), _noteCtrl, ''),
             ]),
 
             const SizedBox(height: 24),
@@ -801,7 +829,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
               padding: const EdgeInsets.only(left: 4, bottom: 8),
               child: Row(
                 children: [
-                  Text('时间段',
+                    Text(_tx(context, '时间段', 'Time Slots', ja: '時間枠'),
                       style:
                           TextStyle(color: colors.hint, fontSize: 13)),
                   const Spacer(),
@@ -815,12 +843,12 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         color: _accent.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.add, color: _accent, size: 13),
-                          SizedBox(width: 2),
-                          Text('添加',
+                          const Icon(Icons.add, color: _accent, size: 13),
+                          const SizedBox(width: 2),
+                          Text(_tx(context, '添加', 'Add', ja: '追加'),
                               style: TextStyle(
                                   color: _accent, fontSize: 12)),
                         ],
@@ -897,7 +925,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('选择颜色',
+                    Text(_tx(context, '选择颜色', 'Choose Color', ja: '色を選択'),
                         style: TextStyle(
                             color: ac(context).primaryText,
                             fontSize: 16,
@@ -926,7 +954,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8)),
                         ),
-                        child: Text('确定',
+                        child: Text(context.l10n.confirmAction,
                             style: TextStyle(
                                 color: ac(context).primaryText,
                                 fontSize: 14)),
@@ -976,7 +1004,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      Text('自动选色（不与已有课程冲突）',
+                        Text(_tx(context, '自动选色（不与已有课程冲突）', 'Auto pick (avoid conflicts)', ja: '自動選択（既存授業と衝突回避）'),
                           style: TextStyle(
                               color: ac(context).primaryText,
                               fontSize: 13)),

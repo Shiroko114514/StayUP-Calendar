@@ -46,8 +46,7 @@ class HustImporter extends SchoolImporter {
 
   @override
   String newScheduleName(BuildContext context) {
-    final now = DateTime.now();
-    return context.l10n.schoolImportScheduleName(displayName(context), now.month, now.day);
+    return context.l10n.newScheduleTitle;
   }
 
   Future<bool> prepareTermAndLoad(
