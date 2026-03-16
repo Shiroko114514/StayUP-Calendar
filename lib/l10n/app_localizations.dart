@@ -228,6 +228,24 @@ abstract class AppLocalizations {
   /// **'深色模式'**
   String get darkMode;
 
+  /// No description provided for @themeModeFollowSystem.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'跟随系统'**
+  String get themeModeFollowSystem;
+
+  /// No description provided for @themeModeLight.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'亮色'**
+  String get themeModeLight;
+
+  /// No description provided for @themeModeDark.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'深色'**
+  String get themeModeDark;
+
   /// No description provided for @courseReminder.
   ///
   /// In zh_Hans, this message translates to:

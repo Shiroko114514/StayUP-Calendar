@@ -160,6 +160,10 @@ const String kLocaleModeChineseTraditional = 'zh-Hant';
 const String kLocaleModeEnglish = 'en';
 const String kLocaleModeJapanese = 'ja';
 
+const String kThemeModeSystem = 'system';
+const String kThemeModeLight = 'light';
+const String kThemeModeDark = 'dark';
+
 const String kDateFormatYmdSlash = 'yyyy/MM/dd';
 const String kDateFormatYmdDash = 'yyyy-MM-dd';
 const String kDateFormatMdySlash = 'MM/dd/yyyy';
@@ -176,7 +180,7 @@ class AppState extends ChangeNotifier {
   bool showWeekend;
   bool showNonWeek;
   bool showSection;
-  bool isDarkMode;
+  String themeMode;
   String localeMode;
   String dateFormatPattern;
 
@@ -218,7 +222,7 @@ class AppState extends ChangeNotifier {
     this.showWeekend = true,
     this.showNonWeek = true,
     this.showSection = true,
-    this.isDarkMode = false,
+    this.themeMode = kThemeModeSystem,
     this.localeMode = kLocaleModeSystem,
     this.dateFormatPattern = kDateFormatYmdSlash,
     this.themeColorValue,
@@ -385,8 +389,8 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateDarkMode(bool value) {
-    isDarkMode = value;
+  void updateThemeMode(String value) {
+    themeMode = value;
     notifyListeners();
   }
 
@@ -436,7 +440,7 @@ class AppState extends ChangeNotifier {
         'showWeekend': showWeekend,
         'showNonWeek': showNonWeek,
         'showSection': showSection,
-        'isDarkMode': isDarkMode,
+        'themeMode': themeMode,
         'localeMode': localeMode,
         'dateFormatPattern': dateFormatPattern,
         'themeColorValue': themeColorValue,
@@ -492,6 +496,13 @@ class AppState extends ChangeNotifier {
           ];
         }
 
+        final legacyIsDark = j['isDarkMode'] as bool?;
+        final persistedThemeMode = j['themeMode'] as String?;
+        final resolvedThemeMode = persistedThemeMode ??
+            (legacyIsDark == null
+                ? kThemeModeSystem
+                : (legacyIsDark ? kThemeModeDark : kThemeModeLight));
+
         return AppState(
           allTimeTables: allTimeTables,
           activeTimeTableIndex: j['activeTimeTableIndex'] as int? ?? 0,
@@ -501,7 +512,7 @@ class AppState extends ChangeNotifier {
           showWeekend: j['showWeekend'] as bool? ?? true,
           showNonWeek: j['showNonWeek'] as bool? ?? true,
           showSection: j['showSection'] as bool? ?? true,
-          isDarkMode: j['isDarkMode'] as bool? ?? false,
+          themeMode: resolvedThemeMode,
           localeMode: j['localeMode'] as String? ?? kLocaleModeSystem,
             dateFormatPattern:
               j['dateFormatPattern'] as String? ?? kDateFormatYmdSlash,

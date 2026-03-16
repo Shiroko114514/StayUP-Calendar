@@ -74,6 +74,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get darkMode => '深色模式';
 
   @override
+  String get themeModeFollowSystem => '跟随系统';
+
+  @override
+  String get themeModeLight => '亮色';
+
+  @override
+  String get themeModeDark => '深色';
+
+  @override
   String get courseReminder => '课程提醒';
 
   @override
@@ -549,6 +558,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get darkMode => '深色模式';
 
   @override
+  String get themeModeFollowSystem => '跟随系统';
+
+  @override
+  String get themeModeLight => '亮色';
+
+  @override
+  String get themeModeDark => '深色';
+
+  @override
   String get courseReminder => '课程提醒';
 
   @override
@@ -1022,6 +1040,15 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get darkMode => '深色模式';
+
+  @override
+  String get themeModeFollowSystem => '跟隨系統';
+
+  @override
+  String get themeModeLight => '亮色';
+
+  @override
+  String get themeModeDark => '深色';
 
   @override
   String get courseReminder => '課程提醒';

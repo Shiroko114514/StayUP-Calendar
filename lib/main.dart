@@ -19,7 +19,7 @@ class WakeUpApp extends StatefulWidget {
 
 class _WakeUpAppState extends State<WakeUpApp> {
   AppState? _appState;
-  bool _isDarkMode = false;
+  String _themeMode = kThemeModeSystem;
 
   @override
   void initState() {
@@ -33,15 +33,15 @@ class _WakeUpAppState extends State<WakeUpApp> {
       state.addListener(_onStateChanged);
       setState(() {
         _appState = state;
-        _isDarkMode = state.isDarkMode;
+        _themeMode = state.themeMode;
       });
     }
   }
 
   void _onStateChanged() {
-    if (mounted && _appState != null && _appState!.isDarkMode != _isDarkMode) {
+    if (mounted && _appState != null && _appState!.themeMode != _themeMode) {
       setState(() {
-        _isDarkMode = _appState!.isDarkMode;
+        _themeMode = _appState!.themeMode;
       });
     }
   }
@@ -86,14 +86,25 @@ class _WakeUpAppState extends State<WakeUpApp> {
         ),
       );
     }
-    return _AppWithTheme(appState: state, isDarkMode: _isDarkMode);
+    return _AppWithTheme(appState: state, themeMode: _themeMode);
   }
 }
 
 class _AppWithTheme extends StatelessWidget {
   final AppState appState;
-  final bool isDarkMode;
-  const _AppWithTheme({required this.appState, required this.isDarkMode});
+  final String themeMode;
+  const _AppWithTheme({required this.appState, required this.themeMode});
+
+  ThemeMode _toThemeMode(String mode) {
+    switch (mode) {
+      case kThemeModeLight:
+        return ThemeMode.light;
+      case kThemeModeDark:
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +195,7 @@ class _AppWithTheme extends StatelessWidget {
         ),
         extensions: const [AppColors.dark],
       ),
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+        themeMode: _toThemeMode(themeMode),
       builder: (context, child) =>
           AppStateScope(notifier: appState, child: child!),
       home: const SchedulePage(),

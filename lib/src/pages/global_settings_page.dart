@@ -95,6 +95,18 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
     }
   }
 
+  String _themeModeLabel(BuildContext context, String mode) {
+    final l10n = context.l10n;
+    switch (mode) {
+      case kThemeModeLight:
+        return l10n.themeModeLight;
+      case kThemeModeDark:
+        return l10n.themeModeDark;
+      default:
+        return l10n.themeModeFollowSystem;
+    }
+  }
+
   String _datePatternLabel(BuildContext context, String pattern) {
     final sample = DateFormat(pattern).format(DateTime.now());
     return '$pattern  ($sample)';
@@ -257,6 +269,81 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
     );
   }
 
+  void _showThemeModePicker(BuildContext context, AppState appState) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: ac(context).card,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        final options = [
+          kThemeModeSystem,
+          kThemeModeLight,
+          kThemeModeDark,
+        ];
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 36),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.l10n.darkMode,
+                style: TextStyle(
+                  color: ac(context).primaryText,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ...options.map(
+                (mode) => GestureDetector(
+                  onTap: () {
+                    appState.updateThemeMode(mode);
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 14,
+                      horizontal: 4,
+                    ),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: kDivider, width: 0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          _themeModeLabel(context, mode),
+                          style: TextStyle(
+                            color: mode == appState.themeMode
+                                ? const Color(0xFF4ECDC4)
+                                : ac(context).primaryText,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (mode == appState.themeMode)
+                          const Icon(
+                            Icons.check,
+                            color: Color(0xFF4ECDC4),
+                            size: 18,
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = AppStateScope.of(context);
@@ -267,11 +354,18 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
         settingCard(context, [
           _WideSettingRow(
             label: context.l10n.darkMode,
-            trailing: Switch(
-              value: appState.isDarkMode,
-              onChanged: (v) => appState.updateDarkMode(v),
-              activeThumbColor: const Color(0xFF4ECDC4),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _themeModeLabel(context, appState.themeMode),
+                  style: const TextStyle(color: kHint, fontSize: 13),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right, color: kHint, size: 18),
+              ],
             ),
+            onTap: () => _showThemeModePicker(context, appState),
           ),
           _WideSettingRow(
             label: context.l10n.languageSettingLabel,
