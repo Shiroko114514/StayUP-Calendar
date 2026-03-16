@@ -179,5 +179,97 @@
   "schedulePageToolScheduleSettings": "課表設定",
   "schedulePageToolAddedCourses": "已添課程",
   "schedulePageWeekLabel": "週數",
-  "schedulePageSwitchSchedule": "切換課表"
+  "schedulePageSwitchSchedule": "切換課表",
+  "classTimeNewAction": "新建",
+  "classTimeCurrentTableLabel": "當前課表顯示的時間表",
+  "classTimeSelectHint": "輕觸右側選擇目前使用的時間表",
+  "classTimeTableListHeader": "時間表",
+  "classTimeSwipeHint": "條目上左滑刪除",
+  "classTimeDeleteTitle": "刪除時間表",
+  "classTimeDeleteMessage": "確定刪除「{name}」？",
+  "@classTimeDeleteMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "classTimeSelectTitle": "選擇時間表",
+  "classTimeNewTitle": "新建時間表",
+  "classTimeNewHint": "請輸入時間表名稱",
+  "classTimeDefaultName": "時間表",
+  "classTimeEditPageTitle": "時間表編輯",
+  "classTimeCheckOrder": "檢查時間順序",
+  "classTimeOrderOkTitle": "時間順序正常",
+  "classTimeOrderConflicts": "發現 {count} 處衝突",
+  "@classTimeOrderConflicts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderOkMessage": "所有節次時間區間無衝突，順序正確。",
+  "classTimeNameLabel": "時間表名稱",
+  "classTimeEditNameHint": "輕觸上方以編輯名稱",
+  "classTimeSameDuration": "每節課時長相同",
+  "classTimeDurationLabel": "每節課時長（分鐘）",
+  "classTimeDurationWarning": "謹慎調整此項！調整後，將會根據每節課的「上課時間」，\n加上這個時長，來計算並更新「下課時間」，這意味著原來設置的下課時間會被覆蓋！",
+  "classTimeSectionLabel": "第 {n} 節",
+  "@classTimeSectionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeSectionListHint": "調整時間，多餘的節數不用管\n如果想修改課表顯示的節數，請去「課表設置」中的「每天節次數」",
+  "classTimeReset": "重置為預設時間",
+  "classTimeEditNameTitle": "編輯名稱",
+  "classTimeDurationPickerTitle": "每節課時長（分鐘）",
+  "classTimeMinutes": "{value} 分鐘",
+  "@classTimeMinutes": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerStartHelpText": "第 {n} 節  開始時間",
+  "@classTimePickerStartHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerEndHelpText": "第 {n} 節  結束時間",
+  "@classTimePickerEndHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderEndBeforeStart": "第 {n} 節：結束時間不能早於或等於開始時間（{start} – {end}）",
+  "@classTimeOrderEndBeforeStart": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "start": {},
+      "end": {}
+    }
+  },
+  "classTimeOrderOverlap": "第 {n} 節與第 {m} 節時間重疊\n  第{n}節結束 {end} > 第{m}節開始 {start}",
+  "@classTimeOrderOverlap": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      },
+      "end": {},
+      "start": {}
+    }
+  }
 }

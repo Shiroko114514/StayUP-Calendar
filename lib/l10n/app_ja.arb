@@ -179,5 +179,97 @@
   "schedulePageToolScheduleSettings": "時間割設定",
   "schedulePageToolAddedCourses": "追加済み授業",
   "schedulePageWeekLabel": "週数",
-  "schedulePageSwitchSchedule": "時間割を切替"
+  "schedulePageSwitchSchedule": "時間割を切替",
+  "classTimeNewAction": "新規",
+  "classTimeCurrentTableLabel": "現在の時間割に使われる時間表",
+  "classTimeSelectHint": "右側タップで使用する時間表を選択",
+  "classTimeTableListHeader": "時間表",
+  "classTimeSwipeHint": "左スワイプで削除",
+  "classTimeDeleteTitle": "時間表を削除",
+  "classTimeDeleteMessage": "「{name}」を削除しますか？",
+  "@classTimeDeleteMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "classTimeSelectTitle": "時間表を選択",
+  "classTimeNewTitle": "新しい時間表",
+  "classTimeNewHint": "時間表の名前を入力",
+  "classTimeDefaultName": "時間表",
+  "classTimeEditPageTitle": "時間表を編集",
+  "classTimeCheckOrder": "時間を確認",
+  "classTimeOrderOkTitle": "問題なし",
+  "classTimeOrderConflicts": "{count} 件の競合",
+  "@classTimeOrderConflicts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderOkMessage": "すべてのコマに時間の競合はありません。",
+  "classTimeNameLabel": "時間表の名前",
+  "classTimeEditNameHint": "上をタップして名前を編集",
+  "classTimeSameDuration": "全コマの時間を統一",
+  "classTimeDurationLabel": "コマの長さ（分）",
+  "classTimeDurationWarning": "注意！変更すると、各コマの終了時刻は「開始時刻＋この長さ」で再計算され、\n既存の終了時刻が上書きされます。",
+  "classTimeSectionLabel": "第 {n} コマ",
+  "@classTimeSectionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeSectionListHint": "開始時刻を調整してください。余分なコマは表示に影響しません。\n表示するコマ数を変更するには、時間割設定 › 1日のコマ数 に移動してください。",
+  "classTimeReset": "デフォルト時刻にリセット",
+  "classTimeEditNameTitle": "名前を編集",
+  "classTimeDurationPickerTitle": "コマの長さ（分）",
+  "classTimeMinutes": "{value} 分",
+  "@classTimeMinutes": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerStartHelpText": "第 {n} コマ　開始時刻",
+  "@classTimePickerStartHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerEndHelpText": "第 {n} コマ　終了時刻",
+  "@classTimePickerEndHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderEndBeforeStart": "第 {n} コマ：終了時刻は開始時刻より後にしてください（{start}–{end}）",
+  "@classTimeOrderEndBeforeStart": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "start": {},
+      "end": {}
+    }
+  },
+  "classTimeOrderOverlap": "第 {n} コマと第 {m} コマが重複\n  第{n}コマ終了 {end} > 第{m}コマ開始 {start}",
+  "@classTimeOrderOverlap": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      },
+      "end": {},
+      "start": {}
+    }
+  }
 }

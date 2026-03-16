@@ -731,6 +731,192 @@ abstract class AppLocalizations {
   /// In zh_Hans, this message translates to:
   /// **'切换课表'**
   String get schedulePageSwitchSchedule;
+
+  /// No description provided for @classTimeNewAction.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'新建'**
+  String get classTimeNewAction;
+
+  /// No description provided for @classTimeCurrentTableLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'当前课表显示的时间表'**
+  String get classTimeCurrentTableLabel;
+
+  /// No description provided for @classTimeSelectHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'轻触右侧选择当前使用的时间表'**
+  String get classTimeSelectHint;
+
+  /// No description provided for @classTimeTableListHeader.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'时间表'**
+  String get classTimeTableListHeader;
+
+  /// No description provided for @classTimeSwipeHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'条目上左划删除'**
+  String get classTimeSwipeHint;
+
+  /// No description provided for @classTimeDeleteTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'删除时间表'**
+  String get classTimeDeleteTitle;
+
+  /// No description provided for @classTimeDeleteMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'确定删除「{name}」？'**
+  String classTimeDeleteMessage(Object name);
+
+  /// No description provided for @classTimeSelectTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'选择时间表'**
+  String get classTimeSelectTitle;
+
+  /// No description provided for @classTimeNewTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'新建时间表'**
+  String get classTimeNewTitle;
+
+  /// No description provided for @classTimeNewHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'请输入时间表名称'**
+  String get classTimeNewHint;
+
+  /// No description provided for @classTimeDefaultName.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'时间表'**
+  String get classTimeDefaultName;
+
+  /// No description provided for @classTimeEditPageTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'时间表编辑'**
+  String get classTimeEditPageTitle;
+
+  /// No description provided for @classTimeCheckOrder.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'检查时间顺序'**
+  String get classTimeCheckOrder;
+
+  /// No description provided for @classTimeOrderOkTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'时间顺序正常'**
+  String get classTimeOrderOkTitle;
+
+  /// No description provided for @classTimeOrderConflicts.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'发现 {count} 处冲突'**
+  String classTimeOrderConflicts(int count);
+
+  /// No description provided for @classTimeOrderOkMessage.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'所有节次时间区间无冲突，顺序正确。'**
+  String get classTimeOrderOkMessage;
+
+  /// No description provided for @classTimeNameLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'时间表名称'**
+  String get classTimeNameLabel;
+
+  /// No description provided for @classTimeEditNameHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'轻触上方以编辑名称'**
+  String get classTimeEditNameHint;
+
+  /// No description provided for @classTimeSameDuration.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'每节课时长相同'**
+  String get classTimeSameDuration;
+
+  /// No description provided for @classTimeDurationLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'每节课时长（分钟）'**
+  String get classTimeDurationLabel;
+
+  /// No description provided for @classTimeDurationWarning.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！'**
+  String get classTimeDurationWarning;
+
+  /// No description provided for @classTimeSectionLabel.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {n} 节'**
+  String classTimeSectionLabel(int n);
+
+  /// No description provided for @classTimeSectionListHint.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」'**
+  String get classTimeSectionListHint;
+
+  /// No description provided for @classTimeReset.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'重置为默认时间'**
+  String get classTimeReset;
+
+  /// No description provided for @classTimeEditNameTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'编辑名称'**
+  String get classTimeEditNameTitle;
+
+  /// No description provided for @classTimeDurationPickerTitle.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'每节课时长（分钟）'**
+  String get classTimeDurationPickerTitle;
+
+  /// No description provided for @classTimeMinutes.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'{value} 分钟'**
+  String classTimeMinutes(int value);
+
+  /// No description provided for @classTimePickerStartHelpText.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {n} 节  开始时间'**
+  String classTimePickerStartHelpText(int n);
+
+  /// No description provided for @classTimePickerEndHelpText.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {n} 节  结束时间'**
+  String classTimePickerEndHelpText(int n);
+
+  /// No description provided for @classTimeOrderEndBeforeStart.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {n} 节：结束时间不能早于或等于开始时间（{start} – {end}）'**
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end);
+
+  /// No description provided for @classTimeOrderOverlap.
+  ///
+  /// In zh_Hans, this message translates to:
+  /// **'第 {n} 节与第 {m} 节时间重叠\n  第{n}节结束 {end} > 第{m}节开始 {start}'**
+  String classTimeOrderOverlap(int n, int m, Object end, Object start);
 }
 
 class _AppLocalizationsDelegate

@@ -347,4 +347,115 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get schedulePageSwitchSchedule => '時間割を切替';
+
+  @override
+  String get classTimeNewAction => '新規';
+
+  @override
+  String get classTimeCurrentTableLabel => '現在の時間割に使われる時間表';
+
+  @override
+  String get classTimeSelectHint => '右側タップで使用する時間表を選択';
+
+  @override
+  String get classTimeTableListHeader => '時間表';
+
+  @override
+  String get classTimeSwipeHint => '左スワイプで削除';
+
+  @override
+  String get classTimeDeleteTitle => '時間表を削除';
+
+  @override
+  String classTimeDeleteMessage(Object name) {
+    return '「$name」を削除しますか？';
+  }
+
+  @override
+  String get classTimeSelectTitle => '時間表を選択';
+
+  @override
+  String get classTimeNewTitle => '新しい時間表';
+
+  @override
+  String get classTimeNewHint => '時間表の名前を入力';
+
+  @override
+  String get classTimeDefaultName => '時間表';
+
+  @override
+  String get classTimeEditPageTitle => '時間表を編集';
+
+  @override
+  String get classTimeCheckOrder => '時間を確認';
+
+  @override
+  String get classTimeOrderOkTitle => '問題なし';
+
+  @override
+  String classTimeOrderConflicts(int count) {
+    return '$count 件の競合';
+  }
+
+  @override
+  String get classTimeOrderOkMessage => 'すべてのコマに時間の競合はありません。';
+
+  @override
+  String get classTimeNameLabel => '時間表の名前';
+
+  @override
+  String get classTimeEditNameHint => '上をタップして名前を編集';
+
+  @override
+  String get classTimeSameDuration => '全コマの時間を統一';
+
+  @override
+  String get classTimeDurationLabel => 'コマの長さ（分）';
+
+  @override
+  String get classTimeDurationWarning =>
+      '注意！変更すると、各コマの終了時刻は「開始時刻＋この長さ」で再計算され、\n既存の終了時刻が上書きされます。';
+
+  @override
+  String classTimeSectionLabel(int n) {
+    return '第 $n コマ';
+  }
+
+  @override
+  String get classTimeSectionListHint =>
+      '開始時刻を調整してください。余分なコマは表示に影響しません。\n表示するコマ数を変更するには、時間割設定 › 1日のコマ数 に移動してください。';
+
+  @override
+  String get classTimeReset => 'デフォルト時刻にリセット';
+
+  @override
+  String get classTimeEditNameTitle => '名前を編集';
+
+  @override
+  String get classTimeDurationPickerTitle => 'コマの長さ（分）';
+
+  @override
+  String classTimeMinutes(int value) {
+    return '$value 分';
+  }
+
+  @override
+  String classTimePickerStartHelpText(int n) {
+    return '第 $n コマ　開始時刻';
+  }
+
+  @override
+  String classTimePickerEndHelpText(int n) {
+    return '第 $n コマ　終了時刻';
+  }
+
+  @override
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end) {
+    return '第 $n コマ：終了時刻は開始時刻より後にしてください（$start–$end）';
+  }
+
+  @override
+  String classTimeOrderOverlap(int n, int m, Object end, Object start) {
+    return '第 $n コマと第 $m コマが重複\n  第$nコマ終了 $end > 第$mコマ開始 $start';
+  }
 }

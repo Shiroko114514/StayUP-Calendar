@@ -345,6 +345,117 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get schedulePageSwitchSchedule => '切换课表';
+
+  @override
+  String get classTimeNewAction => '新建';
+
+  @override
+  String get classTimeCurrentTableLabel => '当前课表显示的时间表';
+
+  @override
+  String get classTimeSelectHint => '轻触右侧选择当前使用的时间表';
+
+  @override
+  String get classTimeTableListHeader => '时间表';
+
+  @override
+  String get classTimeSwipeHint => '条目上左划删除';
+
+  @override
+  String get classTimeDeleteTitle => '删除时间表';
+
+  @override
+  String classTimeDeleteMessage(Object name) {
+    return '确定删除「$name」？';
+  }
+
+  @override
+  String get classTimeSelectTitle => '选择时间表';
+
+  @override
+  String get classTimeNewTitle => '新建时间表';
+
+  @override
+  String get classTimeNewHint => '请输入时间表名称';
+
+  @override
+  String get classTimeDefaultName => '时间表';
+
+  @override
+  String get classTimeEditPageTitle => '时间表编辑';
+
+  @override
+  String get classTimeCheckOrder => '检查时间顺序';
+
+  @override
+  String get classTimeOrderOkTitle => '时间顺序正常';
+
+  @override
+  String classTimeOrderConflicts(int count) {
+    return '发现 $count 处冲突';
+  }
+
+  @override
+  String get classTimeOrderOkMessage => '所有节次时间区间无冲突，顺序正确。';
+
+  @override
+  String get classTimeNameLabel => '时间表名称';
+
+  @override
+  String get classTimeEditNameHint => '轻触上方以编辑名称';
+
+  @override
+  String get classTimeSameDuration => '每节课时长相同';
+
+  @override
+  String get classTimeDurationLabel => '每节课时长（分钟）';
+
+  @override
+  String get classTimeDurationWarning =>
+      '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！';
+
+  @override
+  String classTimeSectionLabel(int n) {
+    return '第 $n 节';
+  }
+
+  @override
+  String get classTimeSectionListHint =>
+      '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」';
+
+  @override
+  String get classTimeReset => '重置为默认时间';
+
+  @override
+  String get classTimeEditNameTitle => '编辑名称';
+
+  @override
+  String get classTimeDurationPickerTitle => '每节课时长（分钟）';
+
+  @override
+  String classTimeMinutes(int value) {
+    return '$value 分钟';
+  }
+
+  @override
+  String classTimePickerStartHelpText(int n) {
+    return '第 $n 节  开始时间';
+  }
+
+  @override
+  String classTimePickerEndHelpText(int n) {
+    return '第 $n 节  结束时间';
+  }
+
+  @override
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end) {
+    return '第 $n 节：结束时间不能早于或等于开始时间（$start – $end）';
+  }
+
+  @override
+  String classTimeOrderOverlap(int n, int m, Object end, Object start) {
+    return '第 $n 节与第 $m 节时间重叠\n  第$n节结束 $end > 第$m节开始 $start';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -688,6 +799,117 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get schedulePageSwitchSchedule => '切换课表';
+
+  @override
+  String get classTimeNewAction => '新建';
+
+  @override
+  String get classTimeCurrentTableLabel => '当前课表显示的时间表';
+
+  @override
+  String get classTimeSelectHint => '轻触右侧选择当前使用的时间表';
+
+  @override
+  String get classTimeTableListHeader => '时间表';
+
+  @override
+  String get classTimeSwipeHint => '条目上左划删除';
+
+  @override
+  String get classTimeDeleteTitle => '删除时间表';
+
+  @override
+  String classTimeDeleteMessage(Object name) {
+    return '确定删除「$name」？';
+  }
+
+  @override
+  String get classTimeSelectTitle => '选择时间表';
+
+  @override
+  String get classTimeNewTitle => '新建时间表';
+
+  @override
+  String get classTimeNewHint => '请输入时间表名称';
+
+  @override
+  String get classTimeDefaultName => '时间表';
+
+  @override
+  String get classTimeEditPageTitle => '时间表编辑';
+
+  @override
+  String get classTimeCheckOrder => '检查时间顺序';
+
+  @override
+  String get classTimeOrderOkTitle => '时间顺序正常';
+
+  @override
+  String classTimeOrderConflicts(int count) {
+    return '发现 $count 处冲突';
+  }
+
+  @override
+  String get classTimeOrderOkMessage => '所有节次时间区间无冲突，顺序正确。';
+
+  @override
+  String get classTimeNameLabel => '时间表名称';
+
+  @override
+  String get classTimeEditNameHint => '轻触上方以编辑名称';
+
+  @override
+  String get classTimeSameDuration => '每节课时长相同';
+
+  @override
+  String get classTimeDurationLabel => '每节课时长（分钟）';
+
+  @override
+  String get classTimeDurationWarning =>
+      '谨慎调整此项！调整后，将会根据每节课的「上课时间」，\n加上这个时长，来计算并更新「下课时间」，这意味着原来设置的下课时间会被覆盖！';
+
+  @override
+  String classTimeSectionLabel(int n) {
+    return '第 $n 节';
+  }
+
+  @override
+  String get classTimeSectionListHint =>
+      '调整时间，多余的节数不用管\n如果想修改课表显示的节数，请去「课表设置」中的「每天节次数」';
+
+  @override
+  String get classTimeReset => '重置为默认时间';
+
+  @override
+  String get classTimeEditNameTitle => '编辑名称';
+
+  @override
+  String get classTimeDurationPickerTitle => '每节课时长（分钟）';
+
+  @override
+  String classTimeMinutes(int value) {
+    return '$value 分钟';
+  }
+
+  @override
+  String classTimePickerStartHelpText(int n) {
+    return '第 $n 节  开始时间';
+  }
+
+  @override
+  String classTimePickerEndHelpText(int n) {
+    return '第 $n 节  结束时间';
+  }
+
+  @override
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end) {
+    return '第 $n 节：结束时间不能早于或等于开始时间（$start – $end）';
+  }
+
+  @override
+  String classTimeOrderOverlap(int n, int m, Object end, Object start) {
+    return '第 $n 节与第 $m 节时间重叠\n  第$n节结束 $end > 第$m节开始 $start';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
@@ -1031,4 +1253,115 @@ class AppLocalizationsZhHant extends AppLocalizationsZh {
 
   @override
   String get schedulePageSwitchSchedule => '切換課表';
+
+  @override
+  String get classTimeNewAction => '新建';
+
+  @override
+  String get classTimeCurrentTableLabel => '當前課表顯示的時間表';
+
+  @override
+  String get classTimeSelectHint => '輕觸右側選擇目前使用的時間表';
+
+  @override
+  String get classTimeTableListHeader => '時間表';
+
+  @override
+  String get classTimeSwipeHint => '條目上左滑刪除';
+
+  @override
+  String get classTimeDeleteTitle => '刪除時間表';
+
+  @override
+  String classTimeDeleteMessage(Object name) {
+    return '確定刪除「$name」？';
+  }
+
+  @override
+  String get classTimeSelectTitle => '選擇時間表';
+
+  @override
+  String get classTimeNewTitle => '新建時間表';
+
+  @override
+  String get classTimeNewHint => '請輸入時間表名稱';
+
+  @override
+  String get classTimeDefaultName => '時間表';
+
+  @override
+  String get classTimeEditPageTitle => '時間表編輯';
+
+  @override
+  String get classTimeCheckOrder => '檢查時間順序';
+
+  @override
+  String get classTimeOrderOkTitle => '時間順序正常';
+
+  @override
+  String classTimeOrderConflicts(int count) {
+    return '發現 $count 處衝突';
+  }
+
+  @override
+  String get classTimeOrderOkMessage => '所有節次時間區間無衝突，順序正確。';
+
+  @override
+  String get classTimeNameLabel => '時間表名稱';
+
+  @override
+  String get classTimeEditNameHint => '輕觸上方以編輯名稱';
+
+  @override
+  String get classTimeSameDuration => '每節課時長相同';
+
+  @override
+  String get classTimeDurationLabel => '每節課時長（分鐘）';
+
+  @override
+  String get classTimeDurationWarning =>
+      '謹慎調整此項！調整後，將會根據每節課的「上課時間」，\n加上這個時長，來計算並更新「下課時間」，這意味著原來設置的下課時間會被覆蓋！';
+
+  @override
+  String classTimeSectionLabel(int n) {
+    return '第 $n 節';
+  }
+
+  @override
+  String get classTimeSectionListHint =>
+      '調整時間，多餘的節數不用管\n如果想修改課表顯示的節數，請去「課表設置」中的「每天節次數」';
+
+  @override
+  String get classTimeReset => '重置為預設時間';
+
+  @override
+  String get classTimeEditNameTitle => '編輯名稱';
+
+  @override
+  String get classTimeDurationPickerTitle => '每節課時長（分鐘）';
+
+  @override
+  String classTimeMinutes(int value) {
+    return '$value 分鐘';
+  }
+
+  @override
+  String classTimePickerStartHelpText(int n) {
+    return '第 $n 節  開始時間';
+  }
+
+  @override
+  String classTimePickerEndHelpText(int n) {
+    return '第 $n 節  結束時間';
+  }
+
+  @override
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end) {
+    return '第 $n 節：結束時間不能早於或等於開始時間（$start – $end）';
+  }
+
+  @override
+  String classTimeOrderOverlap(int n, int m, Object end, Object start) {
+    return '第 $n 節與第 $m 節時間重疊\n  第$n節結束 $end > 第$m節開始 $start';
+  }
 }

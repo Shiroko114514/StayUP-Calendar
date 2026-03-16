@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n.dart';
 import 'models.dart';
 import 'common_widgets.dart';
 
@@ -1118,6 +1119,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
     final s = AppStateScope.of(context);
     final tables = s.allTimeTables;
     final activeIdx = s.activeTimeTableIndex;
+     final l = context.l10n;
 
     return Scaffold(
       backgroundColor: ac(context).bg,
@@ -1126,21 +1128,21 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
         elevation: 0,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-            SizedBox(width: 8),
-            Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
-            Text('返回', style: TextStyle(color: _kAccent, fontSize: 15)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const SizedBox(width: 8),
+              const Icon(Icons.arrow_back_ios, color: _kAccent, size: 17),
+              Text(l.backAction, style: const TextStyle(color: _kAccent, fontSize: 15)),
           ]),
         ),
         leadingWidth: 64,
-        title: Text('上课时间',
+          title: Text(l.schedulePageToolClassTime,
             style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600)),
         centerTitle: true,
         actions: [
           TextButton(
             onPressed: () => _newTimeTable(context, s),
-            child: const Text('新建',
-                style: TextStyle(color: _kAccent, fontSize: 15)),
+              child: Text(l.classTimeNewAction,
+                  style: const TextStyle(color: _kAccent, fontSize: 15)),
           ),
         ],
       ),

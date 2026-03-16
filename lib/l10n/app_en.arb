@@ -179,5 +179,97 @@
   "schedulePageToolScheduleSettings": "Schedule Settings",
   "schedulePageToolAddedCourses": "Added Courses",
   "schedulePageWeekLabel": "Week",
-  "schedulePageSwitchSchedule": "Switch Schedule"
+  "schedulePageSwitchSchedule": "Switch Schedule",
+  "classTimeNewAction": "New",
+  "classTimeCurrentTableLabel": "Timetable for current schedule",
+  "classTimeSelectHint": "Tap right to select the active timetable",
+  "classTimeTableListHeader": "Timetables",
+  "classTimeSwipeHint": "Swipe left on an item to delete",
+  "classTimeDeleteTitle": "Delete Timetable",
+  "classTimeDeleteMessage": "Delete \"{name}\"?",
+  "@classTimeDeleteMessage": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "classTimeSelectTitle": "Select Timetable",
+  "classTimeNewTitle": "New Timetable",
+  "classTimeNewHint": "Enter a timetable name",
+  "classTimeDefaultName": "Timetable",
+  "classTimeEditPageTitle": "Edit Timetable",
+  "classTimeCheckOrder": "Check Order",
+  "classTimeOrderOkTitle": "No Conflicts",
+  "classTimeOrderConflicts": "{count} conflict(s) found",
+  "@classTimeOrderConflicts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderOkMessage": "All section times are valid with no conflicts.",
+  "classTimeNameLabel": "Timetable Name",
+  "classTimeEditNameHint": "Tap above to edit name",
+  "classTimeSameDuration": "Same duration for all sections",
+  "classTimeDurationLabel": "Section duration (min)",
+  "classTimeDurationWarning": "Caution! After updating, each section's end time will be recalculated as start time + this duration, overwriting existing end times.",
+  "classTimeSectionLabel": "Section {n}",
+  "@classTimeSectionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeSectionListHint": "Adjust start times; extra sections don't affect the display.\nTo change the number of visible sections, go to Schedule Settings \u203a Sections per Day.",
+  "classTimeReset": "Reset to default times",
+  "classTimeEditNameTitle": "Edit Name",
+  "classTimeDurationPickerTitle": "Section duration (minutes)",
+  "classTimeMinutes": "{value} min",
+  "@classTimeMinutes": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerStartHelpText": "Section {n} \u2013 Start time",
+  "@classTimePickerStartHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimePickerEndHelpText": "Section {n} \u2013 End time",
+  "@classTimePickerEndHelpText": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "classTimeOrderEndBeforeStart": "Section {n}: End time must be after start time ({start}\u2013{end})",
+  "@classTimeOrderEndBeforeStart": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "start": {},
+      "end": {}
+    }
+  },
+  "classTimeOrderOverlap": "Section {n} and {m} overlap\n  Section {n} ends {end} > Section {m} starts {start}",
+  "@classTimeOrderOverlap": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      },
+      "end": {},
+      "start": {}
+    }
+  }
 }

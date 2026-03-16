@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'l10n.dart';
 import 'models.dart';
 import 'common_widgets.dart';
 import 'course_editor.dart';
@@ -938,18 +939,17 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
     _sliderValue = widget.currentWeek.toDouble();
   }
 
-  // 工具格子数据
-  static const List<_MenuTool> _tools = [
-    _MenuTool(icon: Icons.access_time_outlined, label: '上课时间',  route: 'class_time'),
-    _MenuTool(icon: Icons.tune_outlined,         label: '课表设置',  route: 'schedule_settings'),
-    _MenuTool(icon: Icons.inbox_outlined,        label: '已添课程',  route: 'added_courses'),
-    _MenuTool(icon: Icons.settings_outlined,     label: '全局设置',  route: 'global_settings'),
-    _MenuTool(icon: Icons.ios_share_outlined,    label: '导出课表',  route: 'export'),
-    _MenuTool(icon: Icons.info_outline,          label: '关于',      route: 'about'),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    final tools = [
+      _MenuTool(icon: Icons.access_time_outlined, label: l.schedulePageToolClassTime,       route: 'class_time'),
+      _MenuTool(icon: Icons.tune_outlined,         label: l.schedulePageToolScheduleSettings, route: 'schedule_settings'),
+      _MenuTool(icon: Icons.inbox_outlined,        label: l.schedulePageToolAddedCourses,     route: 'added_courses'),
+      _MenuTool(icon: Icons.settings_outlined,     label: l.globalSettingsTitle,              route: 'global_settings'),
+      _MenuTool(icon: Icons.ios_share_outlined,    label: l.exportScheduleTitle,              route: 'export'),
+      _MenuTool(icon: Icons.info_outline,          label: l.aboutTitle,                       route: 'about'),
+    ];
     final colors = ac(context);
     return Container(
       decoration: BoxDecoration(
@@ -983,7 +983,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('周数', style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                      Text(l.schedulePageWeekLabel, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                       const SizedBox(height: 12),
                       // 带数字标签的滑块
                       Row(
@@ -1040,7 +1040,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     children: [
                       Row(
                         children: [
-                          Text('切换课表', style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
+                          Text(l.schedulePageSwitchSchedule, style: TextStyle(color: colors.primaryText, fontSize: 15, fontWeight: FontWeight.w600)),
                           const Spacer(),
                           GestureDetector(
                             onTap: () {
@@ -1050,7 +1050,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const NewSchedulePage(),
                               ));
                             },
-                            child: const Text('新建课表  ', style: TextStyle(color: _accent, fontSize: 13)),
+                            child: Text('${l.newScheduleButton}  ', style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                           GestureDetector(
                             onTap: () {
@@ -1059,7 +1059,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                                 builder: (_) => const ManageSchedulePage(),
                               ));
                             },
-                            child: const Text('管理课表', style: TextStyle(color: _accent, fontSize: 13)),
+                            child: Text(l.manageScheduleTitle, style: const TextStyle(color: _accent, fontSize: 13)),
                           ),
                         ],
                       ),
@@ -1097,7 +1097,7 @@ class _MoreMenuSheetState extends State<_MoreMenuSheet> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     childAspectRatio: 1.1,
-                    children: _tools.map((t) => _ToolCell(tool: t)).toList(),
+                    children: tools.map((t) => _ToolCell(tool: t)).toList(),
                   ),
                 ),
               ),
@@ -1203,21 +1203,21 @@ class _ToolCell extends StatelessWidget {
             builder: (ctx) => AlertDialog(
               backgroundColor: ac(ctx).card,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              title: const Row(children: [
-                Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
-                SizedBox(width: 8),
-                Text('导出课表', style: TextStyle(
+              title: Row(children: [
+                const Icon(Icons.ios_share_outlined, color: Color(0xFF6C6C70), size: 20),
+                const SizedBox(width: 8),
+                Text(ctx.l10n.exportScheduleTitle, style: const TextStyle(
                     color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
               ]),
-              content: const Text(
-                '「导出课表」功能正在开发中，敬请期待。',
-                style: TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
+              content: Text(
+                ctx.l10n.featureInDevelopmentMessage,
+                style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('好的',
-                      style: TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
+                  child: Text(ctx.l10n.okAction,
+                      style: const TextStyle(color: Color(0xFFFF3B5C), fontSize: 15)),
                 ),
               ],
             ),

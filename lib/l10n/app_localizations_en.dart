@@ -353,4 +353,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get schedulePageSwitchSchedule => 'Switch Schedule';
+
+  @override
+  String get classTimeNewAction => 'New';
+
+  @override
+  String get classTimeCurrentTableLabel => 'Timetable for current schedule';
+
+  @override
+  String get classTimeSelectHint => 'Tap right to select the active timetable';
+
+  @override
+  String get classTimeTableListHeader => 'Timetables';
+
+  @override
+  String get classTimeSwipeHint => 'Swipe left on an item to delete';
+
+  @override
+  String get classTimeDeleteTitle => 'Delete Timetable';
+
+  @override
+  String classTimeDeleteMessage(Object name) {
+    return 'Delete \"$name\"?';
+  }
+
+  @override
+  String get classTimeSelectTitle => 'Select Timetable';
+
+  @override
+  String get classTimeNewTitle => 'New Timetable';
+
+  @override
+  String get classTimeNewHint => 'Enter a timetable name';
+
+  @override
+  String get classTimeDefaultName => 'Timetable';
+
+  @override
+  String get classTimeEditPageTitle => 'Edit Timetable';
+
+  @override
+  String get classTimeCheckOrder => 'Check Order';
+
+  @override
+  String get classTimeOrderOkTitle => 'No Conflicts';
+
+  @override
+  String classTimeOrderConflicts(int count) {
+    return '$count conflict(s) found';
+  }
+
+  @override
+  String get classTimeOrderOkMessage =>
+      'All section times are valid with no conflicts.';
+
+  @override
+  String get classTimeNameLabel => 'Timetable Name';
+
+  @override
+  String get classTimeEditNameHint => 'Tap above to edit name';
+
+  @override
+  String get classTimeSameDuration => 'Same duration for all sections';
+
+  @override
+  String get classTimeDurationLabel => 'Section duration (min)';
+
+  @override
+  String get classTimeDurationWarning =>
+      'Caution! After updating, each section\'s end time will be recalculated as start time + this duration, overwriting existing end times.';
+
+  @override
+  String classTimeSectionLabel(int n) {
+    return 'Section $n';
+  }
+
+  @override
+  String get classTimeSectionListHint =>
+      'Adjust start times; extra sections don\'t affect the display.\nTo change the number of visible sections, go to Schedule Settings › Sections per Day.';
+
+  @override
+  String get classTimeReset => 'Reset to default times';
+
+  @override
+  String get classTimeEditNameTitle => 'Edit Name';
+
+  @override
+  String get classTimeDurationPickerTitle => 'Section duration (minutes)';
+
+  @override
+  String classTimeMinutes(int value) {
+    return '$value min';
+  }
+
+  @override
+  String classTimePickerStartHelpText(int n) {
+    return 'Section $n – Start time';
+  }
+
+  @override
+  String classTimePickerEndHelpText(int n) {
+    return 'Section $n – End time';
+  }
+
+  @override
+  String classTimeOrderEndBeforeStart(int n, Object start, Object end) {
+    return 'Section $n: End time must be after start time ($start–$end)';
+  }
+
+  @override
+  String classTimeOrderOverlap(int n, int m, Object end, Object start) {
+    return 'Section $n and $m overlap\n  Section $n ends $end > Section $m starts $start';
+  }
 }
