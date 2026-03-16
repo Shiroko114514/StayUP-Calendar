@@ -55,13 +55,13 @@ class ScheduleSettingsPage extends StatelessWidget {
         backgroundColor: ac(context).card,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Row(children: [
-          Icon(Icons.lock_outline, color: Color(0xFF6C6C70), size: 20),
+          Icon(Icons.lock_outline, color: ac(context).hint, size: 20),
           SizedBox(width: 8),
-          Text(_t(context, '暂未开放', 'Coming Soon', ja: '近日公開'), style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 16, fontWeight: FontWeight.w600)),
+          Text(_t(context, '暂未开放', 'Coming Soon', ja: '近日公開'), style: TextStyle(color: ac(context).primaryText, fontSize: 16, fontWeight: FontWeight.w600)),
         ]),
         content: Text(
           _t(context, '「课表外观」功能正在开发中，敬请期待。', 'This feature is currently under development.', ja: 'この機能は現在開発中です。'),
-          style: const TextStyle(color: Color(0xFF6C6C70), fontSize: 14, height: 1.5),
+          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
@@ -102,8 +102,8 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 TextButton(onPressed: () => Navigator.pop(ctx),
                   child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: const TextStyle(color: kAccent))),
-                Text(title, style: const TextStyle(
-                    color: const Color(0xFF1C1C1E), fontWeight: FontWeight.w600, fontSize: 16)),
+                Text(title, style: TextStyle(
+                    color: ac(context).primaryText, fontWeight: FontWeight.w600, fontSize: 16)),
                 TextButton(
                     onPressed: () { onPick(tmp); Navigator.pop(ctx); },
                   child: Text(_t(context, '确定', 'Confirm', ja: '確認'), style: const TextStyle(color: kAccent))),
@@ -138,6 +138,8 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
 
   // 日期选择器
   void _pickDate(DateTime current, ValueChanged<DateTime> onPick) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
     final picked = await showDatePicker(
       context: context,
       initialDate: current,
@@ -145,12 +147,22 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
       lastDate: DateTime(2035),
 
       builder: (ctx, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFFF3B5C),
-            surface: Color(0xFFFFFFFF),
-          ),
-          dialogBackgroundColor: const Color(0xFFF2F2F7),
+        data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+          colorScheme: isDark
+              ? ColorScheme.dark(
+                  primary: const Color(0xFFFF3B5C),
+                  surface: bgColor,
+                  surfaceContainerHigh: bgColor,
+                  onSurface: const Color(0xFFFFFFFF),
+                )
+              : ColorScheme.light(
+                  primary: const Color(0xFFFF3B5C),
+                  surface: bgColor,
+                  surfaceContainerHigh: bgColor,
+                  onSurface: const Color(0xFF1C1C1E),
+                ),
+          dialogBackgroundColor: bgColor,
+          dialogTheme: DialogThemeData(backgroundColor: bgColor),
         ),
         child: child!,
       ),
@@ -198,7 +210,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           settingCard(context, [
             SettingRow(
               label: _t(context, '课表名称', 'Schedule Name', ja: '時間割名'),
-              trailing: Text(cfg.name, style: const TextStyle(color: kHint, fontSize: 15)),
+              trailing: Text(cfg.name, style: TextStyle(color: kHint, fontSize: 15)),
               onTap: () {
                 final ctrl = TextEditingController(text: cfg.name);
                 showDialog(
@@ -211,7 +223,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                     content: TextField(
                       controller: ctrl,
                       autofocus: true,
-                      style: const TextStyle(color: const Color(0xFF1C1C1E)),
+                      style: TextStyle(color: ac(context).primaryText),
                       decoration: InputDecoration(
                         hintText: _t(context, '请输入课表名称', 'Enter schedule name', ja: '時間割名を入力してください'),
                         hintStyle: TextStyle(color: kHint),
@@ -224,7 +236,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: const TextStyle(color: kHint))),
+                          child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: TextStyle(color: kHint))),
                       TextButton(
                           onPressed: () {
                             final name = ctrl.text.trim();
@@ -262,16 +274,16 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               trailing: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE5E5EA),
+                  color: ac(context).divider,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(_fmtDate(context, cfg.firstWeekDay),
-                    style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                    style: TextStyle(color: ac(context).primaryText, fontSize: 14)),
               ),
             ),
             SettingRow(
               label: _t(context, '一周起始天', 'Week starts on', ja: '週の開始曜日'),
-              trailing: Text(_t(context, '周一', 'Monday', ja: '月曜日'), style: const TextStyle(color: kHint, fontSize: 14)),
+              trailing: Text(_t(context, '周一', 'Monday', ja: '月曜日'), style: TextStyle(color: kHint, fontSize: 14)),
             ),
             SettingRow(
               label: _t(context, '当前周', 'Current week', ja: '現在の週'),
@@ -279,9 +291,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               onTap: () => _pickNumber(_t(context, '当前周', 'Current week', ja: '現在の週'), displayWeek, 1, cfg.totalWeeks, (v) {}),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(_t(context, '第 $displayWeek 周', 'Week $displayWeek', ja: '第$displayWeek週'),
-                    style: const TextStyle(color: kHint, fontSize: 14)),
+                    style: TextStyle(color: kHint, fontSize: 14)),
                 const SizedBox(width: 6),
-                const Icon(Icons.unfold_more, color: kHint, size: 18),
+                Icon(Icons.unfold_more, color: kHint, size: 18),
               ]),
             ),
           ]),
@@ -295,7 +307,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 onTap: () => _pickNumber(_t(context, '一天课程节数', 'Sections per day', ja: '1日の授業数'), cfg.sectionsPerDay, 1, 20,
                   (v) => s.updateActiveConfig(sectionsPerDay: v)),
               trailing: Text('${cfg.sectionsPerDay}',
-                  style: const TextStyle(color: kHint, fontSize: 15)),
+                  style: TextStyle(color: kHint, fontSize: 15)),
             ),
             SettingRow(
                 label: _t(context, '学期周数', 'Total weeks', ja: '学期週数'),
@@ -303,7 +315,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 onTap: () => _pickNumber(_t(context, '学期周数', 'Total weeks', ja: '学期週数'), cfg.totalWeeks, 1, 20,
                   (v) => s.updateActiveConfig(totalWeeks: v)),
               trailing: Text('${cfg.totalWeeks}',
-                  style: const TextStyle(color: kHint, fontSize: 15)),
+                  style: TextStyle(color: kHint, fontSize: 15)),
             ),
           ]),
         ],
@@ -329,6 +341,8 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
       DateFormat.yMd(Localizations.localeOf(context).toLanguageTag()).format(d);
 
   Future<void> _pickDate(DateTime initial, ValueChanged<DateTime> onPick) async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1C1C1E) : const Color(0xFFF2F2F7);
     final picked = await showDatePicker(
       context: context,
       initialDate: initial,
@@ -336,12 +350,22 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
       lastDate: DateTime(2035),
 
       builder: (ctx, child) => Theme(
-        data: ThemeData.dark().copyWith(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFFFF3B5C),
-            surface: Color(0xFFFFFFFF),
-          ),
-          dialogBackgroundColor: const Color(0xFFF2F2F7),
+        data: (isDark ? ThemeData.dark() : ThemeData.light()).copyWith(
+          colorScheme: isDark
+              ? ColorScheme.dark(
+                  primary: const Color(0xFFFF3B5C),
+                  surface: bgColor,
+                  surfaceContainerHigh: bgColor,
+                  onSurface: const Color(0xFFFFFFFF),
+                )
+              : ColorScheme.light(
+                  primary: const Color(0xFFFF3B5C),
+                  surface: bgColor,
+                  surfaceContainerHigh: bgColor,
+                  onSurface: const Color(0xFF1C1C1E),
+                ),
+          dialogBackgroundColor: bgColor,
+          dialogTheme: DialogThemeData(backgroundColor: bgColor),
         ),
         child: child!,
       ),
@@ -383,7 +407,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(_t(context, '已将 ${_fmtDate(context, _fromDate)} 的课程移动到 ${_fmtDate(context, _toDate)}', 'Moved courses from ${_fmtDate(context, _fromDate)} to ${_fmtDate(context, _toDate)}', ja: '${_fmtDate(context, _fromDate)} から ${_fmtDate(context, _toDate)} に授業を移動しました')),
-      backgroundColor: const Color(0xFFE5E5EA),
+      backgroundColor: ac(context).card,
       behavior: SnackBarBehavior.floating,
     ));
   }
@@ -423,7 +447,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             padding: EdgeInsets.only(left: 2, bottom: 14),
             child: Text(
               _t(context, '本功能用于节假日调休等场景，可以将某天的课程移动到另一天，请谨慎操作', 'Move courses from one date to another for schedule adjustment. Please use carefully.', ja: '振替休日などの調整用に、ある日の授業を別の日に移動できます。慎重に操作してください。'),
-              style: const TextStyle(color: kHint, fontSize: 13, height: 1.6),
+              style: TextStyle(color: kHint, fontSize: 13, height: 1.6),
             ),
           ),
 
@@ -433,9 +457,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
               label: _t(context, '要调整的课表', 'Schedule to adjust', ja: '調整対象の時間割'),
               showDivider: false,
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                const Text('1', style: TextStyle(color: kHint, fontSize: 15)),
+                Text('1', style: TextStyle(color: kHint, fontSize: 15)),
                 const SizedBox(width: 4),
-                const Icon(Icons.unfold_more, color: kHint, size: 18),
+                Icon(Icons.unfold_more, color: kHint, size: 18),
               ]),
             ),
           ]),
@@ -448,22 +472,22 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                Text(_t(context, '将', 'From', ja: '移動元'), style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 15)),
+                Text(_t(context, '将', 'From', ja: '移動元'), style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () => _pickDate(_fromDate, (d) => setState(() => _fromDate = d)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5E5EA),
+                      color: ac(context).divider,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_fmtDate(context, _fromDate),
-                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                        style: TextStyle(color: ac(context).primaryText, fontSize: 14)),
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text(_t(context, '的课程', 'courses', ja: 'の授業'), style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 15)),
+                Text(_t(context, '的课程', 'courses', ja: 'の授業'), style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
               ]),
             ),
             // 分隔线
@@ -472,18 +496,18 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Row(children: [
-                Text(_t(context, '移动到', 'Move to', ja: '移動先'), style: const TextStyle(color: Color(0xFF1C1C1E), fontSize: 15)),
+                Text(_t(context, '移动到', 'Move to', ja: '移動先'), style: TextStyle(color: ac(context).primaryText, fontSize: 15)),
                 const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () => _pickDate(_toDate, (d) => setState(() => _toDate = d)),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE5E5EA),
+                      color: ac(context).divider,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(_fmtDate(context, _toDate),
-                        style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 14)),
+                        style: TextStyle(color: ac(context).primaryText, fontSize: 14)),
                   ),
                 ),
               ]),
@@ -556,11 +580,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(_t(context, '删除课程', 'Delete Courses', ja: '授業を削除')),
         content: Text(_t(context, '确定删除已选的 ${_selected.length} 门课程？', 'Delete ${_selected.length} selected courses?', ja: '選択した${_selected.length}件の授業を削除しますか？'),
-          style: const TextStyle(color: kHint, fontSize: 14)),
+          style: TextStyle(color: kHint, fontSize: 14)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-            child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: const TextStyle(color: kHint))),
+            child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: TextStyle(color: kHint))),
           TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -582,11 +606,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(_t(context, '清空课表', 'Clear Schedule', ja: '時間割をクリア')),
         content: Text(_t(context, '确定删除当前课表全部 ${s.courses.length} 门课程？此操作不可恢复。', 'Delete all ${s.courses.length} courses in this schedule? This cannot be undone.', ja: 'この時間割の${s.courses.length}件の授業をすべて削除しますか？この操作は取り消せません。'),
-            style: const TextStyle(color: kHint, fontSize: 14, height: 1.5)),
+            style: TextStyle(color: kHint, fontSize: 14, height: 1.5)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: const TextStyle(color: kHint))),
+              child: Text(_t(context, '取消', 'Cancel', ja: 'キャンセル'), style: TextStyle(color: kHint))),
           TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -633,7 +657,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
           _editing
               ? (_selected.isEmpty ? _t(context, '选择课程', 'Select Courses', ja: '授業を選択') : _t(context, '已选 ${_selected.length} 门', '${_selected.length} selected', ja: '${_selected.length}件選択中'))
               : _t(context, '已添课程', 'Added Courses', ja: '追加済み授業'),
-          style: const TextStyle(color: const Color(0xFF1C1C1E), fontSize: 17, fontWeight: FontWeight.w600),
+          style: TextStyle(color: ac(context).primaryText, fontSize: 17, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [
@@ -658,7 +682,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                 child: Row(children: [
                   Text(
                     _t(context, '共 ${courses.length} 门课程', '${courses.length} courses', ja: '${courses.length}件の授業'),
-                    style: const TextStyle(color: kHint, fontSize: 13),
+                    style: TextStyle(color: kHint, fontSize: 13),
                   ),
                   if (_editing && courses.isNotEmpty) ...[
                     const Spacer(),
@@ -678,7 +702,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                       ),
                     ),
                   ] else if (!_editing)
-                    Text(_t(context, '  左滑可删除', '  Swipe left to delete', ja: '  左スワイプで削除'), style: const TextStyle(color: kHint, fontSize: 13)),
+                    Text(_t(context, '  左滑可删除', '  Swipe left to delete', ja: '  左スワイプで削除'), style: TextStyle(color: kHint, fontSize: 13)),
                 ]),
               ),
 
@@ -687,9 +711,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 60),
                     child: Column(children: [
-                      const Icon(Icons.library_books_outlined, color: kHint, size: 48),
+                      Icon(Icons.library_books_outlined, color: kHint, size: 48),
                       const SizedBox(height: 12),
-                      Text(_t(context, '还没有课程', 'No courses yet', ja: '授業がありません'), style: const TextStyle(color: kHint, fontSize: 15)),
+                      Text(_t(context, '还没有课程', 'No courses yet', ja: '授業がありません'), style: TextStyle(color: kHint, fontSize: 15)),
                     ]),
                   ),
                 )
@@ -760,11 +784,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                             // 时间信息
                             Text(
                               _t(context, '周${_weekdayShort(context, c.day)}  第${c.startSection}–${c.startSection + c.span - 1}节', '${_weekdayShort(context, c.day)}  ${c.startSection}-${c.startSection + c.span - 1}', ja: '${_weekdayShort(context, c.day)}  ${c.startSection}-${c.startSection + c.span - 1}限'),
-                              style: const TextStyle(color: kHint, fontSize: 13),
+                              style: TextStyle(color: kHint, fontSize: 13),
                             ),
                             if (!_editing) ...[
                               const SizedBox(width: 4),
-                              const Icon(Icons.chevron_right, color: kHint, size: 16),
+                              Icon(Icons.chevron_right, color: kHint, size: 16),
                             ],
                           ]),
                         ),
@@ -796,13 +820,13 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                 builder: (_) => AlertDialog(
                                   backgroundColor: ac(context).card,
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                  title: const Text('删除课程'),
+                                  title: Text('删除课程'),
                                   content: Text('确定删除「${c.name}」？',
-                                      style: const TextStyle(color: kHint)),
+                                      style: TextStyle(color: kHint)),
                                   actions: [
                                     TextButton(
                                         onPressed: () => Navigator.pop(context, false),
-                                        child: const Text('取消', style: TextStyle(color: kHint))),
+                                        child: Text('取消', style: TextStyle(color: kHint))),
                                     TextButton(
                                         onPressed: () => Navigator.pop(context, true),
                                         child: const Text('删除',
@@ -828,7 +852,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
             Positioned(
               left: 0, right: 0, bottom: 0,
               child: Container(
-                color: const Color(0xFFF2F2F7),
+                color: ac(context).card,
                 padding: EdgeInsets.fromLTRB(
                     20, 12, 20, MediaQuery.of(context).padding.bottom + 12),
                 child: Row(
