@@ -87,7 +87,7 @@ class AppColors extends ThemeExtension<AppColors> {
 }
 
 // ─────────────────────────────────────────────
-// 时间表配置（名称 + 20节时间）
+// 时间表配置（名称 + 12节时间）
 // ─────────────────────────────────────────────
 
 class TimeTableConfig {
@@ -272,7 +272,7 @@ class AppState extends ChangeNotifier {
              ScheduleConfig(
                name: '新建课表',
                firstWeekDay: _defaultFirstWeekDay,
-               sectionsPerDay: 20,
+               sectionsPerDay: 12,
                totalWeeks: 20,
              ),
            ],
@@ -621,7 +621,7 @@ class AppState extends ChangeNotifier {
         ScheduleConfig(
           name: '新建课表',
           firstWeekDay: DateTime(DateTime.now().year, 9, 1),
-          sectionsPerDay: 20,
+          sectionsPerDay:12,
           totalWeeks: 20,
         ),
       ],
@@ -680,7 +680,7 @@ class CourseSlot {
     required this.endWeek,
   });
 
-  int get span => (endSection - startSection + 1).clamp(1, 20);
+  int get span => (endSection - startSection + 1).clamp(1,12);
   List<int> get weeks =>
       List.generate(endWeek - startWeek + 1, (i) => startWeek + i);
 
@@ -829,17 +829,9 @@ const List<TimeSlot> kTimeSlots = [
   TimeSlot(10, '19:20', '20:05'),
   TimeSlot(11, '20:15', '21:00'),
   TimeSlot(12, '21:05', '21:50'),
-  TimeSlot(13, '07:00', '07:45'),
-  TimeSlot(14, '07:50', '08:35'),
-  TimeSlot(15, '12:00', '12:45'),
-  TimeSlot(16, '12:50', '13:35'),
-  TimeSlot(17, '13:40', '14:25'),
-  TimeSlot(18, '17:35', '18:20'),
-  TimeSlot(19, '21:55', '22:40'),
-  TimeSlot(20, '22:45', '23:30'),
 ];
 
-// 默认20节时间表（供重置使用）
+// 默认12节时间表（供重置使用）
 final List<List<String>> kDefaultTimes = kTimeSlots
     .map((s) => [s.start, s.end])
     .toList();
@@ -857,7 +849,7 @@ const List<Color> kCourseColors = [
 
 const List<String> kWeekDays = ['一', '二', '三', '四', '五', '六', '日'];
 
-final List<int> kAllWeeks = List.generate(20, (i) => i + 1);
+final List<int> kAllWeeks = List.generate(12, (i) => i + 1);
 final List<int> kEvenWeeks = [2, 4, 6, 8, 10, 12, 14, 16];
 
 final List<Course> kInitialCourses = [
