@@ -368,7 +368,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                         onSelectedItemChanged: (i) =>
                             setS(() => tmpStart = i + 1),
                         childDelegate: ListWheelChildBuilderDelegate(
-                          childCount: 20,
+                          childCount: 12,
                           builder: (_, i) => Center(
                             child: Text(_weekNthLabel(context, i + 1),
                               style: TextStyle(
@@ -397,7 +397,7 @@ class _AddCoursePageState extends State<AddCoursePage> {
                             initialItem: tmpEnd - 1),
                         onSelectedItemChanged: (i) => setS(() => tmpEnd = i + 1),
                         childDelegate: ListWheelChildBuilderDelegate(
-                          childCount: 20,
+                          childCount: 12,
                           builder: (_, i) => Center(
                             child: Text(_weekNthLabel(context, i + 1),
                               style: TextStyle(
@@ -1377,7 +1377,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 1. 上课时间（仿 WakeUp 风格，固定20节，检查冲突）
+// 1. 上课时间（仿 WakeUp 风格，固定12节，检查冲突）
 // ═══════════════════════════════════════════════════════════════
 class ClassTimePage extends StatefulWidget {
   final int timeTableIndex;
@@ -1401,7 +1401,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
     final tt =
         AppStateScope.of(context).allTimeTables[widget.timeTableIndex];
     _nameCtrl = TextEditingController(text: tt.name);
-    _times = List.generate(20, (i) {
+    _times = List.generate(12, (i) {
       if (i < tt.times.length) return List<String>.from(tt.times[i]);
       return List<String>.from(kDefaultTimes[i]);
     });
@@ -1666,7 +1666,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           const SizedBox(height: 8),
           _settingCard(
               context,
-              List.generate(20, (i) {
+              List.generate(12, (i) {
                 return _SettingRow(
                    label: l.classTimeSectionLabel(i + 1),
                   showDivider: i < 19,
