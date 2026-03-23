@@ -82,6 +82,24 @@ android {
                 signingConfigs.getByName("debug")
             }
         }
+
+        // Release build with downgrade support for development/testing
+        create("releaseDebug") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = true
+            
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
+        }
     }
 }
 
