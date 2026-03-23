@@ -4,9 +4,9 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
   schedule:
     - cron: "0 16 * * *" # Every day at 16:00 UTC
@@ -169,13 +169,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: nightly-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Build App Bundle
-        run: flutter build appbundle --debug --build-name "${{ steps.build_meta.outputs.BUILD_NAME }}" --build-number "${{ steps.build_meta.outputs.BUILD_NUMBER }}" --obfuscate --split-debug-info=build/app/outputs/symbols --tree-shake-icons
-
-      - name: Upload AAB artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nightly-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: build/app/outputs/flutter-apk/app-debug.apk
