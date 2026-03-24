@@ -246,22 +246,108 @@ jobs:
           echo "Successfully built and uploaded release assets"
           echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.create-release.outputs.version }}"
 
+  build-ios-ipa:
+    needs:
+      - bump-build-number
+      - create-release
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Compute build metadata
+        id: build_meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          echo "BUILD_NAME=${{ needs.create-release.outputs.version_number }}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "BUILD_NUMBER=${{ needs.bump-build-number.outputs.build_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Import signing certificate
+        uses: apple-actions/import-codesign-certs@v3
+        with:
+          p12-file-base64: ${{ secrets.IOS_DISTRIBUTION_CERT_BASE64 }}
+          p12-password: ${{ secrets.IOS_DISTRIBUTION_CERT_PASSWORD }}
+
+      - name: Install provisioning profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          PROFILE_PATH="$RUNNER_TEMP/appstore.mobileprovision"
+          printf '%s' "${{ secrets.IOS_APPSTORE_PROFILE_BASE64 }}" | base64 --decode > "$PROFILE_PATH"
+          UUID=$(/usr/libexec/PlistBuddy -c 'Print UUID' /dev/stdin <<< "$(security cms -D -i "$PROFILE_PATH")")
+          cp "$PROFILE_PATH" "$PROFILE_DIR/$UUID.mobileprovision"
+
+      - name: Generate export options
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > ios/ExportOptions.plist <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>${{ secrets.IOS_TEAM_ID }}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.stayup.schedule</key>
+              <string>${{ secrets.IOS_APPSTORE_PROFILE_NAME }}</string>
+            </dict>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Build signed IPA
+        run: flutter build ipa --release --build-name "${{ steps.build_meta.outputs.BUILD_NAME }}" --build-number "${{ steps.build_meta.outputs.BUILD_NUMBER }}" --export-options-plist=ios/ExportOptions.plist
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-ipa
+          path: build/ios/ipa/*.ipa
+
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v3
+        with:
+          app-path: build/ios/ipa/*.ipa
+          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+          api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+          api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
   notify-completion:
     needs:
       - create-release
       - build-and-upload
+      - build-ios-ipa
     runs-on: ubuntu-latest
     if: always()
 
     steps:
       - name: Notify success
-        if: needs.build-and-upload.result == 'success'
+        if: needs.build-and-upload.result == 'success' && needs.build-ios-ipa.result == 'success'
         run: |
           echo "Release ${{ needs.create-release.outputs.version }} completed successfully"
           echo "All build artifacts have been uploaded"
 
       - name: Notify failure
-        if: needs.build-and-upload.result == 'failure'
+        if: needs.build-and-upload.result == 'failure' || needs.build-ios-ipa.result == 'failure'
         run: |
           echo "Failed to complete release ${{ needs.create-release.outputs.version }}"
           echo "Please check the workflow logs for details"
