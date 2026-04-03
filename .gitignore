@@ -31,6 +31,7 @@ local_build_script.sh
 .DS_Store
 
 # Others
+.certificates
 *.log
 *.lock
 
