@@ -66,22 +66,24 @@ class _WakeUpAppState extends State<WakeUpApp> {
         home: Scaffold(
           backgroundColor: const Color(0xFF1C1C1E),
           body: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(
-                  color: Color(0xFF4ECDC4),
-                  strokeWidth: 2,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  context.l10n.loadingSchedule,
-                  style: const TextStyle(
-                    color: Color(0xFF6C6C70),
-                    fontSize: 14,
+            child: Builder(
+              builder: (innerContext) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(
+                    color: Color(0xFF4ECDC4),
+                    strokeWidth: 2,
                   ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  Text(
+                    innerContext.l10n.loadingSchedule,
+                    style: const TextStyle(
+                      color: Color(0xFF6C6C70),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

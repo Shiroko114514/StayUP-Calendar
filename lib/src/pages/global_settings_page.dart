@@ -14,6 +14,7 @@ class GlobalSettingsPage extends StatefulWidget {
 }
 
 class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
+  // BottomSheet 中“自定义日期格式”这一项的哨兵值。
   static const String _customDateFormatOption = '__custom_date_format_option__';
 
   final bool _notification = false;
@@ -21,6 +22,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   bool _isExitingForLocaleChange = false;
 
   void _showRestartAndExitNotice(BuildContext context) {
+    // 语言切换后当前页面可能仍保留旧文案，统一提示并退出以重启生效。
     if (_isExitingForLocaleChange) return;
     _isExitingForLocaleChange = true;
 
@@ -110,6 +112,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   }
 
   String _datePatternLabel(BuildContext context, String pattern) {
+    // 在候选项中同时显示格式串和示例，便于用户直观看到效果。
     final sample = _datePatternSample(pattern);
     if (sample == null) return pattern;
     return '$pattern  ($sample)';
@@ -229,6 +232,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
   }
 
   void _showDateFormatPicker(BuildContext context, AppState appState) {
+    // 预设格式 + 自定义入口共用一个选择面板。
     showModalBottomSheet(
       context: context,
       backgroundColor: ac(context).card,
@@ -359,6 +363,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                     final changed = mode != appState.localeMode;
                     appState.updateLocaleMode(mode);
                     Navigator.pop(context);
+                    // 切换语言后提示重启，避免局部缓存文案造成体验不一致。
                     if (changed) {
                       _showRestartAndExitNotice(context);
                     }
@@ -485,7 +490,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
     return SubPageScaffold(
       title: context.l10n.globalSettingsTitle,
       children: [
-        // ── 第一组：外观 & 通知 ──
+        // ── 第一组：主题、语言、日期显示格式 ──
         settingCard(context, [
           _WideSettingRow(
             label: context.l10n.darkMode,
@@ -557,30 +562,6 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               child: Switch(
                 value: _widgetSync,
                 onChanged: (v) => _showWip(context),
-                activeThumbColor: const Color(0xFF4ECDC4),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-            ),
-          ),
-        ]),
-
-        const SizedBox(height: 28),
-
-        // ── 第二组：背景格式 ──
-        settingCard(context, [
-          _WideSettingRow(
-            label: context.l10n.setBackgroundFormat,
-            onTap: () => _showWip(context),
-            trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
-          ),
-          _WideSettingRow(
-            label: context.l10n.materialDynamicColor,
-            showDivider: false,
-            trailing: Transform.scale(
-              scale: 0.92,
-              child: Switch(
-                value: appState.useMaterialDynamicColor,
-                onChanged: appState.updateUseMaterialDynamicColor,
                 activeThumbColor: const Color(0xFF4ECDC4),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
