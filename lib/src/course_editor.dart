@@ -1078,7 +1078,6 @@ class _AddCoursePageState extends State<AddCoursePage> {
 // 子页面共用样式常量
 // ═══════════════════════════════════════════════════════════════
 const Color _kAccent  = Color(0xFFFF3B5C);
-const Color _kHint    = Color(0xFF8E8E93);
 // 通用卡片行
 class _SettingRow extends StatelessWidget {
   final String label;
@@ -1186,26 +1185,26 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
               onTap: () => _pickActive(context, s),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(tables[activeIdx].name,
-                    style: const TextStyle(color: _kHint, fontSize: 15)),
+                    style: TextStyle(color: ac(context).hint, fontSize: 15)),
                 const SizedBox(width: 4),
-                const Icon(Icons.unfold_more, color: _kHint, size: 16),
+                Icon(Icons.unfold_more, color: ac(context).hint, size: 16),
               ]),
             ),
           ]),
              Padding(
             padding: EdgeInsets.only(left: 6, bottom: 16, top: 4),
              child: Text(l.classTimeSelectHint,
-               style: TextStyle(color: _kHint, fontSize: 12)),
+               style: TextStyle(color: ac(context).hint, fontSize: 12)),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 6, bottom: 6),
             child: Row(children: [
                Text(l.classTimeTableListHeader,
-                   style: const TextStyle(color: _kHint, fontSize: 12)),
+                   style: TextStyle(color: ac(context).hint, fontSize: 12)),
               const Spacer(),
               if (tables.length > 1)
                  Text(l.classTimeSwipeHint,
-                     style: const TextStyle(color: _kHint, fontSize: 12)),
+                     style: TextStyle(color: ac(context).hint, fontSize: 12)),
             ]),
           ),
           _settingCard(
@@ -1240,14 +1239,14 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                                 style: TextStyle(color: ac(ctx).primaryText, fontSize: 16)),
                             content: Text(
                              l.classTimeDeleteMessage(tables[i].name),
-                                style: const TextStyle(
-                                    color: _kHint, fontSize: 14)),
+                                style: TextStyle(
+                                    color: ac(ctx).hint, fontSize: 14)),
                             actions: [
                               TextButton(
                                   onPressed: () =>
                                       Navigator.pop(ctx, false),
                              child: Text(l.cancelAction,
-                               style: const TextStyle(color: _kHint))),
+                               style: TextStyle(color: ac(ctx).hint))),
                               TextButton(
                                   onPressed: () =>
                                       Navigator.pop(ctx, true),
@@ -1263,8 +1262,8 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
                   child: _SettingRow(
                     label: tables[i].name,
                     showDivider: i < tables.length - 1,
-                    trailing: const Icon(Icons.chevron_right,
-                        color: _kHint, size: 18),
+                    trailing: Icon(Icons.chevron_right,
+                        color: ac(context).hint, size: 18),
                     onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -1346,7 +1345,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           style: TextStyle(color: ac(ctx).primaryText),
            decoration: InputDecoration(
              hintText: l.classTimeNewHint,
-             hintStyle: const TextStyle(color: _kHint),
+             hintStyle: TextStyle(color: ac(ctx).hint),
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: Color(0xFF4ECDC4))),
             focusedBorder: UnderlineInputBorder(
@@ -1358,7 +1357,7 @@ class _ClassTimeListPageState extends State<ClassTimeListPage> {
           TextButton(
               onPressed: () => Navigator.pop(ctx),
                child: Text(l.cancelAction,
-                   style: const TextStyle(color: _kHint))),
+                   style: TextStyle(color: ac(ctx).hint))),
           TextButton(
             onPressed: () {
               final name = ctrl.text.trim().isEmpty
@@ -1613,14 +1612,14 @@ class _ClassTimePageState extends State<ClassTimePage> {
               onTap: () => _editName(),
               trailing: Text(
                 _nameCtrl.text,
-                style: const TextStyle(color: _kHint, fontSize: 15),
+                style: TextStyle(color: ac(context).hint, fontSize: 15),
               ),
             ),
           ]),
              Padding(
             padding: EdgeInsets.only(left: 6, bottom: 12),
              child: Text(l.classTimeEditNameHint,
-               style: TextStyle(color: _kHint, fontSize: 12)),
+               style: TextStyle(color: ac(context).hint, fontSize: 12)),
           ),
           _settingCard(context, [
             _SettingRow(
@@ -1639,7 +1638,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                 onTap: _pickDuration,
                 trailing: Text(
                   '$_duration',
-                  style: const TextStyle(color: _kHint, fontSize: 15),
+                  style: TextStyle(color: ac(context).hint, fontSize: 15),
                 ),
               ),
               GestureDetector(
@@ -1649,7 +1648,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
                   child: Text(
                      l.classTimeDurationWarning,
-                    style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
+                    style: TextStyle(color: ac(context).hint, fontSize: 12, height: 1.5),
                   ),
                 ),
               ),
@@ -1660,7 +1659,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
               padding: const EdgeInsets.only(left: 6, bottom: 8),
               child: Text(
                  l.classTimeSectionListHint,
-                style: const TextStyle(color: _kHint, fontSize: 12, height: 1.5),
+                style: TextStyle(color: ac(context).hint, fontSize: 12, height: 1.5),
               ),
             ),
           const SizedBox(height: 8),
@@ -1674,7 +1673,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
                   trailing: Text(
                     '${_times[i][0]} - ${_times[i][1]}',
                     style:
-                        const TextStyle(color: _kHint, fontSize: 15),
+                        TextStyle(color: ac(context).hint, fontSize: 15),
                   ),
                 );
               })),
@@ -1727,7 +1726,7 @@ class _ClassTimePageState extends State<ClassTimePage> {
           TextButton(
               onPressed: () => Navigator.pop(bCtx),
                child: Text(l.cancelAction,
-                 style: const TextStyle(color: _kHint))),
+                 style: TextStyle(color: ac(bCtx).hint))),
           TextButton(
               onPressed: () {
                 final newName = ctrl.text.trim().isEmpty

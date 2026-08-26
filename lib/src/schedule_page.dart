@@ -321,14 +321,14 @@ class _SchedulePageState extends State<SchedulePage> {
                 context.l10n.scheduleSettingsDeleteNamedCourseMessage(
                   course.name,
                 ),
-                style: TextStyle(color: kHint),
+                style: TextStyle(color: ac(context).hint),
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context, false),
                   child: Text(
                     context.l10n.cancelAction,
-                    style: TextStyle(color: kHint),
+                    style: TextStyle(color: ac(context).hint),
                   ),
                 ),
                 TextButton(

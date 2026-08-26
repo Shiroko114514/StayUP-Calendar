@@ -12,8 +12,6 @@ const double _kAppBarTextActionStartPadding = 16;
 // ─────────────────────────────────────────────
 
 const Color kAccent = Color(0xFFFF3B5C);
-const kHint = Color(0xFF6C6C70);
-const kDivider = Color(0xFFE5E5EA);
 
 // ─────────────────────────────────────────────
 // 便捷访问函数

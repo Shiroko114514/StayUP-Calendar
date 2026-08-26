@@ -72,7 +72,7 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
               padding: const EdgeInsets.only(left: 2, bottom: 10),
               child: Text(
                 context.l10n.manageScheduleHint,
-                style: const TextStyle(color: kHint, fontSize: 13),
+                style: TextStyle(color: ac(context).hint, fontSize: 13),
               ),
             ),
             itemCount: schedules.length,
@@ -146,14 +146,14 @@ class _ManageSchedulePageState extends State<ManageSchedulePage> {
         ),
         content: Text(
           context.l10n.deleteScheduleMessage(name),
-          style: const TextStyle(color: kHint, fontSize: 14, height: 1.5),
+          style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               context.l10n.cancelAction,
-              style: const TextStyle(color: kHint),
+              style: TextStyle(color: ac(context).hint),
             ),
           ),
           TextButton(

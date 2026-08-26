@@ -41,7 +41,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
         ),
         content: Text(
           ctx.l10n.languageChangedRestartMessage,
-          style: const TextStyle(color: kHint, fontSize: 14),
+          style: TextStyle(color: ac(ctx).hint, fontSize: 14),
         ),
       ),
     );
@@ -67,7 +67,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
         ),
         content: Text(
           ctx.l10n.featureInDevelopmentMessage,
-          style: TextStyle(color: kHint, fontSize: 14),
+          style: TextStyle(color: ac(ctx).hint, fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -163,9 +163,9 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                       vertical: 14,
                       horizontal: 4,
                     ),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: kDivider, width: 0.5),
+                        bottom: BorderSide(color: ac(context).divider, width: 0.5),
                       ),
                     ),
                     child: Row(
@@ -264,7 +264,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
             children: [
               Text(
                 l10n.dateFormatCustomDialogHelper,
-                style: const TextStyle(color: kHint, fontSize: 13, height: 1.5),
+                style: TextStyle(color: ac(ctx).hint, fontSize: 13, height: 1.5),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -273,7 +273,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                 style: TextStyle(color: ac(ctx).primaryText),
                 decoration: InputDecoration(
                   hintText: l10n.dateFormatCustomDialogHint,
-                  hintStyle: const TextStyle(color: kHint),
+                  hintStyle: TextStyle(color: ac(ctx).hint),
                   errorText: errorText,
                   enabledBorder: const UnderlineInputBorder(
                     borderSide: BorderSide(color: kAccent),
@@ -295,7 +295,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               onPressed: () => Navigator.pop(ctx),
               child: Text(
                 l10n.cancelAction,
-                style: const TextStyle(color: kHint),
+                style: TextStyle(color: ac(ctx).hint),
               ),
             ),
             TextButton(
@@ -382,9 +382,9 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                       vertical: 14,
                       horizontal: 4,
                     ),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: kDivider, width: 0.5),
+                        bottom: BorderSide(color: ac(context).divider, width: 0.5),
                       ),
                     ),
                     child: Row(
@@ -464,9 +464,9 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                       vertical: 14,
                       horizontal: 4,
                     ),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: kDivider, width: 0.5),
+                        bottom: BorderSide(color: ac(context).divider, width: 0.5),
                       ),
                     ),
                     child: Row(
@@ -535,9 +535,9 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
                       vertical: 14,
                       horizontal: 4,
                     ),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(color: kDivider, width: 0.5),
+                        bottom: BorderSide(color: ac(context).divider, width: 0.5),
                       ),
                     ),
                     child: Row(
@@ -585,10 +585,10 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               children: [
                 Text(
                   _themeModeLabel(context, appState.themeMode),
-                  style: const TextStyle(color: kHint, fontSize: 13),
+                  style: TextStyle(color: ac(context).hint, fontSize: 13),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: kHint, size: 18),
+                Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
               ],
             ),
             onTap: () => _showThemeModePicker(context, appState),
@@ -600,10 +600,10 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               children: [
                 Text(
                   _localeModeLabel(context, appState.localeMode),
-                  style: const TextStyle(color: kHint, fontSize: 13),
+                  style: TextStyle(color: ac(context).hint, fontSize: 13),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: kHint, size: 18),
+                Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
               ],
             ),
             onTap: () => _showLanguagePicker(context, appState),
@@ -615,10 +615,10 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               children: [
                 Text(
                   _datePatternLabel(context, appState.dateFormatPattern),
-                  style: const TextStyle(color: kHint, fontSize: 13),
+                  style: TextStyle(color: ac(context).hint, fontSize: 13),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: kHint, size: 18),
+                Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
               ],
             ),
             onTap: () => _showDateFormatPicker(context, appState),
@@ -635,10 +635,10 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
               children: [
                 Text(
                   _courseReminderLabel(appState.courseReminderMinutes),
-                  style: const TextStyle(color: kHint, fontSize: 13),
+                  style: TextStyle(color: ac(context).hint, fontSize: 13),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.chevron_right, color: kHint, size: 18),
+                Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
               ],
             ),
             onTap: () => _showCourseReminderPicker(context, appState),
@@ -665,7 +665,7 @@ class _GlobalSettingsPageState extends State<GlobalSettingsPage> {
           _WideSettingRow(
             label: context.l10n.helpUsage,
             showDivider: false,
-            trailing: const Icon(Icons.open_in_new, color: kHint, size: 16),
+            trailing: Icon(Icons.open_in_new, color: ac(context).hint, size: 16),
             onTap: () async {
               final uri = Uri.parse(
                 'https://blog.lucas04.top/docs/stayup-schedule/usage-guide/',

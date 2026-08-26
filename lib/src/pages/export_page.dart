@@ -157,13 +157,13 @@ class _ExportPageState extends State<ExportPage> {
           SettingRow(
             label: context.l10n.exportCurrentScheduleJsonAction,
             onTap: _exportCurrentSchedule,
-            trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
+            trailing: Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
           ),
           SettingRow(
             label: context.l10n.importScheduleFromJsonAction,
             showDivider: false,
             onTap: _importFromJson,
-            trailing: const Icon(Icons.chevron_right, color: kHint, size: 18),
+            trailing: Icon(Icons.chevron_right, color: ac(context).hint, size: 18),
           ),
         ]),
         Container(

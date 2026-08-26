@@ -62,7 +62,7 @@ class _AboutPageState extends State<AboutPage> {
               const SizedBox(height: 4),
               Text(
                 context.l10n.appVersionLabel(version),
-                style: const TextStyle(color: kHint, fontSize: 13),
+                style: TextStyle(color: ac(context).hint, fontSize: 13),
               ),
             ],
           ),
@@ -70,7 +70,7 @@ class _AboutPageState extends State<AboutPage> {
         settingCard(context, [
           SettingRow(
             label: context.l10n.versionNumber,
-            trailing: Text(version, style: const TextStyle(color: kHint, fontSize: 14)),
+            trailing: Text(version, style: TextStyle(color: ac(context).hint, fontSize: 14)),
             showDivider: true,
           ),
           SettingRow(
@@ -81,22 +81,22 @@ class _AboutPageState extends State<AboutPage> {
                   final uri = Uri.parse('https://github.com/Shiroko114514');
                   if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
                 },
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Shiroko114514', style: TextStyle(color: kHint, fontSize: 14)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Shiroko114514', style: TextStyle(color: ac(context).hint, fontSize: 14)),
                   SizedBox(width: 3),
-                  Icon(Icons.open_in_new, color: kHint, size: 13),
+                  Icon(Icons.open_in_new, color: ac(context).hint, size: 13),
                 ]),
               ),
-              const Text('  /  ', style: TextStyle(color: kHint, fontSize: 14)),
+              Text('  /  ', style: TextStyle(color: ac(context).hint, fontSize: 14)),
               GestureDetector(
                 onTap: () async {
                   final uri = Uri.parse('https://github.com/Lucas04-nhr');
                   if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
                 },
-                child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Lucas', style: TextStyle(color: kHint, fontSize: 14)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Lucas', style: TextStyle(color: ac(context).hint, fontSize: 14)),
                   SizedBox(width: 3),
-                  Icon(Icons.open_in_new, color: kHint, size: 13),
+                  Icon(Icons.open_in_new, color: ac(context).hint, size: 13),
                 ]),
               ),
             ]),
@@ -104,7 +104,7 @@ class _AboutPageState extends State<AboutPage> {
           ),
           SettingRow(
             label: context.l10n.openSourceLicense,
-            trailing: Text('GPLv3 License', style: TextStyle(color: kHint, fontSize: 14)),
+            trailing: Text('GPLv3 License', style: TextStyle(color: ac(context).hint, fontSize: 14)),
             showDivider: true,
           ),
           SettingRow(
@@ -118,7 +118,7 @@ class _AboutPageState extends State<AboutPage> {
           child: Text(
             context.l10n.aboutFooter,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: kHint, fontSize: 12, height: 1.8),
+            style: TextStyle(color: ac(context).hint, fontSize: 12, height: 1.8),
           ),
         ),
           ],

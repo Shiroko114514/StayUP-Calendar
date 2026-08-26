@@ -300,7 +300,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
               label: context.l10n.weekStartDay,
               trailing: Text(
                 context.l10n.mondayLabel,
-                style: const TextStyle(color: kHint, fontSize: 14),
+                style: TextStyle(color: ac(context).hint, fontSize: 14),
               ),
             ),
             SettingRow(
@@ -311,10 +311,10 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
                 children: [
                   Text(
                     context.l10n.autoLabel,
-                    style: const TextStyle(color: kHint, fontSize: 14),
+                    style: TextStyle(color: ac(context).hint, fontSize: 14),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.unfold_more, color: kHint, size: 18),
+                  Icon(Icons.unfold_more, color: ac(context).hint, size: 18),
                 ],
               ),
             ),
@@ -332,7 +332,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
               ),
               trailing: Text(
                 '$_sectionsPerDay',
-                style: const TextStyle(color: kHint, fontSize: 15),
+                style: TextStyle(color: ac(context).hint, fontSize: 15),
               ),
             ),
             SettingRow(
@@ -347,7 +347,7 @@ class _NewSchedulePageState extends State<NewSchedulePage> {
               ),
               trailing: Text(
                 '$_totalWeeks',
-                style: const TextStyle(color: kHint, fontSize: 15),
+                style: TextStyle(color: ac(context).hint, fontSize: 15),
               ),
             ),
           ]),

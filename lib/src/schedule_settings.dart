@@ -201,7 +201,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
           settingCard(context, [
             SettingRow(
               label: context.l10n.scheduleSettingsScheduleNameLabel,
-              trailing: Text(cfg.name, style: TextStyle(color: kHint, fontSize: 15)),
+              trailing: Text(cfg.name, style: TextStyle(color: ac(context).hint, fontSize: 15)),
               onTap: () {
                 final ctrl = TextEditingController(text: cfg.name);
                 showDialog(
@@ -217,7 +217,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                       style: TextStyle(color: ac(context).primaryText),
                       decoration: InputDecoration(
                         hintText: context.l10n.scheduleSettingsRenameHint,
-                        hintStyle: TextStyle(color: kHint),
+                        hintStyle: TextStyle(color: ac(context).hint),
                         enabledBorder: UnderlineInputBorder(
                             borderSide: BorderSide(color: kAccent)),
                         focusedBorder: UnderlineInputBorder(
@@ -227,7 +227,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: Text(context.l10n.cancelAction, style: TextStyle(color: kHint))),
+                          child: Text(context.l10n.cancelAction, style: TextStyle(color: ac(context).hint))),
                       TextButton(
                           onPressed: () {
                             final rawName = ctrl.text.trim();
@@ -311,7 +311,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
             ),
             SettingRow(
               label: context.l10n.weekStartDay,
-              trailing: Text(context.l10n.mondayLabel, style: TextStyle(color: kHint, fontSize: 14)),
+              trailing: Text(context.l10n.mondayLabel, style: TextStyle(color: ac(context).hint, fontSize: 14)),
             ),
             SettingRow(
               label: context.l10n.currentWeek,
@@ -319,9 +319,9 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
               onTap: () => _pickNumber(context.l10n.currentWeek, displayWeek, 1, cfg.totalWeeks, (v) {}),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 Text(context.l10n.scheduleSettingsWeekDisplay(displayWeek),
-                    style: TextStyle(color: kHint, fontSize: 14)),
+                    style: TextStyle(color: ac(context).hint, fontSize: 14)),
                 const SizedBox(width: 6),
-                Icon(Icons.unfold_more, color: kHint, size: 18),
+                Icon(Icons.unfold_more, color: ac(context).hint, size: 18),
               ]),
             ),
           ]),
@@ -335,7 +335,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 onTap: () => _pickNumber(context.l10n.sectionsPerDay, cfg.sectionsPerDay, 1, 20,
                   (v) => s.updateActiveConfig(sectionsPerDay: v)),
               trailing: Text('${cfg.sectionsPerDay}',
-                  style: TextStyle(color: kHint, fontSize: 15)),
+                  style: TextStyle(color: ac(context).hint, fontSize: 15)),
             ),
             SettingRow(
                 label: context.l10n.totalWeeks,
@@ -343,7 +343,7 @@ class _ScheduleDataPageState extends State<ScheduleDataPage> {
                 onTap: () => _pickNumber(context.l10n.totalWeeks, cfg.totalWeeks, 1, 20,
                   (v) => s.updateActiveConfig(totalWeeks: v)),
               trailing: Text('${cfg.totalWeeks}',
-                  style: TextStyle(color: kHint, fontSize: 15)),
+                  style: TextStyle(color: ac(context).hint, fontSize: 15)),
             ),
           ]),
         ],
@@ -476,7 +476,7 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
             padding: EdgeInsets.only(left: 2, bottom: 14),
             child: Text(
               context.l10n.scheduleSettingsAdjustDescription,
-              style: TextStyle(color: kHint, fontSize: 13, height: 1.6),
+              style: TextStyle(color: ac(context).hint, fontSize: 13, height: 1.6),
             ),
           ),
 
@@ -486,9 +486,9 @@ class _AdjustCoursePageState extends State<AdjustCoursePage> {
               label: context.l10n.scheduleSettingsScheduleToAdjustLabel,
               showDivider: false,
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('1', style: TextStyle(color: kHint, fontSize: 15)),
+                Text('1', style: TextStyle(color: ac(context).hint, fontSize: 15)),
                 const SizedBox(width: 4),
-                Icon(Icons.unfold_more, color: kHint, size: 18),
+                Icon(Icons.unfold_more, color: ac(context).hint, size: 18),
               ]),
             ),
           ]),
@@ -611,11 +611,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(context.l10n.scheduleSettingsDeleteCoursesTitle),
         content: Text(context.l10n.scheduleSettingsDeleteSelectedMessage(_selected.length),
-          style: TextStyle(color: kHint, fontSize: 14)),
+          style: TextStyle(color: ac(context).hint, fontSize: 14)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-            child: Text(context.l10n.cancelAction, style: TextStyle(color: kHint))),
+            child: Text(context.l10n.cancelAction, style: TextStyle(color: ac(context).hint))),
           TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -640,11 +640,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         title: Text(context.l10n.scheduleSettingsClearScheduleTitle),
         content: Text(context.l10n.scheduleSettingsClearAllMessage(s.courses.length),
-            style: TextStyle(color: kHint, fontSize: 14, height: 1.5)),
+            style: TextStyle(color: ac(context).hint, fontSize: 14, height: 1.5)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(context.l10n.cancelAction, style: TextStyle(color: kHint))),
+              child: Text(context.l10n.cancelAction, style: TextStyle(color: ac(context).hint))),
           TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -717,7 +717,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                 child: Row(children: [
                   Text(
                     context.l10n.scheduleSettingsCoursesCount(courses.length),
-                    style: TextStyle(color: kHint, fontSize: 13),
+                    style: TextStyle(color: ac(context).hint, fontSize: 13),
                   ),
                   if (_editing && courses.isNotEmpty) ...[
                     const Spacer(),
@@ -737,7 +737,7 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                       ),
                     ),
                   ] else if (!_editing)
-                    Text('  ${context.l10n.classTimeSwipeHint}', style: TextStyle(color: kHint, fontSize: 13)),
+                    Text('  ${context.l10n.classTimeSwipeHint}', style: TextStyle(color: ac(context).hint, fontSize: 13)),
                 ]),
               ),
 
@@ -746,9 +746,9 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 60),
                     child: Column(children: [
-                      Icon(Icons.library_books_outlined, color: kHint, size: 48),
+                      Icon(Icons.library_books_outlined, color: ac(context).hint, size: 48),
                       const SizedBox(height: 12),
-                      Text(context.l10n.scheduleSettingsNoCourses, style: TextStyle(color: kHint, fontSize: 15)),
+                      Text(context.l10n.scheduleSettingsNoCourses, style: TextStyle(color: ac(context).hint, fontSize: 15)),
                     ]),
                   ),
                 )
@@ -823,11 +823,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                 c.startSection,
                                 c.startSection + c.span - 1,
                               ),
-                              style: TextStyle(color: kHint, fontSize: 13),
+                              style: TextStyle(color: ac(context).hint, fontSize: 13),
                             ),
                             if (!_editing) ...[
                               const SizedBox(width: 4),
-                              Icon(Icons.chevron_right, color: kHint, size: 16),
+                              Icon(Icons.chevron_right, color: ac(context).hint, size: 16),
                             ],
                           ]),
                         ),
@@ -861,11 +861,11 @@ class _AddedCoursesPageState extends State<AddedCoursesPage> {
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                                   title: Text(context.l10n.schedulePageDeleteCourse),
                                   content: Text(context.l10n.scheduleSettingsDeleteNamedCourseMessage(c.name),
-                                      style: TextStyle(color: kHint)),
+                                      style: TextStyle(color: ac(context).hint)),
                                   actions: [
                                     TextButton(
                                         onPressed: () => Navigator.pop(context, false),
-                                        child: Text(context.l10n.cancelAction, style: TextStyle(color: kHint))),
+                                        child: Text(context.l10n.cancelAction, style: TextStyle(color: ac(context).hint))),
                                     TextButton(
                                         onPressed: () => Navigator.pop(context, true),
                                         child: Text(context.l10n.deleteAction,
