@@ -4,15 +4,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-  schedule:
-    - cron: "0 16 * * *" # Every day at 16:00 UTC
-  pull_request:
-    branches:
-      - main
 
 concurrency:
   group: pubspec-build-bump-${{ github.event.repository.default_branch }}
@@ -25,7 +17,6 @@ permissions:
 
 jobs:
   ci:
-    if: github.event_name != 'push' || !(startsWith(github.event.head_commit.message, 'chore') && contains(github.event.head_commit.message, 'Bump build number to '))
     runs-on: ubuntu-latest
 
     steps:
@@ -34,7 +25,6 @@ jobs:
           fetch-depth: 0
 
       - name: Bump pubspec build number
-        if: github.event_name != 'pull_request'
         id: bump_build
         shell: bash
         run: |

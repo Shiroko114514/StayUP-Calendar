@@ -8,11 +8,8 @@ on:
     inputs:
       tag:
         description: Existing tag to release, for example v1.0.0
-        required: false
+        required: true
         type: string
-  push:
-    tags:
-      - "v*.*.*"
 
 concurrency:
   group: pubspec-build-bump-${{ github.event.repository.default_branch }}
@@ -235,7 +232,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.create-release.outputs.version }}
-          artifacts: build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab
+          artifacts: build/app/outputs/flutter-apk/app-release.apk
           allowUpdates: true
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
