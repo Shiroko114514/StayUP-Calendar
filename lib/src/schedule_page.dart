@@ -789,6 +789,7 @@ class _ScheduleGrid extends StatelessWidget {
                   day: day,
                   isToday: isToday,
                   sectionCount: customTimes.length,
+                  currentSectionIdx: currentSectionIdx,
                   getCoursesAt: getCoursesAt,
                   onCourseTap: onCourseTap,
                 ),
@@ -809,6 +810,7 @@ class _DayColumn extends StatelessWidget {
   final int day;
   final bool isToday;
   final int sectionCount;
+  final int currentSectionIdx;
   final List<Course> Function(int day, int section) getCoursesAt;
   final ValueChanged<Course> onCourseTap;
 
@@ -818,6 +820,7 @@ class _DayColumn extends StatelessWidget {
     required this.getCoursesAt,
     required this.onCourseTap,
     this.sectionCount = 10,
+    this.currentSectionIdx = -1,
   });
 
   @override
@@ -856,10 +859,22 @@ class _DayColumn extends StatelessWidget {
       ),
       child: Stack(
         children: [
+          // 当前节次高亮带（横跨整行，置于格子线之下）
+          if (currentSectionIdx >= 0)
+            Positioned(
+              top: currentSectionIdx * kSlotHeight,
+              left: 0,
+              right: 0,
+              height: kSlotHeight,
+              child: ColoredBox(
+                color: const Color(0xFF4ECDC4).withValues(alpha: 0.10),
+              ),
+            ),
           // 背景格子线
           Column(
             children: List.generate(sectionCount, (_) {
               return Container(
+                width: double.infinity,
                 height: kSlotHeight,
                 decoration: const BoxDecoration(
                   border: Border(bottom: BorderSide(color: Color(0x08000000))),
