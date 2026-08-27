@@ -7,8 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Version to release, for example 0.3.0 (or v0.3.0)
-        required: true
+        description: Version to release, for example 0.3.0 (or v0.3.0). Leave empty to auto-increment the patch version.
+        required: false
         type: string
       build_number:
         description: Build number (versionCode) to use. Leave empty to auto-increment.
@@ -44,23 +44,39 @@ jobs:
         run: |
           set -euo pipefail
 
-          VERSION_INPUT="${{ github.event.inputs.version }}"
-          VERSION_NAME="${VERSION_INPUT#v}"
-          if ! [[ "$VERSION_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
-            echo "Invalid version: $VERSION_INPUT" >&2
-            exit 1
-          fi
-
           VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
           if [ -z "$VERSION_LINE" ]; then
             echo "Failed to read version from pubspec.yaml" >&2
             exit 1
           fi
 
+          CURRENT_VERSION_NAME="${VERSION_LINE%%+*}"
           CURRENT_BUILD_NUMBER="${VERSION_LINE##*+}"
           if ! [[ "$CURRENT_BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
             echo "Invalid build number in pubspec.yaml version: $VERSION_LINE" >&2
             exit 1
+          fi
+
+          VERSION_INPUT="${{ github.event.inputs.version || '' }}"
+          if [ -n "$VERSION_INPUT" ]; then
+            VERSION_NAME="${VERSION_INPUT#v}"
+            if ! [[ "$VERSION_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+              echo "Invalid version: $VERSION_INPUT" >&2
+              exit 1
+            fi
+          else
+            # 留空时自动递增 patch 版本（仅支持纯 X.Y.Z 格式）
+            if ! [[ "$CURRENT_VERSION_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Cannot auto-increment version '$CURRENT_VERSION_NAME'. Please provide a version manually." >&2
+              exit 1
+            fi
+            MAJOR="${CURRENT_VERSION_NAME%%.*}"
+            REST="${CURRENT_VERSION_NAME#*.}"
+            MINOR="${REST%%.*}"
+            PATCH="${REST#*.}"
+            NEXT_PATCH=$((PATCH + 1))
+            VERSION_NAME="${MAJOR}.${MINOR}.${NEXT_PATCH}"
+            echo "Auto-incremented version: ${CURRENT_VERSION_NAME} -> ${VERSION_NAME}"
           fi
 
           MANUAL_BUILD_NUMBER="${{ github.event.inputs.build_number || '' }}"
