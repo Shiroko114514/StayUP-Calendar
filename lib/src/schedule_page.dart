@@ -731,6 +731,7 @@ class _ScheduleGrid extends StatelessWidget {
             SizedBox(
               width: 44,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: List.generate(customTimes.length, (i) {
                   final isCurrent = i == currentSectionIdx;
                   final start = customTimes[i][0];
