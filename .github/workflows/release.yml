@@ -6,8 +6,8 @@ env:
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: Existing tag to release, for example v1.0.0
+      version:
+        description: Version to release, for example 0.3.0 (or v0.3.0)
         required: true
         type: string
       build_number:
@@ -28,6 +28,7 @@ jobs:
   bump-build-number:
     runs-on: ubuntu-latest
     outputs:
+      version_name: ${{ steps.bump.outputs.VERSION_NAME }}
       build_number: ${{ steps.bump.outputs.BUILD_NUMBER }}
 
     steps:
@@ -37,21 +38,22 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.repository.default_branch }}
 
-      - name: Bump pubspec build number
+      - name: Set version and build number
         id: bump
         shell: bash
         run: |
           set -euo pipefail
 
-          VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
-          if [ -z "$VERSION_LINE" ]; then
-            echo "Failed to read version from pubspec.yaml" >&2
+          VERSION_INPUT="${{ github.event.inputs.version }}"
+          VERSION_NAME="${VERSION_INPUT#v}"
+          if ! [[ "$VERSION_NAME" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid version: $VERSION_INPUT" >&2
             exit 1
           fi
 
-          BASE_VERSION="${VERSION_LINE%%+*}"
-          if [ "$BASE_VERSION" = "$VERSION_LINE" ]; then
-            echo "pubspec.yaml version must include build number suffix (+N). Got: $VERSION_LINE" >&2
+          VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
+          if [ -z "$VERSION_LINE" ]; then
+            echo "Failed to read version from pubspec.yaml" >&2
             exit 1
           fi
 
@@ -72,69 +74,34 @@ jobs:
             NEXT_BUILD_NUMBER=$((CURRENT_BUILD_NUMBER + 1))
           fi
 
-          if [ "$NEXT_BUILD_NUMBER" != "$CURRENT_BUILD_NUMBER" ]; then
-            NEXT_VERSION="${BASE_VERSION}+${NEXT_BUILD_NUMBER}"
+          NEXT_VERSION="${VERSION_NAME}+${NEXT_BUILD_NUMBER}"
+          if [ "$NEXT_VERSION" != "$VERSION_LINE" ]; then
             sed -i "s/^version: .*/version: ${NEXT_VERSION}/" pubspec.yaml
 
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add pubspec.yaml
-            git commit -m "chore: Bump build number to ${NEXT_BUILD_NUMBER}"
+            git commit -m "chore: Release ${VERSION_NAME} (build ${NEXT_BUILD_NUMBER})"
             git push origin "HEAD:${{ github.event.repository.default_branch }}"
           else
-            echo "Build number unchanged: ${NEXT_BUILD_NUMBER}"
+            echo "Version unchanged: ${NEXT_VERSION}"
           fi
 
+          echo "VERSION_NAME=${VERSION_NAME}" >> "$GITHUB_OUTPUT"
           echo "BUILD_NUMBER=${NEXT_BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
 
   create-release:
     needs: bump-build-number
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.tag_version.outputs.VERSION }}
-      version_number: ${{ steps.tag_version.outputs.VERSION_NUMBER }}
+      version: v${{ needs.bump-build-number.outputs.version_name }}
+      version_number: ${{ needs.bump-build-number.outputs.version_name }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-
-      - name: Extract tag version
-        id: tag_version
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if [ -n "${{ github.event.inputs.tag || '' }}" ]; then
-            VERSION="${{ github.event.inputs.tag }}"
-          elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/}"
-          else
-            echo "Manual release requires the tag input when not running from a tag ref." >&2
-            exit 1
-          fi
-
-          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "VERSION_NUMBER=${VERSION#v}" >> "$GITHUB_OUTPUT"
-
-          VERSION_LINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"
-          if [ -z "$VERSION_LINE" ]; then
-            echo "Failed to read version from pubspec.yaml" >&2
-            exit 1
-          fi
-
-          PUBSPEC_VERSION="${VERSION_LINE%%+*}"
-          if [ "$PUBSPEC_VERSION" != "${VERSION#v}" ]; then
-            echo "Tag version (${VERSION#v}) does not match pubspec version ($PUBSPEC_VERSION)." >&2
-            exit 1
-          fi
-
-          PUBSPEC_BUILD_NUMBER="${VERSION_LINE##*+}"
-          if ! [[ "$PUBSPEC_BUILD_NUMBER" =~ ^[0-9]+$ ]]; then
-            echo "Invalid build number in pubspec.yaml version: $VERSION_LINE" >&2
-            exit 1
-          fi
 
       - name: Prepare release notes
         shell: bash
@@ -144,25 +111,25 @@ jobs:
           if [ -s CHANGELOG.md ]; then
             cp CHANGELOG.md release-notes.md
           else
-            echo "Release ${{ steps.tag_version.outputs.VERSION }}" > release-notes.md
+            echo "Release v${{ needs.bump-build-number.outputs.version_name }}" > release-notes.md
           fi
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          tag: ${{ steps.tag_version.outputs.VERSION }}
-          name: ${{ steps.tag_version.outputs.VERSION }}
+          tag: v${{ needs.bump-build-number.outputs.version_name }}
+          name: v${{ needs.bump-build-number.outputs.version_name }}
           bodyFile: release-notes.md
           draft: false
-          prerelease: ${{ contains(steps.tag_version.outputs.VERSION, 'beta') || contains(steps.tag_version.outputs.VERSION, 'alpha') || contains(steps.tag_version.outputs.VERSION, 'rc') }}
+          prerelease: ${{ contains(needs.bump-build-number.outputs.version_name, 'beta') || contains(needs.bump-build-number.outputs.version_name, 'alpha') || contains(needs.bump-build-number.outputs.version_name, 'rc') }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Notify release created
         run: |
-          echo "Successfully created release ${{ steps.tag_version.outputs.VERSION }}"
+          echo "Successfully created release v${{ needs.bump-build-number.outputs.version_name }}"
           echo "Release notes sourced from CHANGELOG.md when available"
-          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ steps.tag_version.outputs.VERSION }}"
+          echo "Release URL: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.bump-build-number.outputs.version_name }}"
 
   build-and-upload:
     needs:
